@@ -1,0 +1,454 @@
+#=====================================================
+#
+#   To learn more about how to configure Polybar
+#   go to https://github.com/jaagr/polybar
+#
+#   The README contains alot of information
+#
+#=====================================================
+# background = ${xrdb:polybarbackground}
+# foreground = ${xrdb:foreground}
+# color0 = ${xrdb:color0}
+# color1 = ${xrdb:color1}
+# color2 = ${xrdb:color2}
+# color3 = ${xrdb:color3}
+# color4 = ${xrdb:color4}
+# color5 = ${xrdb:color5}
+# color6 = ${xrdb:color6}
+# color7 = ${xrdb:color7}
+# gbackground = ${xrdb:gbackground}
+
+
+[colors]
+background = ${xrdb:polybarbackground}
+foreground = #323568
+#${xrdb:foreground}
+color0 = ${xrdb:color0}
+color1 = #c78b34
+#BA7A15
+color2 = ${xrdb:color2}
+color3 = ${xrdb:color3}
+color4 = #293364
+#a3c4cd
+#BD93F9
+color5 = ${xrdb:color5}
+color6 = ${xrdb:color6}
+color7 = ${xrdb:color7}
+color8 = #a9bbf9
+#44475A
+#795510
+color9 = #a3c4cd
+#6272A4
+color10 = #ea2121
+color11 = #ea2121
+gbackground = #a9bbf9
+#E3DDCD
+#44475A
+
+
+[bar/top]
+monitor = ${env:MONITOR:}
+width = 100%
+height = 30
+radius = 4.0
+enable-ipc=true
+pin-workspaces = true
+dpi-x = 90
+dpi-y = 90
+
+background = ${colors.gbackground}
+foreground = ${colors.foreground}
+
+
+font-0 = SF Pro Display:style=Medium:pixelsize=10;1
+font-1 = FontAwesome:size=11;2
+font-2 = Font Awesome 5 Free:size=11;2
+font-3 = Font Awesome 5 Brands:size=11;2
+font-4 = Font Awesome 5 Free Solid:size=11;2
+
+border-size=0
+border-top-size = 0#10
+border-left-size = 0#20
+border-right-size = 0#20
+
+
+padding-left = 0
+padding-right = 0#2
+
+module-margin-right = 4
+
+
+tray-scale = 1.0
+tray-background = ${colors.gbackground}
+tray-position = right
+tray-padding = 2
+tray-maxsize = 16
+# tray-transparent = false
+tray-offset-x = 0
+tray-offset-y = 0
+
+;-------------------------------------------------------------------------------
+;	M O D U L E S    L O C A T I O N
+;-------------------------------------------------------------------------------
+
+modules-left = i3
+modules-center = date pomodoro
+modules-right = spotify xkeyboard memory backlight volume wifi battery
+
+
+;-------------------------------------------------------------------------------
+;	M O D U L E S
+;-------------------------------------------------------------------------------
+
+
+# Module for window title
+[module/xwindow]
+type = internal/xwindow
+label = %title%
+label-maxlen = 70
+
+
+# Workspaces module
+[module/i3]
+type = internal/i3
+strip-wsnumbers = true
+wrapping-scroll = false
+enable-click = true
+
+label-focused = %name%
+label-focused-foreground = ${colors.gbackground}
+label-focused-background = ${colors.color4}
+label-focused-padding = 4
+
+label-unfocused = %name%
+label-unfocused-padding = 4
+label-unfocused-background = ${colors.color8}
+
+label-visible = %name%
+label-visible-padding = 4
+label-visible-background = ${colors.color9}
+
+label-urgent = %name%
+label-urgent-background = ${colors.color1}
+label-urgent-foreground = ${colors.foreground}
+label-urgent-padding = 4
+
+# Module for keyboard
+[module/xkeyboard]
+type = internal/xkeyboard
+blacklist-0 = num lock
+
+format-prefix = " "
+format-prefix-foreground = ${colors.color2}
+format-prefix-underline = ${colors.foreground}
+
+label-layout = %layout%
+label-layout-underline = ${colors.foreground}
+label-layout-padding = 2
+
+label-indicator-padding = 2
+label-indicator-margin = 1
+label-indicator-background = ${colors.background}
+
+[module/previous]
+type = custom/script
+interval = 86400
+format = "%{T3}<label>"
+format-padding = 5
+; Previous song icon
+exec = echo ""
+format-underline = #1db954
+line-size = 1
+click-left = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
+
+[module/next]
+type = custom/script
+interval = 86400
+format = "%{T3}<label>"
+format-padding = 5
+; Next song icon
+exec = echo ""
+format-underline = #1db954
+line-size = 1
+click-left = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"
+
+#[module/playpause]
+#type = custom/ipc
+#; Default
+#hook-0 = echo ""
+#; Playing
+#hook-1 = echo ""
+#; Paused
+#hook-2 = echo ""
+#initial = 1
+#format-underline = #1db954
+#line-size = 1
+#click-left = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
+
+# [module/spotify]
+# type = custom/ipc
+# hook-0 = echo ""
+# hook-1 = python3 ~/.config/polybar/scripts/spotify/spotify_status.py
+# initial = 1
+# format-padding = 4
+# format-underline = #1db954
+# line-size = 1
+
+[module/spotify]
+type = custom/script
+interval = 2
+format-prefix = " "
+format = <label>
+exec = python3 /home/diviyan/.config/polybar/scripts/spotify.py -q -f '  {artist} - {song}'
+format-underline = #1db954
+;control players (optional)
+click-left = playerctl --player=spotify play-pause
+click-right = playerctl --player=spotify next
+click-middle = playerctl --player=spotify previous
+
+
+[module/zen]
+type = custom/script
+interval = 2
+format-prefix = ""
+format = <label>
+exec = python3 /home/diviyan/.config/polybar/scripts/spotify.py -q -f '  {artist} - {song}'
+format-underline = #1db954
+;control players (optional)
+format-prefix-foreground = ${colors.color11}
+click-left = dunstctl set-paused toggle
+
+
+
+[module/pomodoro]
+type = custom/script
+format-prefix = "  "
+format = <label>
+exec = /home/diviyan/.config/polybar/scripts/pomodoro-counter /home/diviyan/.config/polybar/scripts/pomodoro_offset.txt
+format-underline = #1db954
+;control players (optional)
+format-prefix-foreground = ${colors.color10}
+click-left = kill -USR1 %pid%
+tail=true 
+
+# Module for battery
+[module/battery]
+type = internal/battery
+full-at = 100
+battery = BAT0
+adapter = ADP1
+
+format-charging = <animation-charging> <label-charging>
+label-charging = %percentage% %
+format-charging-foreground = ${colors.color2}
+format-charging-prefix = " "
+
+format-discharging = <ramp-capacity> <label-discharging>
+label-discharging = %percentage% %
+
+format-full = <label-full>
+format-full-prefix = " "
+format-full-foreground = ${colors.color4}
+
+ramp-capacity-0 = 
+ramp-capacity-1 = 
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+
+ramp-capacity-0-foreground = ${colors.color1}
+ramp-capacity-1-foreground = ${colors.color3}
+ramp-capacity-2-foreground = ${colors.color2}
+ramp-capacity-3-foreground = ${colors.color2}
+ramp-capacity-4-foreground = ${colors.color2}
+
+animation-charging-0 = 
+animation-charging-1 = 
+animation-charging-2 = 
+animation-charging-3 = 
+animation-charging-4 = 
+animation-charging-framerate = 750
+
+
+[module/volume]
+type = internal/pulseaudio
+
+
+label-volume = %percentage% %
+label-muted = "Muted"
+
+format-volume = <label-volume>
+format-volume-prefix = "  "
+format-volume-prefix-foreground = ${colors.color4}
+
+format-muted-prefix = " "
+format-muted-prefix-foreground = ${colors.color4}
+
+ramp-headphones-0 = 
+ramp-headphones-1 = 
+
+
+# Module for date & time
+[module/date]
+type = internal/date
+interval = 1
+format-prefix = "  "
+format-prefix-foreground = ${colors.color3}
+date = %b %d, %H:%M:%S
+label = %date%
+
+
+# [module/powermenu]
+# type = custom/menu
+
+# expand-right = false
+
+# format-spacing = 1
+
+# label-open = ""
+# label-open-foreground = ${colors.color1}
+# label-close = ""
+# label-close-foreground = ${colors.color1}
+# label-separator = |
+# label-separator-foreground = ${colors.foreground}
+
+# menu-0-0 = "Reboot "
+# menu-0-0-exec = menu-open-1
+# menu-0-1 = "Poweroff "
+# menu-0-1-exec = menu-open-2
+
+# menu-1-0 = "Reboot "
+# menu-1-0-exec = systemctl reboot
+
+# menu-2-0 = "Poweroff "
+# menu-2-0-exec = systemctl poweroff
+
+
+# Module for brightness
+[module/backlight]
+type = internal/backlight
+card= intel_backlight
+enable_scroll=true
+format=<label>
+format-prefix = " "
+label = %percentage% %
+scroll-up = exec light -A 5
+scroll-down = exec light -U 5
+# type = custom/script
+# interval = 0.2
+# exec = ~/.config/polybar/scripts/light
+#
+# scroll-up = exec light -A 5
+# scroll-down = exec light -U 5
+#
+# format-prefix = " "
+format-prefix-foreground = ${colors.color3}
+#
+# label = %output% %
+# label-foreground = ${colors.foreground}
+# format-padding = 1
+
+
+# Module for wifi
+[module/wifi]
+type = internal/network
+interface = wlp0s20f3
+interval = 3.0
+format-connected = <ramp-signal> <label-connected>
+label-connected = " %essid%"
+format-disconnected = <label-disconnected>
+label-disconnected = " No Wifi"
+label-disconnected-foreground = ${colors.color1}
+ramp-signal-0-foreground = ${colors.color1}
+ramp-signal-0 = 
+ramp-signal-1 = 
+ramp-signal-2 = 
+ramp-signal-3 = 
+ramp-signal-4 = 
+ramp-signal-foreground = ${colors.color5}
+
+
+# Module for ethernet
+[module/ethernet]
+type = internal/network
+interface = enp0s31f6
+interval = 3.0
+format-connected-prefix = " "
+format-connected-prefix-foreground = ${colors.color1}
+label-connected = " %local_ip%"
+format-disconnected =
+
+
+[module/memory]
+type = internal/memory
+interval = 2
+label = %gb_used%
+format-prefix = "M "
+format-prefix-foreground = ${colors.color5}
+
+
+# Module for brightness
+# [module/gitlab]
+# type = custom/script
+# # Check for open merge requests every 15 mins
+# interval = 900
+# exec = ~/.config/polybar/scripts/gitlab.py
+#
+# click-left = exec firefox https://gitlab.com
+#
+# format-prefix = "  "
+# format-prefix-foreground = ${colors.color1}
+#
+# label = %output%
+# label-foreground = ${colors.foreground}
+# format-padding = 1
+
+[module/github]
+type = internal/github
+# Check for open merge requests every 15 mins
+interval = 900
+
+click-left = exec firefox https://github.com
+token = ${file:/home/diviyan/.config/github/token}
+format-prefix = " "
+#click-left = exec firefox https://github.com
+format-prefix-foreground = ${colors.color1}
+empty-notifications = True
+label-foreground = ${colors.foreground}
+format-padding = 1
+
+##### Text / Icon / Launchers ##################
+
+# [module/rofi]
+# type = custom/text
+
+# content = Rofi
+# content-background = ${colors.background}
+# content-foreground = ${colors.foreground}
+# ;content-padding = 4
+
+# click-left = rofi -show run
+# [module/info-projecthamster]
+# type = custom/script
+# exec = ~/.config/polybar/scripts/info-projecthamster.sh
+# interval = 5
+# format-prefix = " "
+# format-prefix-foreground = ${colors.color1}
+# label-foreground = ${colors.color1}
+
+# [module/player-mpris-simple]
+# type = custom/script
+# exec = ~/.config/polybar/scripts/player-mpris-simple.sh
+# interval = 3
+# click-left = playerctl previous
+# click-right = playerctl next
+# click-middle = playerctl play-pause
+# format-prefix-foreground = ${colors.color3}
+# label-foreground = ${colors.color3}
+
+[settings]
+compositing-background = over
+compositing-foreground = over
+compositing-overline = over
+compositing-underline = over
+compositing-border = over
