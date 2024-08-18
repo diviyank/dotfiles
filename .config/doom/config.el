@@ -55,7 +55,7 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-(setq projectile-project-search-path '(("~/fentech" . 1)("~/fentech/algorithm" . 3) ("~/fentech/tools" . 2)("~/fentech/research" . 2) ("~/fentech/report" . 2) ("~/fentech/pct" . 2)  ("~/fentech/tools" . 2) ("~/fentech/dsales/" . 2) ("~/fentech/study" . 1) ("~/research" . 2)))
+(setq projectile-project-search-path '(("~/fentech" . 1) ("~/fentech/clairvoyant" . 1) ("~/fentech/algorithm" . 3) ("~/fentech/tools" . 1) ("~/fentech/research" . 2) ("~/fentech/report" . 2) ("~/fentech/pct" . 2)  ("~/fentech/tools" . 2) ("~/fentech/dsales/" . 2) ("~/fentech/study" . 1) ("~/research" . 2)))
 (setq evil-scroll-count 1)
 (setq avy-keys '(?a ?r ?s ?t ?m ?n ?e ?i ?o))
 ;;        (use-package! lsp-bridge
@@ -89,6 +89,7 @@
 (map! :nv "g s l" #'evil-avy-goto-line)
 (map! :nv "g s o" #'evil-avy-goto-word-1)
 (map! :i "C-g" #'evil-execute-in-normal-state)
+(map! :v "<tab>" #'indent-rigidly)
 (setq-hook! 'python-mode-hook +format-with-lsp 'ruff-format-on-save-mode)
 (after! evil-escape
   (setq evil-escape-key-sequence ",."))
