@@ -202,7 +202,7 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+m exec --no-startup-id autorandr -c
 # pipx install kitti3
-exec_always kitti3 -p RC -s 0.6 1.0 --  --session home/diviyan/.config/kitty/tmux_session.conf
+exec_always /home/diviyan/.local/bin/kitti3 -p RC -s 0.6 1.0 --  --session /home/diviyan/.config/kitty/tmux_session.conf
 bindsym $mod+Tab nop kitti3
 # bindsym $mod+Tab exec --no-startup-id "i3-scratchpad -tmt -atc kitty --session ~/.config/kitty/zellij_session.conf"
 
