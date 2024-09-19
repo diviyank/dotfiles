@@ -37,7 +37,7 @@
 ;; `load-theme' function. This is the default:
 
 (setq doom-theme 'doom-laser)
-(setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 16 :weight 'medium)
+(setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 16) ;; :weight 'medium)
       ;;(setq doom-font (font-spec :family "JetBrains Mono" :size 14 :weight 'medium)
       doom-variable-pitch-font (font-spec :family "Nunito" :size 14)
       )
@@ -92,6 +92,7 @@
 (map! :nv "g s o" #'evil-avy-goto-word-1)
 (map! :i "C-g" #'evil-execute-in-normal-state)
 (map! :v "<tab>" #'indent-rigidly)
+(map! :v "z-i" #'hs-hide-level)
 (setq-hook! 'python-mode-hook +format-with-lsp 'ruff-format-on-save-mode)
 (after! evil-escape
   (setq evil-escape-key-sequence ",."))
@@ -117,8 +118,6 @@
 (add-hook 'python-mode-hook
           (lambda ()
             (vimish-fold-mode)
-            ;; (vimish-fold-delete-all)
-            (vimish-fold-refold-all)
             ));;
 
 (defun efs/org-mode-setup ()
