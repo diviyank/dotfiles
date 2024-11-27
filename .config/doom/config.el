@@ -37,7 +37,7 @@
 ;; `load-theme' function. This is the default:
 
 (setq doom-theme 'doom-laser)
-(setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 16) ;; :weight 'medium)
+(setq doom-font (font-spec :family "Iosevka" :size 16) ;; :weight 'medium)
       ;;(setq doom-font (font-spec :family "JetBrains Mono" :size 14 :weight 'medium)
       doom-variable-pitch-font (font-spec :family "Nunito" :size 14)
       )
@@ -80,7 +80,7 @@
 (map! :i "RET" #'evil-ret-and-indent)
 (map! "C-c C-t" #'+workspace/delete)
 (map! :nv "M-o" #'+evil/insert-newline-above)
-(map! :nv "M-O" #'+evil/insert-newline-below)
+                                        ;(map! :nv "M-O" #'+evil/insert-newline-below)
 (map! :nv "M-p" #'evil-paste-after)
 (map! :i "M-p" #'evil-paste-before-cursor-after)
 (map! :nvi "M-P" #'evil-paste-before)
@@ -92,7 +92,8 @@
 (map! :nv "g s o" #'evil-avy-goto-word-1)
 (map! :i "C-g" #'evil-execute-in-normal-state)
 (map! :v "<tab>" #'indent-rigidly)
-(map! :v "z-i" #'hs-hide-level)
+(map! :n "z i" #'hs-hide-level)
+(map! :n "SPC t t" #'treemacs)
 (setq-hook! 'python-mode-hook +format-with-lsp 'ruff-format-on-save-mode)
 (after! evil-escape
   (setq evil-escape-key-sequence ",."))
@@ -173,7 +174,8 @@
   ;; (setq org-ellipsis " ▾")
   (efs/org-font-setup))
 
-
+(setq company-idle-delay
+      (lambda () (if (company-in-string-or-comment) nil 0.2)))
 
 (defun efs/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -184,13 +186,13 @@
   :hook (org-mode . efs/org-mode-visual-fill))
 
 
-(use-package! typst-ts-mode
-  :defer t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.typ" . typst-ts-mode))
-  :custom
-  (typst-ts-mode-watch-options "--open")
-  )
+                                        ;(use-package! typst-ts-mode
+                                        ;  :defer t
+                                        ;  :config
+                                        ;  (add-to-list 'auto-mode-alist '("\\.typ" . typst-ts-mode))
+                                        ;  :custom
+                                        ;  (typst-ts-mode-watch-options "--open")
+                                        ;  )
 ;;
 ;; (after! elpy
 ;;   (set-company-backend! 'elpy-mode

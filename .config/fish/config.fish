@@ -5,7 +5,7 @@ set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND "--type=f"
 set -gx FZF_CTRL_T_OPTS "--preview='bat --style=numbers --color=always {}'"
 set -gx FZF_ALT_C_COMMAND $FZF_DEFAULT_COMMAND "--type=d"
 alias py xonsh
-
+alias enw "emacs -nw"
 alias ga "git add -u"
 alias gc "git commit -m"
 alias gp "git push"
