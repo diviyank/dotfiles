@@ -39,7 +39,7 @@
 (setq doom-theme 'doom-laser)
 (setq doom-font (font-spec :family "Iosevka" :size 16) ;; :weight 'medium)
       ;;(setq doom-font (font-spec :family "JetBrains Mono" :size 14 :weight 'medium)
-      doom-variable-pitch-font (font-spec :family "Nunito" :size 14)
+      doom-variable-pitch-font (font-spec :family "Nunito" :size 15)
       )
 (setq shell-file-name (executable-find "bash"))
 ;;(setq-default line-spacing 0)
@@ -102,8 +102,6 @@
   (map! :i "C-<return>" #'evil-escape))
 
 (setq flycheck-python-pyright-executable "/home/diviyan/.pyenv/shims/pyright")
-(setq lsp-semgrep-scan-max-memory 500)
-(setq lsp-semgrep-scan-max-target-bytes 30)
 ;; (add-hook 'python-mode-hook
 ;;           (defun set-checker-hook-100 ()
 ;;             (flycheck-mode 1)

@@ -8,17 +8,17 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
                                         ;(package! some-package)
-(package! beacon)
-(package! evil-colemak-basics) ; colemak remaps
-(when (package! lsp-bridge
-        :recipe (:host github
-                 :repo "manateelazycat/lsp-bridge"
-                 :branch "master"
-                 :files ("*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-                 ;; do not perform byte compilation or native compilation for lsp-bridge
-                 :build (:not compile)))
-  (package! markdown-mode)
-  (package! yasnippet))
+;;(package! beacon)
+;;(package! evil-colemak-basics) ; colemak remaps
+;; (when (package! lsp-bridge
+;;         :recipe (:host github
+;;                  :repo "manateelazycat/lsp-bridge"
+;;                  :branch "master"
+;;                  :files ("*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+;;                  ;; do not perform byte compilation or native compilation for lsp-bridge
+;;                  :build (:not compile)))
+;;   (package! markdown-mode)
+;;   (package! yasnippet))
 ;;(package! elpy :recipe
 ;;  (:host github :repo "jorgenschaefer/elpy")
 ;;  )
@@ -26,8 +26,8 @@
 (package! beacon)
 (package! visual-fill-column)
 (package! affe)
-;(package! typst-ts-mode
-;  :recipe (:host sourcehut :repo "meow_king/typst-ts-mode" ))
+                                        ;(package! typst-ts-mode
+                                        ;  :recipe (:host sourcehut :repo "meow_king/typst-ts-mode" ))
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/radian-software/straight.el#the-recipe-format
