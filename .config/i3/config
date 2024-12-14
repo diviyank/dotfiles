@@ -69,7 +69,8 @@ bindsym $mod+Return exec kitty --session ~/.config/kitty/tmux_session.conf
 bindsym $mod+Shift+q kill
 
 #emacs
-bindsym $mod+Shift+Return exec emacsclient -c -a "emacs"
+bindsym $mod+Shift+Return exec kitty --config ~/.config/kitty/kitty_nvim.conf --session ~/.config/kitty/tmux_session.conf
+# bindsym $mod+Shift+Return exec emacsclient -c -a "emacs"
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
