@@ -1,0 +1,14 @@
+[tool.ruff]
+src = ["src"]
+line-length = 90
+fix=true
+
+[tool.ruff.lint]
+ignore = ["D401"]
+select = ["B", "D", "E", "F", "I", "N", "Q", "W"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
