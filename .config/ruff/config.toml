@@ -1,14 +1,18 @@
-[tool.ruff]
-src = ["src"]
 line-length = 90
 fix=true
 
-[tool.ruff.lint]
+[lint]
 ignore = ["D401"]
 select = ["B", "D", "E", "F", "I", "N", "Q", "W"]
 
-[tool.ruff.lint.flake8-quotes]
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 90
+
+[lint.flake8-quotes]
 inline-quotes = "double"
 
-[tool.ruff.lint.pydocstyle]
+[lint.pydocstyle]
 convention = "numpy"
