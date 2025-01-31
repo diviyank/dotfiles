@@ -1,7 +1,7 @@
 set -gx EDITOR emacs
 set fish_greeting #"Hello Diviyan ! What are you going to break today ?"
 # Set up fzf key bindings
-set -U fish_user_paths /opt/homebrew/bin $fish_user_paths
+set -U fish_user_paths /opt/homebrew/bin /usr/local/bin/ $fish_user_paths
 fzf --fish | source
 set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND "--type=f"
 set -gx FZF_CTRL_T_OPTS "--preview='bat --style=numbers --color=always {}'"
