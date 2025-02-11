@@ -9,10 +9,9 @@ after-login-command = []
 # You can use it to add commands that run after AeroSpace startup.
 # 'after-startup-command' is run after 'after-login-command'
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = []
-
+after-startup-command = ['exec-and-forget borders active_color=0xffccc6af inactive_color=0xff121d5c width=5.0']
 # Start AeroSpace at login
-start-at-login = false
+start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
@@ -213,4 +212,21 @@ automatically-unhide-macos-hidden-apps = true
 
     down = 'volume down'
     up = 'volume up'
-    shift-down = ['volume set 0', 'mode main']
+
+[[on-window-detected]]
+   if.app-id = 'com.hnc.Discord'
+   run = ['move-node-to-workspace 6']  # The callback itself   shift-down = ['volume set 0', 'mode main']
+
+[[on-window-detected]]
+   if.app-id = 'com.apple.mail'
+   run = ['move-node-to-workspace 7']  # The callback itself   shift-down = ['volume set 0', 'mode main']
+
+
+[[on-window-detected]]
+   if.app-id = 'com.spotify.client'
+   run = ['move-node-to-workspace 9']  # The callback itself   shift-down = ['volume set 0', 'mode main']
+
+[[on-window-detected]]
+   if.app-id = 'com.apple.iCal'
+   run = ['move-node-to-workspace 8']  # The callback itself   shift-down = ['volume set 0', 'mode main']
+
