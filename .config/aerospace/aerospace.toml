@@ -231,3 +231,7 @@ automatically-unhide-macos-hidden-apps = true
    if.app-id = 'com.apple.iCal'
    run = ['move-node-to-workspace 8']  # The callback itself   shift-down = ['volume set 0', 'mode main']
 
+
+[[on-window-detected]]
+   if.app-id = 'com.cockos.LICEcap'
+   run = ['layout floating']  # The callback itself   shift-down = ['volume set 0', 'mode main']
