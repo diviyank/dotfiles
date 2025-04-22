@@ -24,7 +24,9 @@ if [ "$(/opt/homebrew/bin/aerospace list-windows --focused | rg kitty_scratch | 
 }
 
 unfocus_app() {
+  current_monitor=$(/opt/homebrew/bin/aerospace list-monitors --focused)
   /opt/homebrew/bin/aerospace move-node-to-workspace 0
+  /opt/homebrew/bin/aerospace move-workspace-to-monitor $current_monitor
 }
 
 
