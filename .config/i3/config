@@ -73,7 +73,8 @@ bindsym $mod+Shift+Return exec kitty --config ~/.config/kitty/kitty_nvim.conf --
 # bindsym $mod+Shift+Return exec emacsclient -c -a "emacs"
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
+# bindsym $mod+d exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
+bindsym $mod+space exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
 # A more modern dmenu replacement is rofi:
 # bindsym $mod+d exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -128,7 +129,7 @@ bindsym $mod+e layout toggle split
 bindsym $mod+Shift+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+# bindsym $mod+space focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
