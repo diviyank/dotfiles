@@ -1,7 +1,6 @@
 set -gx EDITOR emacs
 set fish_greeting #"Hello Diviyan ! What are you going to break today ?"
 # Set up fzf key bindings
-set -U fish_user_paths /opt/homebrew/bin /usr/local/bin/ $fish_user_paths
 fzf --fish | source
 set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND "--type=f"
 set -gx FZF_CTRL_T_OPTS "--preview='bat --style=numbers --color=always {}'"
@@ -17,6 +16,9 @@ alias gd "git diff HEAD"
 function gtag --description "git tag and push"
    command git tag $argv && git push origin $argv
 end
+function gtagdel --description "git tag delete"
+   command git tag --delete $argv && git push origin --delete $argv
+end
 function gcp --description "git commit and push"
    command git commit -m $argv && git push
 end
@@ -25,7 +27,5 @@ starship init fish | source
 pyenv init - | source
 fish_add_path /home/diviyan/.emacs.d/bin
 zoxide init --cmd cd fish | source
-set -gx LANGUAGE en_US.UTF-8
-set -gx LANG en_US.UTF-8
-set -gx LC_ALL en_US.UTF-8
-set -gx LC_TYPE en_US.UTF-8
+source "$HOME/.cargo/env.fish"
+source "$HOME/.global_env.fish"
