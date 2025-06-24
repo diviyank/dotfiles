@@ -29,3 +29,9 @@ fish_add_path /home/diviyan/.emacs.d/bin
 zoxide init --cmd cd fish | source
 source "$HOME/.cargo/env.fish"
 source "$HOME/.global_env.fish"
+function ...
+  ../..
+end
+function ....
+  ../../..
+end
