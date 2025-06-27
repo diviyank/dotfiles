@@ -30,3 +30,4 @@ function gritp --description "grit python"
     command grit apply "language python $argv"
 end
 zoxide init --cmd cd fish | source
+source $HOME/.global_env.fish

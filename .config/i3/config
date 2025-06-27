@@ -75,6 +75,7 @@ bindsym $mod+Shift+Return exec kitty --config ~/.config/kitty/kitty_nvim.conf --
 # start dmenu (a program launcher)
 # bindsym $mod+d exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
 bindsym $mod+space exec --no-startup-id /home/diviyan/.config/rofi/scripts/launcher_t1 #dmenu_run
+bindsym Mod1+c exec --no-startup-id /home/diviyan/.config/rofi/scripts/clip_t1 #greenclip
 # A more modern dmenu replacement is rofi:
 # bindsym $mod+d exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -320,9 +321,10 @@ exec_always --no-startup-id flashfocus
 # exec --no-startup-id "betterbird"
 exec --no-startup-id "clipit -n"
 exec --no-startup-id "flameshot"
-exec --no-startup-id "emacs --daemon --with-x-toolkit=lucid"
+# exec --no-startup-id "emacs --daemon --with-x-toolkit=lucid"
 exec --no-startup-id "sleep 30 && spotify"
 exec --no-startup-id "mailspring"
+exec --no-startup-id "greenclip daemon"
 exec_always --no-startup-id "sh ~/.config/polybar/launch.sh"
 # exec --no-startup-id "xrandr --output HDMI-0 --off --output DP-0 --off --output DP-1 --off --output DP-2 --primary --mode 2560x1440 --pos 0x0 --rotate normal --output DP-3 --off --output DP-4 --mode 1920x1080 --pos 2570x382 --rotate normal --rate 239.76 --output DP-5 --off"
 exec --no-startup-id "xset r rate 270 70"
