@@ -103,7 +103,7 @@ automatically-unhide-macos-hidden-apps = true
     cmd-slash = 'layout tiles horizontal vertical'
     cmd-comma = 'layout accordion horizontal vertical'
     cmd-e = 'layout accordion horizontal vertical'
-
+    # cmd-shift-period = 'exec-and-forget /opt/homebrew/Caskroom/flameshot/12.1.0/flameshot.app/Contents/MacOS/flameshot gui'
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
     cmd-left = 'focus --boundaries all-monitors-outer-frame left'
     cmd-down = 'focus --boundaries all-monitors-outer-frame down'
