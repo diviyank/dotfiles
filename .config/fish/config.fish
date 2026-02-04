@@ -35,3 +35,6 @@ end
 function ....
   ../../..
 end
+
+# uv
+fish_add_path "/Users/diviyan/.local/bin"
