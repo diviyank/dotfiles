@@ -1,0 +1,98 @@
+#### YABAI CONFIG
+
+# for this to work you must configure sudo such that
+# it will be able to run the command without password
+
+
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+
+yabai -m config layout bsp
+
+yabai -m config top_padding    3
+yabai -m config bottom_padding 3
+yabai -m config left_padding   3
+yabai -m config right_padding  3
+yabai -m config window_gap     3
+
+yabai -m config auto_balance off
+yabai -m config split_ratio 0.5
+
+yabai -m config mouse_modifier cmd
+
+# set modifier + left-click drag to move window (default: move)
+yabai -m config mouse_action1 move
+
+# set modifier + right-click drag to resize window (default: resize)
+yabai -m config mouse_action2 resize
+
+yabai -m config focus_follows_mouse autofocus
+yabai -m config mouse_follows_focus on
+
+
+yabai -m config window_shadow float
+yabai -m config window_opacity on
+yabai -m config active_window_opacity 1.0
+yabai -m config normal_window_opacity 0.95
+
+yabai -m config external_bar all:10:0
+
+# Music
+yabai -m rule --add app="^(Spotify|Amazon Music)$" space=9
+# Social
+yabai -m rule --add app="^(iCal)$" space=8
+yabai -m rule --add app="^(Mail)$" space=7
+yabai -m rule --add app="^(Discord)$" space=6
+yabai -m rule --add app="^(Slack|WhatsApp|Microsoft Teams)$" space=0
+
+setup_spaces() {
+    # Count current spaces (requires jq, or use grep workaround below)
+    # Method 1: Cleanest (if you have jq installed via brew install jq)
+    local current_count=$(yabai -m query --spaces | jq '. | length')
+
+    # Method 2: No dependencies (if you don't have jq)
+    # local current_count=$(yabai -m query --spaces | grep -c "index")
+
+    local target_count=11
+
+    # Calculate how many spaces we are missing
+    local missing_count=$((target_count - current_count))
+
+    # Create the missing spaces
+    if [ "$missing_count" -gt 0 ]; then
+        for ((i=1; i<=missing_count; i++)); do
+            yabai -m space --create
+        done
+    fi
+}
+
+setup_spaces
+
+yabai -m space 1 --label one
+yabai -m space 2 --label two
+yabai -m space 3 --label three
+yabai -m space 4 --label four
+yabai -m space 5 --label five
+yabai -m space 6 --label six
+yabai -m space 7 --label seven
+yabai -m space 8 --label eight
+yabai -m space 9 --label nine
+yabai -m space 10 --label ten
+yabai -m space 11 --label eleven
+
+yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
+yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
+
+# yabai -m signal --add event=window_focused \
+#     action="sketchybar --trigger window_attention_changed"
+
+yabai -m signal --add event=window_title_changed \
+    action="sketchybar --trigger window_attention_changed"
+
+yabai -m signal --add event=application_activated \
+    action="sketchybar --trigger window_attention_changed"
+
+yabai -m signal --add event=application_launched \
+    action="sketchybar --trigger window_attention_changed"

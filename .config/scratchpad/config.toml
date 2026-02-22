@@ -1,0 +1,11 @@
+scratchpad_space = 11
+launch_timeout = 5
+
+[[scratchpad]]
+name = "kitty"
+target_type = "title"
+target = "Scratchpad"
+position = [0, 0]
+size = [700, 1000]
+launch_type = "app_with_arg"
+launch_command = ["kitty.app", "--title", "Scratchpad"]
