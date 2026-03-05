@@ -1,6 +1,10 @@
 #!/bin/sh
 STATUS_LABEL=$(lsappinfo info -only StatusLabel "Discord")
 ICON=
+if [ "$SENDER" = "mouse.clicked" ]; then
+    /opt/homebrew/bin/yabai -m space --focus six
+    exit 0
+fi
 if [[ $STATUS_LABEL =~ \"label\"=\"([^\"]*)\" ]]; then
     LABEL="${BASH_REMATCH[1]}"
 
