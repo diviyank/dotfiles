@@ -5,7 +5,8 @@ launch_timeout = 5
 name = "kitty"
 target_type = "title"
 target = "Scratchpad"
-position = [1000, 50]
+
+position = [1000, 40]
 size = [900, 1150]
 launch_type = "app_with_arg"
 launch_command = ["kitty.app", "--title", "Scratchpad"]
