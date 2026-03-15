@@ -6,4 +6,6 @@ command = "kitty --class scratchpad --session ~/.config/kitty/tmux_session.conf"
 class = "scratchpad"
 size = "60% 90%"
 position = "40% 5%"
+unfocus = "hide"        # hides when you click away
+lazy = true             # don't spawn until first toggle
 animation = "fromTop"

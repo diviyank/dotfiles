@@ -83,6 +83,26 @@ window#waybar {
 #temperature.critical {
     color: #cc3436;
 }
+#custom-spotify { color: #1db954; }
+#custom-spotify.custom-spotify-paused { opacity: 0.5; }
+#custom-pomodoro {
+    padding: 0 10px;
+}
+
+#custom-pomodoro.focus {
+    color: #ed8796;
+}
+
+#custom-pomodoro.rest {
+    color: #eed49f;
+}
+
+#custom-pomodoro.splash {
+    color: #24273a;
+    background-color: #ed8796;
+    border-radius: 20px;
+    margin: 5px 5px;
+}
 /*-----Colors----*/
 /*
  *rgba(0,85,102,1),#005566 --> Indigo(dye)

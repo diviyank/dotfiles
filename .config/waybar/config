@@ -1,7 +1,7 @@
 {
     "modules-left": ["hyprland/workspaces", "hyprland/mode"],
-    "modules-center": ["clock", "idle_inhibitor", "custom/spotify"],
-    "modules-right": ["tray", "custom/scratchpad-indicator", "pulseaudio", "custom/power"],
+    "modules-center": ["clock", "idle_inhibitor","custom/pomodoro"],
+    "modules-right": [ "custom/spotify","tray", "custom/scratchpad-indicator", "pulseaudio", "custom/power"],
 
     "hyprland/mode": {
         "format": "<span style=\"italic\">{}</span>"
@@ -24,11 +24,11 @@
         "icon-size": 15,
         "spacing": 10
     },
-    "clock": {
-        "format": "{:%A, {day_with_suffix} %b   %H:%M}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "on-click": "gnome-calendar"
-    },
+	"clock": {
+	    "format": "{:%A %d %b   %H:%M}",
+	    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+	    "on-click": "gnome-calendar"
+	},
     "pulseaudio": {
         "format": "{volume}% {icon} ",
         "format-bluetooth": "{volume}% {icon} {format_source}",
@@ -52,9 +52,17 @@
 		"on-click": "wlogout"
 	},
     "custom/spotify": {
-        "format": " {}",
+	"return-type":"json",
+        "format": "    {}  ",
         "max-length": 40,
         "exec": "$HOME/.config/waybar/mediaplayer.sh", // Script in resources folder
         "exec-if": "pgrep spotify"
     },
+"custom/pomodoro": {
+    "return-type": "json",
+    "interval": 1,
+    "exec": "$HOME/.config/waybar/pomodoro.sh",
+    "on-click": "$HOME/.config/waybar/pomodoro.sh toggle",
+    "format": "{}"
+},
 }

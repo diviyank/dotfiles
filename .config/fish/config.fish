@@ -31,3 +31,6 @@ function gritp --description "grit python"
 end
 zoxide init --cmd cd fish | source
 source $HOME/.global_env.fish
+
+# uv
+fish_add_path "/home/diviyan/.local/bin"
