@@ -157,6 +157,15 @@ sketchybar  --add   item discord right \
                     icon.font.size=18 \
            --subscribe discord system_woke
 
+sketchybar --add item pomodoro right\
+    --set pomodoro \
+        icon="󰔛" \
+        background.color=0xffa6da95 \
+        icon.color=0xffed8796 \
+        label.color=0xffed8796 \
+        update_freq=1 \
+        script="$PLUGIN_SHARED_DIR/pomodoro.sh" \
+    --subscribe pomodoro mouse.clicked 
 
 # sketchybar --add item keyboard right        \
 #            --set keyboard "${keyboard[@]}"  \
