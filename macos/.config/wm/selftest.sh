@@ -85,7 +85,7 @@ rm -rf "$stub"
 # re-add is rejected, so a warm rule list masks a silently-discarded rule --
 # which is precisely the bug this guard exists to catch. yabai startup runs
 # apply-yabai.sh against an empty rule list; test that path.
-for lbl in $(grep -oE -- '--add label=[A-Za-z_]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
+for lbl in $(grep -oE -- '--add label=[A-Za-z0-9_-]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
     "$YABAI" -m rule --remove "$lbl" >/dev/null 2>&1
 done
 
@@ -93,7 +93,7 @@ sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1
 sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1   # twice: proves idempotency
 
 rule_fail=0
-for lbl in $(grep -oE -- '--add label=[A-Za-z_]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
+for lbl in $(grep -oE -- '--add label=[A-Za-z0-9_-]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
     n=$("$YABAI" -m rule --list | "$JQ" --arg l "$lbl" '[.[] | select(.label == $l)] | length')
     if [ "$n" != "1" ]; then
         bad "rule '$lbl' appears $n time(s) in the live list, expected exactly 1"
