@@ -19,11 +19,15 @@ wm_display_count() {
 }
 
 wm_display_uuids() {
-    "$WM_YABAI" -m query --displays | "$WM_JQ" -r 'sort_by(.index)[].uuid'
+    _uuids=$("$WM_YABAI" -m query --displays | "$WM_JQ" -r 'sort_by(.index)[].uuid')
+    [ -n "$_uuids" ] || return 1
+    printf '%s\n' "$_uuids"
 }
 
 wm_spaces_on_display() {
-    "$WM_YABAI" -m query --spaces --display "$1" | "$WM_JQ" -r '.[].index'
+    _spaces=$("$WM_YABAI" -m query --spaces --display "$1" | "$WM_JQ" -r '.[].index')
+    [ -n "$_spaces" ] || return 1
+    printf '%s\n' "$_spaces"
 }
 
 # Gaps key on UUID, not on width: the built-in is 1710px wide and the ASUS

@@ -55,5 +55,23 @@ for f in "$WM_DIR"/*.sh; do
     fi
 done
 
+stub=$(mktemp -d)
+printf '#!/bin/sh\nexit 1\n' > "$stub/yabai"
+chmod +x "$stub/yabai"
+(
+    WM_YABAI="$stub/yabai"
+    wm_display_count       >/dev/null 2>&1 && exit 10
+    wm_display_uuids       >/dev/null 2>&1 && exit 11
+    wm_spaces_on_display 1 >/dev/null 2>&1 && exit 12
+    exit 0
+)
+case $? in
+    0)  ok "profile.sh query functions fail when backend fails" ;;
+    10) bad "wm_display_count returned 0 with a failing yabai" ;;
+    11) bad "wm_display_uuids returned 0 with a failing yabai" ;;
+    12) bad "wm_spaces_on_display returned 0 with a failing yabai" ;;
+esac
+rm -rf "$stub"
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]
