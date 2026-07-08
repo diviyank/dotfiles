@@ -152,5 +152,34 @@ applied=$(grep -c '^apply ' "$tmp/log" 2>/dev/null || printf '0')
                      || bad "debounce: got $applied applies, expected 1"
 rm -rf "$tmp"
 
+# --- .skhdrc must not read $? after a pipeline (bug 5) ---
+SKHDRC="${SKHDRC:-$HOME/dotfiles/.skhdrc}"
+grep -q '\$?' "$SKHDRC" && bad ".skhdrc still tests \$? (unreliable after a pipeline)" \
+                        || ok ".skhdrc has no \$? test"
+
+# --- the reload binding must target a service that exists (bug 9) ---
+grep -q 'homebrew.mxcl.yabai' "$SKHDRC" \
+    && bad ".skhdrc kickstarts homebrew.mxcl.yabai, which does not exist" \
+    || ok ".skhdrc does not reference homebrew.mxcl.yabai"
+
+# --- direction scripts reject bad input rather than doing something arbitrary ---
+before=$("$YABAI" -m query --displays --display | "$JQ" -r '.index')
+
+sh "$WM_DIR/focus-direction.sh" >/dev/null 2>&1 \
+    && bad "focus-direction.sh with no argument exited 0" \
+    || ok "focus-direction.sh rejects a missing argument"
+
+sh "$WM_DIR/focus-direction.sh" __bogus__ >/dev/null 2>&1 \
+    && bad "focus-direction.sh __bogus__ exited 0" \
+    || ok "focus-direction.sh rejects an invalid direction"
+
+sh "$WM_DIR/move-to-display.sh" >/dev/null 2>&1 \
+    && bad "move-to-display.sh with no argument exited 0" \
+    || ok "move-to-display.sh rejects a missing argument"
+
+after=$("$YABAI" -m query --displays --display | "$JQ" -r '.index')
+[ "$before" = "$after" ] && ok "bad input did not move focus (display $before)" \
+                         || bad "focus moved from display $before to $after on bad input"
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]

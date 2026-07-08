@@ -1,15 +1,15 @@
 
 # RELOAD CONFIG
-ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+ctrl + alt + cmd - r : launchctl kickstart -k "gui/${UID}/com.koekeishiya.yabai"
 
 # CHANGE LAYOUT (Fixed path for jq and yabai)
 ctrl + shift - space : /opt/homebrew/bin/yabai -m space --layout "$(/opt/homebrew/bin/yabai -m query --spaces --space | /opt/homebrew/bin/jq -r 'if .type == "bsp" then "stack" else "bsp" end')"
 
-# FOCUS WINDOW
-cmd - up    : /opt/homebrew/bin/yabai -m window --focus north
-cmd - left  : /opt/homebrew/bin/yabai -m window --focus west
-cmd - right : /opt/homebrew/bin/yabai -m window --focus east
-cmd - down  : /opt/homebrew/bin/yabai -m window --focus south
+# FOCUS WINDOW, falling through to the display at the edge.
+cmd - up    : $HOME/.config/wm/focus-direction.sh north
+cmd - left  : $HOME/.config/wm/focus-direction.sh west
+cmd - right : $HOME/.config/wm/focus-direction.sh east
+cmd - down  : $HOME/.config/wm/focus-direction.sh south
 
 # FOCUS SPACES (Using Keycodes 0x12-0x1D to ensure it works on AZERTY/QWERTY)
 cmd - 0x12 : /opt/homebrew/bin/yabai -m space --focus one
@@ -38,10 +38,9 @@ cmd + shift - 0x1D : /opt/homebrew/bin/yabai -m window --space ten
 # FULLSCREEN
 ctrl - f : /opt/homebrew/bin/yabai -m window --toggle zoom-fullscreen
 
-# MOVE WINDOW DISPLAY (Fixed Paths)
-cmd + shift + ctrl - left : WIN_ID=$(/opt/homebrew/bin/yabai -m query --windows --window | /opt/homebrew/bin/jq '.id'); /opt/homebrew/bin/yabai -m window --swap west; [[ ! $? == 0 ]] && (/opt/homebrew/bin/yabai -m display --focus west; /opt/homebrew/bin/yabai -m window last --insert east; /opt/homebrew/bin/yabai -m window --focus $WIN_ID; /opt/homebrew/bin/yabai -m window --display prev; /opt/homebrew/bin/yabai -m window --focus $WIN_ID)
-
-cmd + shift + ctrl - right : WIN_ID=$(/opt/homebrew/bin/yabai -m query --windows --window | /opt/homebrew/bin/jq '.id'); /opt/homebrew/bin/yabai -m window --swap east; [[ ! $? == 0 ]] && (/opt/homebrew/bin/yabai -m display --focus east; /opt/homebrew/bin/yabai -m window first --insert west; /opt/homebrew/bin/yabai -m window --focus $WIN_ID; /opt/homebrew/bin/yabai -m window --display next; /opt/homebrew/bin/yabai -m window --focus $WIN_ID)
+# MOVE WINDOW TO DISPLAY, and follow it.
+cmd + shift + ctrl - left  : $HOME/.config/wm/move-to-display.sh west
+cmd + shift + ctrl - right : $HOME/.config/wm/move-to-display.sh east
 
 # TERMINAL
 cmd - return : open -na /Applications/kitty.app/Contents/MacOS/kitty
