@@ -73,5 +73,28 @@ case $? in
 esac
 rm -rf "$stub"
 
+# --- apply-yabai.sh is idempotent and loses no rules ---
+# yabai discards invalid rules SILENTLY. `.yabairc` declared 5 and only 4 were
+# ever live, because `space=0` is invalid (spaces are 1-indexed). Nothing but
+# this assertion will ever tell you.
+declared=$(grep -c -- '--add label=' "$WM_DIR/apply-yabai.sh")
+sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1
+sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1   # twice: proves idempotency
+live=$("$YABAI" -m rule --list | "$JQ" 'length')
+[ "$declared" = "$live" ] && ok "rules: declared $declared == live $live" \
+                          || bad "rules: declared $declared but live $live"
+
+[ "$("$YABAI" -m config external_bar)" = "all:32:0" ] \
+    && ok "external_bar = all:32:0" \
+    || bad "external_bar = $("$YABAI" -m config external_bar), expected all:32:0"
+
+# --- apply-yabai.sh must capture wm_* exit status, not iterate a substitution ---
+# `for x in $(wm_display_uuids)` discards the function's `return 1`: the loop
+# just runs zero times and exits 0. Verified. profile.sh's failure signalling is
+# worthless unless the caller captures it first.
+grep -qE 'for [A-Za-z_]+ in \$\(wm_' "$WM_DIR/apply-yabai.sh" \
+    && bad "apply-yabai.sh iterates \$(wm_...) directly, discarding its exit status" \
+    || ok "apply-yabai.sh captures wm_* exit status before iterating"
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]
