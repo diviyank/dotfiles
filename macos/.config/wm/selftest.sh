@@ -39,6 +39,9 @@ gap=$(wm_gap_for_display 7B05FE65-87BC-4FFB-9F96-50316B179354)
 gap=$(wm_gap_for_display __unknown_display__)
 [ "$gap" = "3" ] && ok "wm_gap_for_display default = 3" || bad "default gap = '$gap', expected 3"
 
+gap=$(wm_gap_for_display EFF5329B-AEAE-4210-80F0-953761D1FC53)
+[ "$gap" = "8" ] && ok "wm_gap_for_display Dell = 8" || bad "Dell gap = '$gap', expected 8"
+
 # --- no wm script may invoke a bare binary ---
 # yabai spawns signal actions with a minimal environment. A bare `yabai` or `jq`
 # that fails to resolve is the leading theory for how setup_spaces created 11
@@ -95,6 +98,28 @@ live=$("$YABAI" -m rule --list | "$JQ" 'length')
 grep -qE 'for [A-Za-z_]+ in \$\(wm_' "$WM_DIR/apply-yabai.sh" \
     && bad "apply-yabai.sh iterates \$(wm_...) directly, discarding its exit status" \
     || ok "apply-yabai.sh captures wm_* exit status before iterating"
+
+# --- the per-display gap loop is apply-yabai.sh's whole purpose; assert it ran ---
+# Without this, apply-yabai.sh could apply no gaps at all and every other
+# assertion would still pass.
+sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1
+gap_fail=0
+gap_uuids=$(wm_display_uuids) || { bad "wm_display_uuids failed"; gap_fail=1; }
+i=1
+for u in $gap_uuids; do
+    want=$(wm_gap_for_display "$u")
+    gap_spaces=$(wm_spaces_on_display "$i") || { bad "no spaces on display $i"; gap_fail=1; break; }
+    for s in $gap_spaces; do
+        got=$("$YABAI" -m config --space "$s" window_gap)
+        if [ "$got" != "$want" ]; then
+            bad "display $i space $s window_gap=$got, expected $want"
+            gap_fail=1
+            break
+        fi
+    done
+    i=$((i + 1))
+done
+[ "$gap_fail" -eq 0 ] && ok "per-space window_gap matches wm_gap_for_display on every display"
 
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]
