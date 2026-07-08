@@ -80,12 +80,18 @@ rm -rf "$stub"
 # yabai discards invalid rules SILENTLY. `.yabairc` declared 5 and only 4 were
 # ever live, because `space=0` is invalid (spaces are 1-indexed). Nothing but
 # this assertion will ever tell you.
-declared=$(grep -c -- '--add label=' "$WM_DIR/apply-yabai.sh")
 sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1
 sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1   # twice: proves idempotency
-live=$("$YABAI" -m rule --list | "$JQ" 'length')
-[ "$declared" = "$live" ] && ok "rules: declared $declared == live $live" \
-                          || bad "rules: declared $declared but live $live"
+
+rule_fail=0
+for lbl in $(grep -oE -- '--add label=[A-Za-z_]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
+    n=$("$YABAI" -m rule --list | "$JQ" --arg l "$lbl" '[.[] | select(.label == $l)] | length')
+    if [ "$n" != "1" ]; then
+        bad "rule '$lbl' appears $n time(s) in the live list, expected exactly 1"
+        rule_fail=1
+    fi
+done
+[ "$rule_fail" -eq 0 ] && ok "every declared rule label is live exactly once"
 
 [ "$("$YABAI" -m config external_bar)" = "all:32:0" ] \
     && ok "external_bar = all:32:0" \
