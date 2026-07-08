@@ -191,5 +191,26 @@ case "$items" in
                           || bad "bar has no items after reload" ;;
 esac
 
+# --- every .yabairc signal must be labelled and registered exactly once ---
+# `signal --add` WITHOUT a label appends, so re-sourcing .yabairc duplicates every
+# signal. With a label it replaces. Same class of bug as the unlabelled app rules.
+YABAIRC="${YABAIRC:-$HOME/dotfiles/.yabairc}"
+
+declared_sigs=$(grep -vE '^[[:space:]]*#' "$YABAIRC" | grep -c -- 'signal --add')
+labelled_sigs=$(grep -vE '^[[:space:]]*#' "$YABAIRC" | grep -c -- 'signal --add label=')
+[ "$declared_sigs" = "$labelled_sigs" ] \
+    && ok "all $declared_sigs signals in .yabairc carry a label" \
+    || bad "$((declared_sigs - labelled_sigs)) signal(s) in .yabairc lack a label (re-sourcing would duplicate them)"
+
+sig_fail=0
+for lbl in $(grep -vE '^[[:space:]]*#' "$YABAIRC" | grep -oE -- '--add label=[A-Za-z0-9_-]+' | cut -d= -f2); do
+    n=$("$YABAI" -m signal --list | "$JQ" --arg l "$lbl" '[.[] | select(.label == $l)] | length')
+    if [ "$n" != "1" ]; then
+        bad "signal '$lbl' appears $n time(s) in the live list, expected exactly 1"
+        sig_fail=1
+    fi
+done
+[ "$sig_fail" -eq 0 ] && ok "every declared signal label is registered exactly once"
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]

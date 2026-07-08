@@ -4,7 +4,7 @@
 # it will be able to run the command without password
 
 
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+yabai -m signal --add label=wm_dock_restart event=dock_did_restart action="sudo yabai --load-sa"
 sudo yabai --load-sa
 
 
@@ -76,20 +76,23 @@ yabai -m space 9 --label nine
 yabai -m space 10 --label ten
 yabai -m space 11 --label eleven
 
-yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
-yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
-yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
+# Every signal carries a label. `signal --add` WITHOUT a label APPENDS, so
+# re-sourcing this file silently duplicates every signal and each hook then fires
+# twice. With a label it replaces. Same trap as the app rules.
+yabai -m signal --add label=wm_win_focused   event=window_focused   action="sketchybar --trigger window_focus"
+yabai -m signal --add label=wm_win_created   event=window_created   action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add label=wm_win_destroyed event=window_destroyed action="sketchybar --trigger windows_on_spaces"
 
 # yabai -m signal --add event=window_focused \
 #     action="sketchybar --trigger window_attention_changed"
 
-yabai -m signal --add event=window_title_changed \
+yabai -m signal --add label=wm_win_title event=window_title_changed \
     action="sketchybar --trigger window_attention_changed"
 
-yabai -m signal --add event=application_activated \
+yabai -m signal --add label=wm_app_activated event=application_activated \
     action="sketchybar --trigger window_attention_changed"
 
-yabai -m signal --add event=application_launched \
+yabai -m signal --add label=wm_app_launched event=application_launched \
     action="sketchybar --trigger window_attention_changed"
 
 # apply-yabai.sh owns external_bar, per-space gaps and the app rules.
@@ -103,11 +106,11 @@ fi
 
 # display_changed is NOT a hotplug event: it fires whenever focus moves between
 # displays. Hooking a reload to it would rebuild the bar on every cmd+right.
-yabai -m signal --add event=display_added \
+yabai -m signal --add label=wm_display_added event=display_added \
     action="$HOME/.config/wm/on-display-change.sh"
-yabai -m signal --add event=display_removed \
+yabai -m signal --add label=wm_display_removed event=display_removed \
     action="$HOME/.config/wm/on-display-change.sh"
-yabai -m signal --add event=display_moved \
+yabai -m signal --add label=wm_display_moved event=display_moved \
     action="$HOME/.config/wm/on-display-change.sh"
-yabai -m signal --add event=display_resized \
+yabai -m signal --add label=wm_display_resized event=display_resized \
     action="$HOME/.config/wm/on-display-change.sh"
