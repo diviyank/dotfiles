@@ -1,0 +1,59 @@
+#!/bin/sh
+# Headless regression assertions. Run: sh macos/.config/wm/selftest.sh
+set -u
+
+WM_DIR="$(cd "$(dirname "$0")" && pwd)"
+YABAI=/opt/homebrew/bin/yabai
+SKETCHYBAR=/opt/homebrew/bin/sketchybar
+JQ=/usr/bin/jq
+
+fails=0
+ok()   { printf 'PASS  %s\n' "$1"; }
+bad()  { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
+
+# --- binaries exist ---
+for b in "$YABAI" "$SKETCHYBAR" "$JQ"; do
+    if [ -x "$b" ]; then ok "binary $b"; else bad "binary $b missing"; fi
+done
+
+# --- profile.sh is pure and correct ---
+. "$WM_DIR/profile.sh"
+
+count=$(wm_display_count)
+case "$count" in
+    ''|*[!0-9]*) bad "wm_display_count returned non-integer '$count'" ;;
+    *) [ "$count" -ge 1 ] && ok "wm_display_count = $count" || bad "wm_display_count < 1" ;;
+esac
+
+uuids=$(wm_display_uuids | wc -l | tr -d ' ')
+[ "$uuids" = "$count" ] && ok "wm_display_uuids yields $uuids line(s)" \
+                        || bad "wm_display_uuids yielded $uuids, expected $count"
+
+spaces=$(wm_spaces_on_display 1 | wc -l | tr -d ' ')
+[ "$spaces" -ge 1 ] && ok "wm_spaces_on_display 1 yields $spaces space(s)" \
+                    || bad "wm_spaces_on_display 1 yielded none"
+
+gap=$(wm_gap_for_display 7B05FE65-87BC-4FFB-9F96-50316B179354)
+[ "$gap" = "8" ] && ok "wm_gap_for_display ASUS = 8" || bad "ASUS gap = '$gap', expected 8"
+
+gap=$(wm_gap_for_display __unknown_display__)
+[ "$gap" = "3" ] && ok "wm_gap_for_display default = 3" || bad "default gap = '$gap', expected 3"
+
+# --- no wm script may invoke a bare binary ---
+# yabai spawns signal actions with a minimal environment. A bare `yabai` or `jq`
+# that fails to resolve is the leading theory for how setup_spaces created 11
+# orphan spaces from an empty query result.
+#
+# The `-` in the character class matters: `printf 'apply-yabai FAILED'` would
+# otherwise match, since `yabai ` there is preceded by a hyphen.
+BARE='(^|[^-/[:alnum:]_.])(yabai|jq|sketchybar)[[:space:]]'
+for f in "$WM_DIR"/*.sh; do
+    if grep -vE '^[[:space:]]*#' "$f" | grep -qE "$BARE"; then
+        bad "$(basename "$f") invokes bare executable (should use absolute /opt/homebrew/bin paths)"
+    else
+        ok "$(basename "$f") uses absolute binary paths"
+    fi
+done
+
+printf '\n%s failure(s)\n' "$fails"
+[ "$fails" -eq 0 ]
