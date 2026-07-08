@@ -181,5 +181,15 @@ after=$("$YABAI" -m query --displays --display | "$JQ" -r '.index')
 [ "$before" = "$after" ] && ok "bad input did not move focus (display $before)" \
                          || bad "focus moved from display $before to $after on bad input"
 
+# --- the bar must come back after a reload (on-display-change.sh depends on it) ---
+"$SKETCHYBAR" --reload >/dev/null 2>&1
+sleep 1
+items=$("$SKETCHYBAR" --query bar | "$JQ" '.items | length')
+case "$items" in
+    ''|*[!0-9]*) bad "bar item count unreadable: '$items'" ;;
+    *) [ "$items" -gt 0 ] && ok "bar has $items items after reload" \
+                          || bad "bar has no items after reload" ;;
+esac
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]

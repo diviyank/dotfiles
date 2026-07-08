@@ -1,7 +1,8 @@
 #!/usr/bin/env zsh
 
 update_space() {
-    SPACE_ID=$(echo "$INFO" | jq -r '."display-1"')
+    IDX="${NAME##*.}"                       # current_space.2 -> 2
+    SPACE_ID=$(echo "$INFO" | jq -r --arg k "display-$IDX" '.[$k]')
 
     case $SPACE_ID in
     1)
@@ -24,9 +25,7 @@ update_space() {
 
 case "$SENDER" in
 "mouse.clicked")
-    # Reload sketchybar
-    sketchybar --remove '/.*/'
-    source $HOME/.config/sketchybar/sketchybarrc
+    sketchybar --reload
     ;;
 *)
     update_space
