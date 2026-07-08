@@ -136,5 +136,21 @@ for u in $gap_uuids; do
 done
 [ "$gap_fail" -eq 0 ] && ok "per-space window_gap matches wm_gap_for_display on every display"
 
+# --- debounce: one physical hotplug fires 3-4 signals; only the last must apply ---
+# WM_APPLY / WM_SKETCHYBAR are stubbed: this asserts the debounce, not the effects.
+tmp=$(mktemp -d)
+i=1
+while [ "$i" -le 4 ]; do
+    WM_LOCK="$tmp/lock" WM_LOG="$tmp/log" WM_DEBOUNCE=0.4 \
+    WM_APPLY=/usr/bin/true WM_SKETCHYBAR=/usr/bin/true \
+        sh "$WM_DIR/on-display-change.sh" &
+    i=$((i + 1))
+done
+wait
+applied=$(grep -c '^apply ' "$tmp/log" 2>/dev/null || printf '0')
+[ "$applied" = "1" ] && ok "debounce: 4 concurrent invocations -> 1 apply" \
+                     || bad "debounce: got $applied applies, expected 1"
+rm -rf "$tmp"
+
 printf '\n%s failure(s)\n' "$fails"
 [ "$fails" -eq 0 ]
