@@ -36,35 +36,28 @@ yabai -m config window_opacity on
 yabai -m config active_window_opacity 1.0
 yabai -m config normal_window_opacity 0.95
 
-yabai -m config external_bar all:40:0
-
-# Music
-yabai -m rule --add app="^(Spotify|Amazon Music)$" space=9
-# Social
-yabai -m rule --add app="^(iCal)$" space=8
-yabai -m rule --add app="^(Mail)$" space=7
-yabai -m rule --add app="^(Discord)$" space=6
-yabai -m rule --add app="^(Slack|WhatsApp|Microsoft Teams)$" space=0
 
 setup_spaces() {
-    # Count current spaces (requires jq, or use grep workaround below)
-    # Method 1: Cleanest (if you have jq installed via brew install jq)
-    local current_count=$(yabai -m query --spaces | jq '. | length')
+    # `yabai | jq length` exits 0 even when yabai fails, so validate the value.
+    # An empty count made $((11 - "")) evaluate to 11, creating 11 spaces on top
+    # of the existing 11. That is where 22 spaces came from.
+    local current_count
+    current_count=$(/opt/homebrew/bin/yabai -m query --spaces | /usr/bin/jq 'length')
 
-    # Method 2: No dependencies (if you don't have jq)
-    # local current_count=$(yabai -m query --spaces | grep -c "index")
+    case "$current_count" in
+        ''|*[!0-9]*)
+            printf 'wm: refusing to create spaces, bad count %s\n' "${current_count:-<empty>}" >&2
+            return 1
+            ;;
+    esac
 
+    # 11 is deliberate: scratchpad_space = 11 in ~/.config/scratchpad/config.toml.
     local target_count=11
-
-    # Calculate how many spaces we are missing
-    local missing_count=$((target_count - current_count))
-
-    # Create the missing spaces
-    if [ "$missing_count" -gt 0 ]; then
-        for ((i=1; i<=missing_count; i++)); do
-            yabai -m space --create
-        done
-    fi
+    local i="$current_count"
+    while [ "$i" -lt "$target_count" ]; do
+        /opt/homebrew/bin/yabai -m space --create
+        i=$((i + 1))
+    done
 }
 
 setup_spaces
@@ -97,4 +90,20 @@ yabai -m signal --add event=application_activated \
 yabai -m signal --add event=application_launched \
     action="sketchybar --trigger window_attention_changed"
 
-# borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 &
+# apply-yabai.sh owns external_bar, per-space gaps and the app rules.
+# It must run after setup_spaces and the space labels.
+#
+# EXECUTE it, do not source it. Sourcing would (a) let its `exit 1` abort the
+# rest of .yabairc, (b) leak its `set -u`, and (c) break its $0-derived WM_DIR.
+"$HOME/.config/wm/apply-yabai.sh"
+
+# display_changed is NOT a hotplug event: it fires whenever focus moves between
+# displays. Hooking a reload to it would rebuild the bar on every cmd+right.
+yabai -m signal --add event=display_added \
+    action="$HOME/.config/wm/on-display-change.sh"
+yabai -m signal --add event=display_removed \
+    action="$HOME/.config/wm/on-display-change.sh"
+yabai -m signal --add event=display_moved \
+    action="$HOME/.config/wm/on-display-change.sh"
+yabai -m signal --add event=display_resized \
+    action="$HOME/.config/wm/on-display-change.sh"
