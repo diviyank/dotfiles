@@ -80,6 +80,15 @@ rm -rf "$stub"
 # yabai discards invalid rules SILENTLY. `.yabairc` declared 5 and only 4 were
 # ever live, because `space=0` is invalid (spaces are 1-indexed). Nothing but
 # this assertion will ever tell you.
+#
+# Remove the declared labels first. yabai keeps a previously-good rule when a
+# re-add is rejected, so a warm rule list masks a silently-discarded rule --
+# which is precisely the bug this guard exists to catch. yabai startup runs
+# apply-yabai.sh against an empty rule list; test that path.
+for lbl in $(grep -oE -- '--add label=[A-Za-z_]+' "$WM_DIR/apply-yabai.sh" | cut -d= -f2); do
+    "$YABAI" -m rule --remove "$lbl" >/dev/null 2>&1
+done
+
 sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1
 sh "$WM_DIR/apply-yabai.sh" >/dev/null 2>&1   # twice: proves idempotency
 
