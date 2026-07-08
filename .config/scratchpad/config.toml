@@ -6,7 +6,9 @@ name = "kitty"
 target_type = "title"
 target = "Scratchpad"
 
-position = [1000, 40]
-size = [900, 1150]
+position = [765, 50]
+size = [700, 900]
+# position = [1000, 40]
+# size = [900, 1150]
 launch_type = "app_with_arg"
 launch_command = ["kitty.app", "--title", "Scratchpad"]

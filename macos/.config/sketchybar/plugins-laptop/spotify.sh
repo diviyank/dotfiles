@@ -57,7 +57,17 @@ update_track() {
 
 case "$SENDER" in
 "mouse.clicked")
-    osascript -e 'tell application "Spotify" to playpause'
+    case "$BUTTON" in
+    "left")
+        osascript -e 'tell application "Spotify" to playpause'
+        ;;
+    "right")
+        osascript -e 'tell application "Spotify" to next track'
+        ;;
+    "other")
+        osascript -e 'tell application "Spotify" to previous track'
+        ;;
+    esac
     ;;
 *)
     update_track
