@@ -60,7 +60,9 @@ setup_spaces() {
     done
 }
 
-setup_spaces
+if ! setup_spaces; then
+    printf 'wm: setup_spaces refused to run; spaces left as-is\n' >&2
+fi
 
 yabai -m space 1 --label one
 yabai -m space 2 --label two
@@ -95,7 +97,9 @@ yabai -m signal --add event=application_launched \
 #
 # EXECUTE it, do not source it. Sourcing would (a) let its `exit 1` abort the
 # rest of .yabairc, (b) leak its `set -u`, and (c) break its $0-derived WM_DIR.
-"$HOME/.config/wm/apply-yabai.sh"
+if ! "$HOME/.config/wm/apply-yabai.sh"; then
+    printf 'wm: apply-yabai.sh FAILED -- external_bar, gaps and app rules are NOT applied\n' >&2
+fi
 
 # display_changed is NOT a hotplug event: it fires whenever focus moves between
 # displays. Hooking a reload to it would rebuild the bar on every cmd+right.
