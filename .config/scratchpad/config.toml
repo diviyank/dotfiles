@@ -6,9 +6,13 @@ name = "kitty"
 target_type = "title"
 target = "Scratchpad"
 
-position = [765, 50]
-size = [700, 900]
-# position = [1000, 40]
-# size = [900, 1150]
+# Grid, not pixels: proportional on every display.
+# 9/20 = 45% wide; 11 + 9 = 20 -> flush right; 20 rows -> full height.
+# yabai's grid already subtracts external_bar and padding, so start-y = 0
+# sits just below the bar.
+rows = 20
+cols = 20
+position = [11, 0]        # start-x = col 11 (0-indexed), start-y = row 0
+size     = [9, 20]        # width = 9 cols, height = 20 rows
 launch_type = "app_with_arg"
 launch_command = ["kitty.app", "--title", "Scratchpad"]
