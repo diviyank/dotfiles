@@ -23,4 +23,11 @@ esac
 # The moved space is now visible on the destination, so focusing that display
 # follows it. (If the moved space is empty, macOS cannot focus the display and
 # this is a no-op -- the space still moved.)
-exec "$YABAI" -m display --focus "$dir"
+"$YABAI" -m display --focus "$dir" 2>/dev/null
+
+# The move renumbered space indices and changed the visible space on both
+# displays. A cross-display space move does not reliably fire a space_change, so
+# nudge the bar to re-read (current_space.sh queries yabai directly). The short
+# settle lets yabai finish marking the new visible spaces before the bar reads.
+sleep 0.15
+exec /opt/homebrew/bin/sketchybar --trigger space_change
