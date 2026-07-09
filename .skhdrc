@@ -38,9 +38,17 @@ cmd + shift - 0x1D : /opt/homebrew/bin/yabai -m window --space ten
 # FULLSCREEN
 ctrl - f : /opt/homebrew/bin/yabai -m window --toggle zoom-fullscreen
 
-# MOVE WINDOW TO DISPLAY, and follow it.
-cmd + shift + ctrl - left  : $HOME/.config/wm/move-to-display.sh west
-cmd + shift + ctrl - right : $HOME/.config/wm/move-to-display.sh east
+# MOVE WINDOW in a direction; cross to the adjacent display at the space's edge.
+cmd + shift - up    : $HOME/.config/wm/move-window.sh north
+cmd + shift - left  : $HOME/.config/wm/move-window.sh west
+cmd + shift - right : $HOME/.config/wm/move-window.sh east
+cmd + shift - down  : $HOME/.config/wm/move-window.sh south
+
+# MOVE THE WHOLE SPACE to the adjacent display, and follow it.
+cmd + ctrl + shift - up    : $HOME/.config/wm/move-space-to-display.sh north
+cmd + ctrl + shift - left  : $HOME/.config/wm/move-space-to-display.sh west
+cmd + ctrl + shift - right : $HOME/.config/wm/move-space-to-display.sh east
+cmd + ctrl + shift - down  : $HOME/.config/wm/move-space-to-display.sh south
 
 # TERMINAL
 cmd - return : open -na /Applications/kitty.app/Contents/MacOS/kitty

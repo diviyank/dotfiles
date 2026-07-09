@@ -173,9 +173,21 @@ sh "$WM_DIR/focus-direction.sh" __bogus__ >/dev/null 2>&1 \
     && bad "focus-direction.sh __bogus__ exited 0" \
     || ok "focus-direction.sh rejects an invalid direction"
 
-sh "$WM_DIR/move-to-display.sh" >/dev/null 2>&1 \
-    && bad "move-to-display.sh with no argument exited 0" \
-    || ok "move-to-display.sh rejects a missing argument"
+sh "$WM_DIR/move-window.sh" >/dev/null 2>&1 \
+    && bad "move-window.sh with no argument exited 0" \
+    || ok "move-window.sh rejects a missing argument"
+
+sh "$WM_DIR/move-window.sh" __bogus__ >/dev/null 2>&1 \
+    && bad "move-window.sh __bogus__ exited 0" \
+    || ok "move-window.sh rejects an invalid direction"
+
+sh "$WM_DIR/move-space-to-display.sh" >/dev/null 2>&1 \
+    && bad "move-space-to-display.sh with no argument exited 0" \
+    || ok "move-space-to-display.sh rejects a missing argument"
+
+sh "$WM_DIR/move-space-to-display.sh" __bogus__ >/dev/null 2>&1 \
+    && bad "move-space-to-display.sh __bogus__ exited 0" \
+    || ok "move-space-to-display.sh rejects an invalid direction"
 
 after=$("$YABAI" -m query --displays --display | "$JQ" -r '.index')
 [ "$before" = "$after" ] && ok "bad input did not move focus (display $before)" \
