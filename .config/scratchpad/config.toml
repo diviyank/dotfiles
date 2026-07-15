@@ -1,4 +1,7 @@
-scratchpad_space = 11
+# yabai space *label* (not index). Indices renumber when a display is attached
+# and macOS migrates spaces, which sent the hidden scratchpad to display 2.
+# The label "eleven" (set in .yabairc) stays put across topology changes.
+scratchpad_space = "eleven"
 launch_timeout = 5
 
 [[scratchpad]]
