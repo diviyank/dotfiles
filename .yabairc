@@ -51,7 +51,8 @@ setup_spaces() {
             ;;
     esac
 
-    # 11 is deliberate: scratchpad_space = 11 in ~/.config/scratchpad/config.toml.
+    # 11 is deliberate: it is what gives relabel-spaces.sh an eleventh space to
+    # name "eleven", the scratchpad_space in ~/.config/scratchpad/config.toml.
     local target_count=11
     local i="$current_count"
     while [ "$i" -lt "$target_count" ]; do
@@ -64,17 +65,9 @@ if ! setup_spaces; then
     printf 'wm: setup_spaces refused to run; spaces left as-is\n' >&2
 fi
 
-yabai -m space 1 --label one
-yabai -m space 2 --label two
-yabai -m space 3 --label three
-yabai -m space 4 --label four
-yabai -m space 5 --label five
-yabai -m space 6 --label six
-yabai -m space 7 --label seven
-yabai -m space 8 --label eight
-yabai -m space 9 --label nine
-yabai -m space 10 --label ten
-yabai -m space 11 --label eleven
+# Labels are assigned by relabel-spaces.sh, invoked from apply-yabai.sh below.
+# Assigning them here by index would undo the healing on the next login: after a
+# hotplug the indices no longer line up with the names the spaces already hold.
 
 # Every signal carries a label. `signal --add` WITHOUT a label APPENDS, so
 # re-sourcing this file silently duplicates every signal and each hook then fires

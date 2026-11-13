@@ -38,3 +38,7 @@ end
 
 # uv
 fish_add_path "/Users/diviyan/.local/bin"
+fish_add_path "/Library/TeX/texbin"
+# Claude Status Bar Monitor
+alias cs='claude-statusbar'
+alias cstatus='claude-statusbar'

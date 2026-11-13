@@ -25,6 +25,10 @@ esac
 # this is a no-op -- the space still moved.)
 "$YABAI" -m display --focus "$dir" 2>/dev/null
 
+# The move renumbered indices (app rules resolve labels to indices) and changed
+# which display's gaps the moved space needs.
+"$(dirname "$0")/apply-yabai.sh" >/dev/null
+
 # The move renumbered space indices and changed the visible space on both
 # displays. A cross-display space move does not reliably fire a space_change, so
 # nudge the bar to re-read (current_space.sh queries yabai directly). The short
