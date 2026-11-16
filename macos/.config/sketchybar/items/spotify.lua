@@ -24,15 +24,28 @@ local spotify = {}
 function spotify.state(callback)
   sbar.exec(STATE_QUERY, function(result)
     local lines = {}
-    for line in tostring(result):gmatch("[^\n]+") do table.insert(lines, line) end
+    for line in (tostring(result) .. "\n"):gmatch("([^\n]*)\n") do table.insert(lines, line) end
     callback({
-      running = lines[1] ~= nil,
+      running = (lines[1] or "") ~= "",
       playing = lines[1] == "playing",
       paused = lines[1] == "paused",
       artist = lines[2],
       title = lines[3],
     })
   end)
+end
+
+function spotify.describe(state)
+  if not state.title or state.title == "" then return nil end
+  if (state.artist or "") == "" then return state.title end
+  return string.format("%s — %s", state.artist, state.title)
+end
+
+function spotify.command(command)
+  sbar.exec(OSASCRIPT
+    .. [[ -e 'if application "Spotify" is running then']]
+    .. [[ -e 'tell application "Spotify" to ]] .. command .. "'"
+    .. [[ -e 'end if']])
 end
 
 sbar.add("event", "spotify_change", "com.spotify.client.PlaybackStateChanged")
@@ -47,12 +60,13 @@ local item = sbar.add("item", "spotify", {
 local function update()
   spotify.state(function(state)
     local accent = state.playing and colors.primary or colors.outline
+    local description = spotify.describe(state)
     item:set({
       drawing = state.playing or state.paused,
       icon = { color = accent },
       label = {
-        drawing = state.title ~= nil,
-        string = string.format("%s — %s", state.artist or "", state.title or ""),
+        drawing = description ~= nil,
+        string = description or "",
         color = accent,
       },
     })
@@ -62,9 +76,7 @@ end
 item:subscribe({ "spotify_change", "system_woke" }, update)
 item:subscribe("mouse.clicked", function(env)
   local command = click_commands[env.BUTTON]
-  if command then
-    sbar.exec(OSASCRIPT .. [[ -e 'tell application "Spotify" to ]] .. command .. "'")
-  end
+  if command then spotify.command(command) end
 end)
 update()
 

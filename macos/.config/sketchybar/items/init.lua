@@ -9,6 +9,7 @@ require("items.mail")
 require("items.discord")
 require("items.pomodoro")
 require("items.weather")
+require("items.dashboard")
 
 sbar.add("bracket", "status", { "battery", "volume", "mail", "discord", "pomodoro" }, {
   background = { color = require("colors").surface_container },

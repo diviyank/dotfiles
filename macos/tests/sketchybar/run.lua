@@ -212,7 +212,7 @@ function tests.test_layout()
   local left, right = {}, {}
   for _, call in ipairs(stub.find("add", function(kind) return kind == "item" end)) do
     local name, props = call.args[2], call.args[3]
-    if not name:match("^space%.") then
+    if not name:match("^space%.") and not props.position:match("^popup%.") then
       table.insert(props.position == "right" and right or left, name)
     end
   end
@@ -492,6 +492,138 @@ function tests.test_attention()
   windows = { { space = 2, ["is-demanding-attention"] = false } }
   stub.fire(attention, "window_attention_changed")
   eq(attention.props.drawing, false, "attention hidden")
+end
+
+function tests.test_spotify_empty_artist()
+  load_bar({ { "player state", "playing\n\nOne More Time\n" } })
+  local state
+  require("items.spotify").state(function(result) state = result end)
+  eq(state.running, true, "state running")
+  eq(state.artist, "", "empty artist kept empty")
+  eq(state.title, "One More Time", "title not shifted into artist")
+  eq(item("spotify").props.label.string, "One More Time", "label without artist")
+end
+
+local CAL = table.concat({
+  "   November 2026",
+  "Su Mo Tu We Th Fr Sa",
+  " 1  2  3  4  5  6  7",
+  " 8  9 10 11 12 13 14",
+  "15 16 17 18 19 20 21",
+  "22 23 24 25 26 27 28",
+  "29 30",
+  "",
+}, "\n") .. "\n"
+
+local function load_dashboard(spotify_output, weather_report)
+  now_override = os.time({ year = 2026, month = 11, day = 16, hour = 9 })
+  load_bar({
+    { "player state", function() return spotify_output end },
+    { "ipinfo%.io", { city = "Paris", region = "IDF" } },
+    { "wttr%.in", function() return weather_report end },
+    { "^cal %-h$", CAL },
+    { "^date '%+%%A %%%-d %%B'$", "Monday 16 November\n" },
+  })
+  return item("clock")
+end
+
+function tests.test_popup_toggle()
+  local clock = load_dashboard("", wttr(113, "02:00 PM"))
+  stub.calls = {}
+  stub.fire(clock, "mouse.clicked")
+  eq(clock.props.popup.drawing, "toggle", "click toggles popup")
+  eq(#execs("ipinfo%.io"), 1, "weather refreshed")
+  eq(#execs("player state"), 1, "spotify refreshed")
+  eq(#execs("^cal %-h$"), 1, "calendar refreshed")
+  eq(item("dashboard.date").props.label.string, "Monday 16 November", "date label")
+  eq(item("dashboard.date").props.position, "popup.clock", "date in clock popup")
+  stub.fire(clock, "mouse.exited.global")
+  eq(clock.props.popup.drawing, false, "exit hides popup")
+end
+
+function tests.test_popup_style()
+  local clock = load_dashboard("", wttr(113, "02:00 PM"))
+  stub.fire(clock, "mouse.clicked")
+  local popup = clock.props.popup
+  eq(popup.background.color, default_colors.surface, "popup colour")
+  eq(popup.background.corner_radius, 21, "popup corner radius")
+  eq(popup.background.border_width, 0, "popup border")
+  local date = item("dashboard.date")
+  eq(date.props.label.font, "Google Sans Flex:Medium:19.0", "date font")
+  eq(date.props.label.color, default_colors.on_surface, "date colour")
+  local header = item("dashboard.calendar.1")
+  eq(header.props.label.font, "CaskaydiaCove Nerd Font Mono:Regular:16.0", "calendar font")
+  eq(header.props.label.string, "   November 2026", "calendar header keeps alignment")
+  eq(header.props.label.color, default_colors.on_surface_variant, "calendar colour")
+  eq(item("dashboard.calendar.2").props.label.string, "Su Mo Tu We Th Fr Sa", "weekday row")
+  eq(item("dashboard.calendar.5").props.label.color, default_colors.primary, "today's week highlighted")
+  eq(item("dashboard.calendar.4").props.label.color, default_colors.on_surface_variant, "other week")
+  eq(item("dashboard.calendar.8").props.drawing, false, "unused calendar row hidden")
+  local icons = require("icons")
+  local weather = item("dashboard.weather")
+  eq(weather.props.drawing, true, "weather row shown")
+  eq(weather.props.icon.string, icons.clear_day, "weather icon")
+  eq(weather.props.icon.font, "Material Symbols Rounded:Regular:32.0", "weather icon font")
+  eq(weather.props.icon.color, default_colors.primary, "weather icon colour")
+  eq(weather.props.label.string, "14°C · Sunny · Waxing Gibbous", "weather row")
+  eq(weather.props.label.font, "Google Sans Flex:Regular:19.0", "weather label font")
+end
+
+function tests.test_popup_media_idle()
+  local clock = load_dashboard("", wttr(113, "02:00 PM"))
+  stub.fire(clock, "mouse.clicked")
+  local icons = require("icons")
+  local media = item("dashboard.media")
+  eq(media.props.icon.string, icons.music_note, "media icon")
+  eq(media.props.label.string, "Nothing playing", "idle media label")
+  for _, name in ipairs({ "prev", "playpause", "next" }) do
+    eq(item("dashboard." .. name).props.drawing, false, name .. " hidden when idle")
+  end
+  stub.calls = {}
+  stub.fire(item("dashboard.playpause"), "mouse.clicked")
+  for _, call in ipairs(stub.find("exec")) do
+    local cmd = call.args[1]
+    if cmd:find('application "Spotify"') then
+      assert(cmd:find('if application "Spotify" is running then', 1, true), "unguarded: " .. cmd)
+    end
+  end
+end
+
+function tests.test_popup_controls()
+  local clock = load_dashboard("playing\nDaft Punk\nOne More Time\n", wttr(113, "02:00 PM"))
+  stub.fire(clock, "mouse.clicked")
+  local icons = require("icons")
+  eq(item("dashboard.media").props.label.string, "Daft Punk — One More Time", "media label")
+  local playpause = item("dashboard.playpause")
+  eq(playpause.props.drawing, true, "playpause shown")
+  eq(playpause.props.icon.string, icons.pause, "pause glyph while playing")
+  eq(playpause.props.icon.font, "Material Symbols Rounded:Regular:24.0", "control font")
+  eq(playpause.props.icon.color, default_colors.on_surface, "control colour")
+  eq(item("dashboard.prev").props.icon.string, icons.skip_previous, "prev glyph")
+  eq(item("dashboard.next").props.icon.string, icons.skip_next, "next glyph")
+
+  for name, command in pairs({ prev = "previous track", playpause = "playpause", next = "next track" }) do
+    stub.calls = {}
+    stub.fire(item("dashboard." .. name), "mouse.clicked")
+    local runs = execs('tell application "Spotify" to ' .. command .. "'")
+    eq(#runs, 1, name .. " runs " .. command)
+    assert(runs[1].args[1]:find('if application "Spotify" is running then', 1, true), name .. " guarded")
+  end
+
+  stub.calls = {}
+  stub.fire(item("spotify"), "mouse.clicked", { BUTTON = "left" })
+  assert(execs("playpause")[1].args[1]:find('if application "Spotify" is running then', 1, true),
+    "bar click guarded")
+
+  load_dashboard("paused\nDaft Punk\nOne More Time\n", wttr(113, "02:00 PM"))
+  stub.fire(item("clock"), "mouse.clicked")
+  eq(item("dashboard.playpause").props.icon.string, icons.play_arrow, "play glyph while paused")
+end
+
+function tests.test_popup_weather_missing()
+  local clock = load_dashboard("", "")
+  stub.fire(clock, "mouse.clicked")
+  eq(item("dashboard.weather").props.drawing, false, "weather row hidden")
 end
 
 local names = {}

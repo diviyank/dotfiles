@@ -22,3 +22,5 @@ end
 
 clock:subscribe({ "routine", "forced", "system_woke" }, update)
 update()
+
+return clock
