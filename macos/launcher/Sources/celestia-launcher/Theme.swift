@@ -1,0 +1,90 @@
+#if canImport(AppKit)
+import AppKit
+import LauncherCore
+
+enum Theme {
+    enum Family {
+        static let text = "Google Sans Flex"
+        static let icons = "Material Symbols Rounded"
+    }
+
+    enum TextSize {
+        static let labelMedium: CGFloat = 16
+        static let bodySmall: CGFloat = 16
+        static let bodyMedium: CGFloat = 19
+        static let bodyLarge: CGFloat = 21
+    }
+
+    enum IconSize {
+        static let large: CGFloat = 32
+        static let search: CGFloat = 22
+    }
+
+    enum Rounding {
+        static let large: CGFloat = 12
+        static let extraLarge: CGFloat = 21
+    }
+
+    enum Spacing {
+        static let extraSmall: CGFloat = 4
+        static let small: CGFloat = 8
+        static let medium: CGFloat = 12
+        static let large: CGFloat = 16
+    }
+
+    enum Launcher {
+        static let contentWidth: CGFloat = 600
+        static let padding: CGFloat = Spacing.large
+        static let itemHeight: CGFloat = 57
+        static let maxRows = 7
+        static let appIcon: CGFloat = 46
+        static let cardWidth: CGFloat = 280
+        static let cardHeight: CGFloat = 200
+        static let maxCards = 9
+        static let searchVerticalPadding: CGFloat = 14
+        static let highlightAlpha: CGFloat = 0.08
+        static let dimmedCardAlpha: CGFloat = 0.6
+        static let placeholder = "Type \">\" for commands"
+    }
+
+    static let animationDuration: TimeInterval = 0.2
+
+    enum Glyph {
+        static let search = glyph(0xE8B6)
+        static let image = glyph(0xE3F4)
+        static let wallpaper = glyph(0xE1BC)
+    }
+
+    static func glyph(_ codepoint: UInt32) -> String {
+        Unicode.Scalar(codepoint).map { String(Character($0)) } ?? ""
+    }
+
+    static func font(_ family: String, size: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
+        let descriptor = NSFontDescriptor(fontAttributes: [
+            .family: family,
+            .traits: [NSFontDescriptor.TraitKey.weight: weight.rawValue],
+        ])
+        guard let font = NSFont(descriptor: descriptor, size: size), font.familyName == family else {
+            return .systemFont(ofSize: size, weight: weight)
+        }
+        return font
+    }
+
+    static func text(_ size: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
+        font(Family.text, size: size, weight: weight)
+    }
+
+    static func icon(_ size: CGFloat) -> NSFont {
+        font(Family.icons, size: size)
+    }
+
+    static func lineHeight(_ font: NSFont) -> CGFloat {
+        ceil(font.ascender - font.descender + font.leading)
+    }
+
+    static func color(_ palette: Palette, _ role: String, alpha: CGFloat = 1) -> NSColor {
+        let rgb = palette[role]
+        return NSColor(srgbRed: CGFloat(rgb.r), green: CGFloat(rgb.g), blue: CGFloat(rgb.b), alpha: alpha)
+    }
+}
+#endif

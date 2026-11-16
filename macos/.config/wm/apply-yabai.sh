@@ -60,6 +60,7 @@ done
 "$YABAI" -m rule --add label=mail  app="^(Mail)$"                           space=seven
 "$YABAI" -m rule --add label=chat  app="^(Discord)$"                        space=six
 "$YABAI" -m rule --add label=work  app="^(Slack|WhatsApp|Microsoft Teams)$" space=ten
+"$YABAI" -m rule --add label=celestia-launcher app="^celestia-launcher$" manage=off opacity=1.0
 
 # Rules only fire on window creation; --apply re-homes windows already open.
 "$YABAI" -m rule --apply
