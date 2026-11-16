@@ -14,8 +14,15 @@ local function popup_item(name, props)
     padding_left = theme.padding.large,
     padding_right = theme.padding.large,
     background = { drawing = false },
+    icon = { padding_left = 0, padding_right = theme.padding.small },
   }
-  for key, value in pairs(props) do defaults[key] = value end
+  for key, value in pairs(props) do
+    if type(value) == "table" and type(defaults[key]) == "table" then
+      for nested_key, nested_value in pairs(value) do defaults[key][nested_key] = nested_value end
+    else
+      defaults[key] = value
+    end
+  end
   return sbar.add("item", "dashboard." .. name, defaults)
 end
 

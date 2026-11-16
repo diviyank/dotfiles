@@ -6,6 +6,7 @@ return function(name, app, icon, update_freq, space)
   local badge = sbar.add("item", name, {
     position = "right",
     drawing = false,
+    updates = true,
     update_freq = update_freq,
     icon = { string = icon, color = colors.secondary },
     background = { drawing = false },

@@ -21,11 +21,18 @@ local front_app = sbar.add("item", "front_app", {
   position = "left",
   icon = { string = icons.desktop_windows, color = colors.primary },
   label = {
+    max_chars = 24,
     color = colors.primary,
     font = theme.font_string(theme.font.text, "Regular", theme.size.body_small),
   },
 })
 
-front_app:subscribe("front_app_switched", function(env)
-  front_app:set({ icon = { string = icon_for(env.INFO) }, label = { string = env.INFO } })
+local function show(app)
+  front_app:set({ icon = { string = icon_for(app) }, label = { string = app } })
+end
+
+front_app:subscribe("front_app_switched", function(env) show(env.INFO) end)
+
+sbar.exec("/opt/homebrew/bin/yabai -m query --windows --window", function(window)
+  if type(window) == "table" and window.app then show(window.app) end
 end)

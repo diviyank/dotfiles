@@ -145,6 +145,21 @@ function tests.test_front_app()
   eq(front_app.props.icon.string, icons.web, "case-insensitive app match")
   stub.fire(front_app, "front_app_switched", { INFO = "Some Unknown App" })
   eq(front_app.props.icon.string, icons.desktop_windows, "unknown app icon")
+  eq(front_app.props.label.max_chars, 24, "front app label clipped before the notch")
+end
+
+function tests.test_front_app_on_load()
+  load_bar({
+    { "query %-%-displays", displays(1) },
+    { "^/opt/homebrew/bin/yabai %-m query %-%-windows %-%-window$", { app = "Slack" } },
+  })
+  local icons = require("icons")
+  local front_app = item("front_app")
+  eq(front_app.props.label.string, "Slack", "front app label after reload")
+  eq(front_app.props.icon.string, icons.chat, "front app icon after reload")
+
+  load_bar({ { "query %-%-displays", displays(1) } })
+  eq(item("front_app").props.label.string, nil, "no focused window keeps label empty")
 end
 
 function tests.test_clock()
@@ -406,6 +421,7 @@ function tests.test_mail_discord_counts()
     local name, icon, freq, space = table.unpack(spec)
     local counter = item(name)
     eq(counter.props.update_freq, freq, name .. " update_freq")
+    eq(counter.props.updates, true, name .. " polls while hidden")
     eq(counter.props.icon.string, icon, name .. " icon")
     eq(counter.props.drawing, false, name .. " hidden at 0")
     labels[app] = "3"
@@ -480,6 +496,7 @@ function tests.test_attention()
   local icons = require("icons")
   local attention = item("attention")
   eq(attention.props.update_freq, 10, "attention update_freq")
+  eq(attention.props.updates, true, "attention polls while hidden")
   eq(#stub.find("add", function(kind, name) return kind == "event" and name == "window_attention_changed" end), 1,
     "window_attention_changed declared")
   stub.fire(attention, "window_attention_changed")
@@ -567,6 +584,10 @@ function tests.test_popup_style()
   eq(weather.props.icon.color, default_colors.primary, "weather icon colour")
   eq(weather.props.label.string, "14°C · Sunny · Waxing Gibbous", "weather row")
   eq(weather.props.label.font, "Google Sans Flex:Regular:19.0", "weather label font")
+  for _, row in ipairs({ "weather", "media", "prev" }) do
+    eq(item("dashboard." .. row).props.icon.padding_left, 0, row .. " icon aligned with date")
+    eq(item("dashboard." .. row).props.icon.padding_right, 8, row .. " icon gap")
+  end
 end
 
 function tests.test_popup_media_idle()

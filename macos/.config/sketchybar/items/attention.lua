@@ -8,6 +8,7 @@ sbar.add("event", "window_attention_changed")
 local attention = sbar.add("item", "attention", {
   position = "left",
   drawing = false,
+  updates = true,
   update_freq = 10,
   icon = { string = icons.notifications, color = colors.on_error },
   label = { color = colors.on_error },
