@@ -4,6 +4,10 @@ import LauncherCore
 
 let launcherToggleNotification = Notification.Name("local.celestia.launcher.toggle")
 
+private func logError(_ message: String) {
+    FileHandle.standardError.write(Data("celestia-launcher: \(message)\n".utf8))
+}
+
 final class LauncherPanel: NSPanel {
     var onCancel: (() -> Void)?
 
@@ -240,9 +244,11 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         switch resultsView.results {
         case .apps(let apps):
             guard apps.indices.contains(selected) else { return }
-            NSWorkspace.shared.openApplication(
-                at: apps[selected].url, configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil
-            )
+            let app = apps[selected]
+            NSWorkspace.shared.openApplication(at: app.url, configuration: NSWorkspace.OpenConfiguration()) { _, error in
+                guard let error else { return }
+                logError("cannot open \(app.url.path): \(error.localizedDescription)")
+            }
             hide()
         case .commands(let commands):
             guard commands.indices.contains(selected) else { return }
@@ -254,7 +260,11 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
             let process = Process()
             process.executableURL = home.appendingPathComponent(".local/bin/celestia-wallpaper")
             process.arguments = [wallpapers[selected].path]
-            try? process.run()
+            do {
+                try process.run()
+            } catch {
+                logError("cannot run \(process.executableURL?.path ?? "celestia-wallpaper"): \(error.localizedDescription)")
+            }
             hide()
         }
     }
