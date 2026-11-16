@@ -14,15 +14,8 @@ restart() {
 
 hyprctl reload
 
-restart waybar waybar
-restart hyprpaper hyprpaper
-restart hypridle hypridle
+restart qs caelestia shell -d
 restart pypr /home/diviyan/.local/bin/pypr
 restart nm-applet nm-applet --indicator
-
-sleep 2
-for monitor in DP-1 HDMI-A-1; do
-    hyprctl hyprpaper wallpaper "$monitor,/home/diviyan/Pictures/nord_dark_city.png"
-done
 
 notify-send "Hyprland" "Session reloaded" 2>/dev/null

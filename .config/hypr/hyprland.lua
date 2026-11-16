@@ -15,11 +15,8 @@ hl.monitor({ output = "DP-1",     mode = "1920x1080@239.76", position = "2560x18
 hl.on("hyprland.start", function()
     hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
     hl.exec_cmd("nm-applet --indicator")
-    hl.exec_cmd("waybar")
     hl.exec_cmd("/home/diviyan/.local/bin/pypr")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("sleep 2 && hyprctl hyprpaper wallpaper \"DP-1,/home/diviyan/Pictures/nord_dark_city.png\" && hyprctl hyprpaper wallpaper \"HDMI-A-1,/home/diviyan/Pictures/nord_dark_city.png\"")
-    hl.exec_cmd("hypridle")
+    hl.exec_cmd("caelestia shell -d")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
     hl.exec_cmd("discord")
@@ -37,8 +34,6 @@ end)
 local mod             = "SUPER"
 local terminal        = "kitty --session ~/.config/kitty/tmux_session.conf"
 local editor          = "kitty --config ~/.config/kitty/kitty_nvim.conf --session ~/.config/kitty/tmux_session.conf"
-local menu            = "wofi --show drun"
-local clip            = "cliphist list | wofi --dmenu | cliphist decode | wl-copy"
 local scratchpad_term = "kitty --class scratchpad --session ~/.config/kitty/tmux_session.conf"
 
 
@@ -62,28 +57,31 @@ hl.env("VDPAU_DRIVER", "radeonsi")
 
 hl.config({
     general = {
-        gaps_in          = 4,
-        gaps_out         = 4,
+        gaps_in          = 5,
+        gaps_out         = 10,
         border_size      = 0, -- matches your `border pixel 0`
         layout           = "dwindle",
         resize_on_border = true,
     },
 
     decoration = {
-        rounding = 6,
+        rounding = 12,
 
         blur = {
             enabled  = true,
-            size     = 5,
-            passes   = 2,
-            vibrancy = 0.2,
+            size              = 6,
+            passes            = 3,
+            vibrancy          = 0.2,
+            ignore_opacity    = true,
+            new_optimizations = true,
+            popups            = true,
         },
 
         shadow = {
             enabled      = true,
-            range        = 10,
+            range        = 20,
             render_power = 3,
-            color        = "rgba(00000066)",
+            color        = "rgba(0000004d)",
         },
     },
 
@@ -111,15 +109,19 @@ hl.config({
     },
 })
 
-hl.curve("easeOut", { type = "bezier", points = { {0.05, 0.9},   {0.1,  1.05} } })
-hl.curve("linear",  { type = "bezier", points = { {0.0,  0.0},   {1.0,  1.0}  } })
-hl.curve("snap",    { type = "bezier", points = { {0.68, -0.55}, {0.27, 1.55} } })
+hl.curve("emphasizedAccel", { type = "bezier", points = { {0.3,  0},   {0.8, 0.15} } })
+hl.curve("emphasizedDecel", { type = "bezier", points = { {0.05, 0.7}, {0.1, 1}    } })
+hl.curve("standard",        { type = "bezier", points = { {0.2,  0},   {0,   1}    } })
 
-hl.animation({ leaf = "windows",    enabled = true, speed = 4,  bezier = "easeOut" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 4,  bezier = "easeOut", style = "popin 80%" })
-hl.animation({ leaf = "fade",       enabled = true, speed = 4,  bezier = "linear" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 4,  bezier = "easeOut", style = "slide" })
-hl.animation({ leaf = "border",     enabled = true, speed = 10, bezier = "linear" })
+hl.animation({ leaf = "layersIn",    enabled = true, speed = 5, bezier = "emphasizedDecel", style = "slide" })
+hl.animation({ leaf = "layersOut",   enabled = true, speed = 4, bezier = "emphasizedAccel", style = "slide" })
+hl.animation({ leaf = "fadeLayers",  enabled = true, speed = 5, bezier = "standard" })
+hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5, bezier = "emphasizedDecel" })
+hl.animation({ leaf = "windowsOut",  enabled = true, speed = 3, bezier = "emphasizedAccel" })
+hl.animation({ leaf = "windowsMove", enabled = true, speed = 6, bezier = "standard" })
+hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, bezier = "standard" })
+hl.animation({ leaf = "fade",        enabled = true, speed = 6, bezier = "standard" })
+hl.animation({ leaf = "border",      enabled = true, speed = 6, bezier = "standard" })
 
 
 ---------------------
@@ -132,8 +134,8 @@ local left, down, up, right = "j", "k", "l", "semicolon"
 -- Apps
 hl.bind(mod .. " + Return",         hl.dsp.exec_cmd(terminal))
 hl.bind(mod .. " + SHIFT + Return", hl.dsp.exec_cmd(editor))
-hl.bind(mod .. " + SPACE",          hl.dsp.exec_cmd(menu))
-hl.bind("ALT + C",                  hl.dsp.exec_cmd(clip))
+hl.bind(mod .. " + SPACE",          hl.dsp.global("caelestia:launcher"))
+hl.bind("ALT + C",                  hl.dsp.exec_cmd("pkill fuzzel || caelestia clipboard"))
 hl.bind(mod .. " + SHIFT + Q",      hl.dsp.window.close())
 
 -- Fullscreen / floating
@@ -236,7 +238,12 @@ hl.bind(mod .. " + SHIFT + K", hl.dsp.exec_cmd(screenshot))
 hl.bind(mod .. " + SHIFT + apostrophe", hl.dsp.exec_cmd("~/.config/hypr/scripts/gif-record.sh"))
 
 -- Screen lock
-hl.bind(mod .. " + X", hl.dsp.exec_cmd("swaylock -f -c 000000"))
+hl.bind(mod .. " + X", hl.dsp.global("caelestia:lock"))
+hl.bind(mod .. " + D", hl.dsp.global("caelestia:dashboard"))
+hl.bind(mod .. " + ALT + L", function()
+    hl.dispatch(hl.dsp.exec_cmd("caelestia shell -d"))
+    hl.dispatch(hl.dsp.global("caelestia:lock"))
+end, { locked = true })
 
 -- Keyboard layout switching
 -- `hyprctl keyword` does not work with the Lua config manager, so set the
