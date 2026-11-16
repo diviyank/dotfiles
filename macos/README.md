@@ -13,13 +13,15 @@ git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && (cd /tmp/Sba
 cargo install matugen --locked --version 2.4.1
 brew install --cask font-google-sans-flex font-rubik font-material-symbols font-caskaydia-cove-nerd-font
 stow .
-stow -t ~ macos
+mkdir -p ~/.local/bin ~/.local/state ~/.cache
+stow --no-folding -t ~ macos
 mkdir -p ~/Pictures/Wallpapers   # copy the 24 wallpapers here
 ```
 
 System Settings:
 - Keyboard > Keyboard Shortcuts > Spotlight: disable Cmd+Space.
 - Wallpaper: set "Show on all Spaces".
+- Privacy & Security > Automation: allow `celestia-launcher` and `yabai` to control System Events (prompted on the first wallpaper change); re-check after re-running `install.sh`.
 
 Then:
 
@@ -59,9 +61,12 @@ Bar
 - [ ] Spotify not running or not installed: no "Where is Spotify?" dialog and Spotify is not launched
 - [ ] Spotify running: item and dashboard media row, including the play/pause glyph, update after its own controls
 - [ ] Scrolling on the volume item changes the volume; click mutes
+- [ ] Built-in display with Spotify playing and a long app name: nothing under the notch
 
 Dashboard
 - [ ] Clicking the clock opens the popup; `cal -h` shows a clean 8-line calendar with today highlighted
+- [ ] Weather row shows icon, temperature, condition and moon phase
+- [ ] Prev / play-pause / next controls drive Spotify
 - [ ] Popup alignment and padding look right
 - [ ] Moving the mouse onto the popup keeps it open; leaving closes it
 
@@ -69,6 +74,7 @@ Launcher
 - [ ] `macos/launcher/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes
 - [ ] Cmd+Space opens it in under ~100 ms, bottom-centre of the screen under the mouse
 - [ ] yabai does not tile it
+- [ ] Typing goes to the launcher straight away, without clicking it
 - [ ] Esc and focus loss close it
 - [ ] Return on an app ends with that app focused; Utilities apps are found
 - [ ] `>wallpaper` shows thumbnails and applies the chosen one
@@ -80,6 +86,7 @@ Wallpaper
 - [ ] `celestia-wallpaper <file>` sets every display and creates `~/.local/state/celestia/colors.lua`
 - [ ] Bar recolours after the reload and the launcher on its next open
 - [ ] Plugging a display re-applies the wallpaper (display-change hook)
+- [ ] System Events Automation is allowed for `celestia-launcher` and `yabai`; a wallpaper picked in the launcher applies
 
 Scripts
 - [ ] Lua, wallpaper and template tests pass; `~/.config/wm/selftest.sh` passes
