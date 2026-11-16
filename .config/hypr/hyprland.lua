@@ -118,7 +118,7 @@ hl.animation({ leaf = "layersOut",   enabled = true, speed = 4, bezier = "emphas
 hl.animation({ leaf = "fadeLayers",  enabled = true, speed = 5, bezier = "standard" })
 hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5, bezier = "emphasizedDecel" })
 hl.animation({ leaf = "windowsOut",  enabled = true, speed = 3, bezier = "emphasizedAccel" })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 6, bezier = "standard" })
+hl.animation({ leaf = "windowsMove", enabled = true, speed = 2.5, bezier = "standard" })
 hl.animation({ leaf = "workspaces",  enabled = true, speed = 2.5, bezier = "emphasizedDecel", style = "slide" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 6, bezier = "standard" })
 hl.animation({ leaf = "border",      enabled = true, speed = 6, bezier = "standard" })
@@ -286,3 +286,4 @@ hl.window_rule({ name = "ws8-calendar",    match = { class = "(Morgen|MineTime)"
 hl.window_rule({ name = "ws9-spotify",     match = { class = "Spotify" },    workspace = 9 })
 hl.window_rule({ name = "ws13-protonmail", match = { class = "(ProtonMail Bridge|Protonmail Desktop)" }, workspace = 13 })
 hl.window_rule({ name = "ws3-jetbrains",   match = { class = "(jetbrains-.*|Toolbox)" }, workspace = 3 })
+hl.window_rule({ name = "no-client-maximize", match = { class = ".*" }, suppress_event = "maximize" })
