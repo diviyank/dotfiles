@@ -43,6 +43,7 @@ local function load_bar(responses)
   stub.responses = responses or { { "query %-%-displays", displays(1) } }
   env_overrides.CELESTIA_STATE_DIR = env_overrides.CELESTIA_STATE_DIR or tmp_dir .. "/missing"
   env_overrides.CELESTIA_CONFIG_DIR = celestia_dir
+  env_overrides.HOME = env_overrides.HOME or tmp_dir .. "/home"
   for name in pairs(package.loaded) do
     if name == "init" or name == "theme" or name == "icons" or name == "colors"
       or name == "items" or name:match("^items%.") then
@@ -457,6 +458,15 @@ function tests.test_pomodoro_state()
   eq(read_file(state_file), "2600 rest\n", "click toggles phase")
   eq(pomodoro.props.icon.string, icons.coffee, "clicked to rest")
   eq(pomodoro.props.label.string, "05:00", "clicked rest countdown")
+end
+
+function tests.test_load_bar_isolates_home()
+  local home = tmp_dir .. "/home"
+  os.execute("mkdir -p '" .. home .. "/.config/sketchybar'")
+  os.remove(home .. "/.config/sketchybar/.pomodoro_state")
+  load_bar()
+  eq(os.getenv("HOME"), home, "HOME during tests")
+  assert(read_file(home .. "/.config/sketchybar/.pomodoro_state"), "pomodoro state written to test HOME")
 end
 
 function tests.test_attention()
