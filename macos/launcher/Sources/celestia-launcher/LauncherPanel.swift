@@ -16,7 +16,8 @@ final class LauncherPanel: NSPanel {
     override func cancelOperation(_ sender: Any?) { onCancel?() }
 
     static func make() -> LauncherPanel {
-        let panel = LauncherPanel(contentRect: .zero, styleMask: [.borderless], backing: .buffered, defer: false)
+        let panel = LauncherPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel],
+                                  backing: .buffered, defer: false)
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false
@@ -136,8 +137,6 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         let target = panel.frame
         panel.setFrame(target.offsetBy(dx: 0, dy: -Theme.Spacing.large), display: false)
         panel.alphaValue = 0
-        NSApp.unhide(nil)
-        NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
         panel.makeFirstResponder(field)
         (field.currentEditor() as? NSTextView)?.insertionPointColor = Theme.color(palette, "on_surface")
@@ -155,19 +154,18 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         isHiding = true
         defer { isHiding = false }
         panel.orderOut(nil)
-        if NSApp.isActive { NSApp.hide(nil) }
     }
 
     private func rescanApps() {
         guard !isScanningApps else { return }
         isScanningApps = true
-        let roots = ["/Applications", "/System/Applications", home.appendingPathComponent("Applications").path]
-            .map { URL(fileURLWithPath: $0, isDirectory: true) }
+        let roots = applicationRoots(home: home)
         DispatchQueue.global(qos: .utility).async {
             let scanned = scanApplications(roots: roots)
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.isScanningApps = false
+                guard scanned != self.apps else { return }
                 self.apps = scanned
                 self.icons.warm(scanned) { [weak self] in self?.redrawIfVisible() }
                 self.redrawIfVisible()
@@ -260,6 +258,10 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
             let process = Process()
             process.executableURL = home.appendingPathComponent(".local/bin/celestia-wallpaper")
             process.arguments = [wallpapers[selected].path]
+            process.terminationHandler = { finished in
+                guard finished.terminationStatus != 0 else { return }
+                logError("celestia-wallpaper exited with status \(finished.terminationStatus)")
+            }
             do {
                 try process.run()
             } catch {

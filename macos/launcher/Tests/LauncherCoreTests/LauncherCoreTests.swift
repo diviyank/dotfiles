@@ -36,6 +36,22 @@ final class LauncherCoreTests: XCTestCase {
         XCTAssertEqual(result[0].url.path, a.appendingPathComponent("Safari.app").path)
     }
 
+    func testScanAcceptsBundleRoots() throws {
+        try mkdir("CoreServices/Finder.app/Contents")
+        try mkdir("A/Safari.app")
+        let finder = tmp.appendingPathComponent("CoreServices/Finder.app")
+        let result = scanApplications(roots: [tmp.appendingPathComponent("A"), finder,
+                                              tmp.appendingPathComponent("Missing.app")])
+        XCTAssertEqual(result.map(\.name), ["Finder", "Safari"])
+        XCTAssertEqual(result[0].url.path, finder.path)
+    }
+
+    func testApplicationRootsIncludeFinder() {
+        let roots = applicationRoots(home: URL(fileURLWithPath: "/Users/me")).map(\.path)
+        XCTAssertTrue(roots.contains("/System/Library/CoreServices/Finder.app"))
+        XCTAssertTrue(roots.contains("/Users/me/Applications"))
+    }
+
     func testFuzzyBasics() {
         XCTAssertEqual(fuzzyScore("", "Safari"), 0)
         XCTAssertNil(fuzzyScore("xyz", "Safari"))
@@ -84,6 +100,7 @@ final class LauncherCoreTests: XCTestCase {
         let files = ["lake.jpg", "forest.png", "Mountain.jpg"].map { URL(fileURLWithPath: "/w/\($0)") }
         XCTAssertEqual(rankWallpapers("", files), files)
         XCTAssertEqual(rankWallpapers("lk", files).map(\.lastPathComponent), ["lake.jpg"])
+        XCTAssertEqual(rankWallpapers("j", files), [])
     }
 
     func testPaletteParsesHex() throws {

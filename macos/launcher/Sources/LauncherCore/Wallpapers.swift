@@ -14,7 +14,7 @@ public func scanWallpapers(in dir: URL) -> [URL] {
 public func rankWallpapers(_ query: String, _ files: [URL]) -> [URL] {
     if query.isEmpty { return files }
     let scored = files.enumerated().compactMap { index, url in
-        fuzzyScore(query, url.lastPathComponent).map { (index, url, $0) }
+        fuzzyScore(query, url.deletingPathExtension().lastPathComponent).map { (index, url, $0) }
     }
     return scored.sorted { $0.2 != $1.2 ? $0.2 > $1.2 : $0.0 < $1.0 }.map(\.1)
 }
