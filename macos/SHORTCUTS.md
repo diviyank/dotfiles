@@ -1,0 +1,56 @@
+# Shortcuts
+
+Update this file with every bind change (`.skhdrc`, launcher, bar items).
+
+Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of the number row, left to right, are spaces 1 to 10.
+
+## Windows
+
+| Keys | Action |
+|---|---|
+| `cmd - arrows` | Focus window in that direction, falling through to the adjacent display |
+| `cmd + shift - arrows` | Move window in that direction, crossing to the adjacent display at the edge |
+| `ctrl - f` | Toggle zoom-fullscreen |
+| `ctrl + shift - space` | Toggle the space layout between bsp and stack |
+| `ctrl + alt + cmd - r` | Reload yabai |
+
+## Spaces
+
+| Keys | Action |
+|---|---|
+| `cmd - 1..0` (0x12 0x13 0x14 0x15 0x17 0x16 0x1A 0x1C 0x19 0x1D) | Focus space one to ten |
+| `cmd + shift - 1..0` (same keycodes) | Move window to space one to ten |
+| `cmd + ctrl + shift - arrows` | Move the whole space to the adjacent display and follow it |
+
+## Apps
+
+| Keys | Action |
+|---|---|
+| `cmd - return` | New kitty window |
+| `cmd - tab` | Toggle kitty scratchpad |
+
+## Launcher
+
+| Keys | Action |
+|---|---|
+| `cmd - space` | Toggle the launcher (Spotlight's Cmd+Space must be disabled) |
+| `Return` | Open the selected app, apply the selected wallpaper, or complete the selected command |
+| `Esc` | Close |
+| `Up` / `Down` | Move selection |
+| `Shift+Tab` / `Tab` | Move selection up / down |
+| `Left` / `Right` | Move selection in wallpaper mode |
+| `>wallpaper` | Wallpaper picker with thumbnails |
+
+## Bar
+
+| Mouse | Action |
+|---|---|
+| Click a space number | Reload the bar |
+| Click the clock | Toggle the dashboard popup (closes when the mouse leaves) |
+| Click a dashboard media control | Previous / play-pause / next track |
+| Click Spotify (left / right / middle) | Play-pause / next track / previous track |
+| Click volume | Toggle mute |
+| Scroll volume | Change volume |
+| Click Mail | Focus space seven |
+| Click Discord | Focus space six |
+| Click the pomodoro | Skip to the next phase |
