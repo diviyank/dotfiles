@@ -620,6 +620,21 @@ function tests.test_popup_controls()
   eq(item("dashboard.playpause").props.icon.string, icons.play_arrow, "play glyph while paused")
 end
 
+function tests.test_popup_media_follows_spotify_change()
+  local output = "playing\nDaft Punk\nOne More Time\n"
+  load_dashboard("", wttr(113, "02:00 PM"))
+  stub.responses[1] = { "player state", function() return output end }
+  stub.fire(item("clock"), "mouse.clicked")
+  local icons = require("icons")
+  output = "paused\nDaft Punk\nOne More Time\n"
+  stub.fire(item("dashboard.media"), "spotify_change")
+  eq(item("dashboard.playpause").props.icon.string, icons.play_arrow, "glyph after pause")
+  output = "playing\nDaft Punk\nAerodynamic\n"
+  stub.fire(item("dashboard.media"), "spotify_change")
+  eq(item("dashboard.media").props.label.string, "Daft Punk — Aerodynamic", "title after next track")
+  eq(item("dashboard.playpause").props.icon.string, icons.pause, "glyph after resume")
+end
+
 function tests.test_popup_weather_missing()
   local clock = load_dashboard("", "")
   stub.fire(clock, "mouse.clicked")

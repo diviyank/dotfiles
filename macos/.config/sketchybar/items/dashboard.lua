@@ -97,6 +97,17 @@ local function refresh_calendar()
   end)
 end
 
+local function refresh_media()
+  spotify.state(function(state)
+    local active = state.playing or state.paused
+    media:set({ label = { string = spotify.describe(state) or "Nothing playing" } })
+    for _, control in pairs(controls) do control:set({ drawing = active }) end
+    controls.playpause:set({ icon = { string = state.playing and icons.pause or icons.play_arrow } })
+  end)
+end
+
+media:subscribe("spotify_change", refresh_media)
+
 local function refresh()
   sbar.exec("date '+%A %-d %B'", function(result)
     date:set({ label = { string = (tostring(result):gsub("%s+$", "")) } })
@@ -110,12 +121,7 @@ local function refresh()
       label = { string = string.format("%s · %s · %s", data.temp, data.desc, data.moon) },
     })
   end)
-  spotify.state(function(state)
-    local active = state.playing or state.paused
-    media:set({ label = { string = spotify.describe(state) or "Nothing playing" } })
-    for _, control in pairs(controls) do control:set({ drawing = active }) end
-    controls.playpause:set({ icon = { string = state.playing and icons.pause or icons.play_arrow } })
-  end)
+  refresh_media()
 end
 
 clock:subscribe("mouse.clicked", function()
