@@ -1,0 +1,41 @@
+#!/bin/sh
+# celestia-wallpaper <file> | --reapply | --current
+PATH="$PATH:/opt/homebrew/bin:$HOME/.cargo/bin:$HOME/.local/bin"
+STATE="${CELESTIA_STATE_DIR:-$HOME/.local/state/celestia}"
+
+set_on_every_desktop() {
+    escaped="$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+    osascript -e "tell application \"System Events\" to tell every desktop to set picture to POSIX file \"$escaped\""
+}
+
+case "${1:-}" in
+    --current)
+        cat "$STATE/wallpaper"
+        ;;
+    --reapply)
+        [ -s "$STATE/wallpaper" ] || exit 0
+        set_on_every_desktop "$(cat "$STATE/wallpaper")"
+        ;;
+    "")
+        echo "usage: celestia-wallpaper <file> | --reapply | --current" >&2
+        exit 2
+        ;;
+    *)
+        case "$1" in
+            /*) path="$1" ;;
+            *) path="$PWD/$1" ;;
+        esac
+        if [ ! -f "$path" ]; then
+            echo "celestia-wallpaper: no such file: $path" >&2
+            exit 1
+        fi
+        set_on_every_desktop "$path"
+        mkdir -p "$STATE"
+        printf '%s\n' "$path" > "$STATE/wallpaper"
+        if ! matugen image "$path" -t scheme-tonal-spot -m dark -c "$HOME/.config/celestia/matugen.toml"; then
+            echo "celestia-wallpaper: matugen failed" >&2
+            exit 1
+        fi
+        sketchybar --reload
+        ;;
+esac

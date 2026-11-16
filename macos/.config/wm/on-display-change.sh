@@ -27,4 +27,6 @@ if ! "$APPLY" >> "$LOG" 2>&1; then
     printf 'apply-yabai FAILED\n' >> "$LOG"
 fi
 
+"${WM_WALLPAPER:-$HOME/.local/bin/celestia-wallpaper}" --reapply >> "$LOG" 2>&1
+
 "$SKETCHYBAR" --reload >> "$LOG" 2>&1

@@ -1,0 +1,9 @@
+[config]
+
+[templates.celestia-lua]
+input_path = "~/.config/celestia/templates/colors.lua"
+output_path = "~/.local/state/celestia/colors.lua"
+
+[templates.celestia-json]
+input_path = "~/.config/celestia/templates/colors.json"
+output_path = "~/.local/state/celestia/colors.json"
