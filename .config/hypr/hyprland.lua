@@ -134,7 +134,7 @@ local left, down, up, right = "j", "k", "l", "semicolon"
 -- Apps
 hl.bind(mod .. " + Return",         hl.dsp.exec_cmd(terminal))
 hl.bind(mod .. " + SHIFT + Return", hl.dsp.exec_cmd(editor))
-hl.bind(mod .. " + SPACE",          hl.dsp.global("caelestia:launcher"))
+hl.bind(mod .. " + SPACE",          hl.dsp.exec_cmd("caelestia shell drawers toggle launcher"))
 hl.bind("ALT + C",                  hl.dsp.exec_cmd("pkill fuzzel || caelestia clipboard"))
 hl.bind(mod .. " + SHIFT + Q",      hl.dsp.window.close())
 
