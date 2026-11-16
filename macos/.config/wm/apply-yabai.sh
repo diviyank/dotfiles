@@ -24,8 +24,8 @@ uuids=$(wm_display_uuids) || {
     exit 1
 }
 
-# Bar is height=32. This was all:40:0.
-"$YABAI" -m config external_bar all:32:0
+# Bar is height=40 (Caelestia innerWidth).
+"$YABAI" -m config external_bar all:40:0
 
 # wm_display_uuids yields one uuid per line in index order, so the counter is
 # the display index. UUIDs contain no whitespace, so word-splitting is safe.

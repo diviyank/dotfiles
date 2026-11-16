@@ -102,9 +102,9 @@ for lbl in $(grep -oE -- '--add label=[A-Za-z0-9_-]+' "$WM_DIR/apply-yabai.sh" |
 done
 [ "$rule_fail" -eq 0 ] && ok "every declared rule label is live exactly once"
 
-[ "$("$YABAI" -m config external_bar)" = "all:32:0" ] \
-    && ok "external_bar = all:32:0" \
-    || bad "external_bar = $("$YABAI" -m config external_bar), expected all:32:0"
+[ "$("$YABAI" -m config external_bar)" = "all:40:0" ] \
+    && ok "external_bar = all:40:0" \
+    || bad "external_bar = $("$YABAI" -m config external_bar), expected all:40:0"
 
 # --- apply-yabai.sh must capture wm_* exit status, not iterate a substitution ---
 # `for x in $(wm_display_uuids)` discards the function's `return 1`: the loop
