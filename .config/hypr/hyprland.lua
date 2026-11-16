@@ -119,7 +119,7 @@ hl.animation({ leaf = "fadeLayers",  enabled = true, speed = 5, bezier = "standa
 hl.animation({ leaf = "windowsIn",   enabled = true, speed = 5, bezier = "emphasizedDecel" })
 hl.animation({ leaf = "windowsOut",  enabled = true, speed = 3, bezier = "emphasizedAccel" })
 hl.animation({ leaf = "windowsMove", enabled = true, speed = 6, bezier = "standard" })
-hl.animation({ leaf = "workspaces",  enabled = true, speed = 5, bezier = "standard" })
+hl.animation({ leaf = "workspaces",  enabled = true, speed = 2.5, bezier = "emphasizedDecel", style = "slide" })
 hl.animation({ leaf = "fade",        enabled = true, speed = 6, bezier = "standard" })
 hl.animation({ leaf = "border",      enabled = true, speed = 6, bezier = "standard" })
 
@@ -281,6 +281,7 @@ hl.bind(mod .. " + tab", hl.dsp.exec_cmd("/home/diviyan/.local/bin/pypr toggle t
 hl.window_rule({ name = "ws4-slack",       match = { class = "Slack" },      workspace = 4 })
 hl.window_rule({ name = "ws6-thunar",      match = { class = "Thunar" },     workspace = 6 })
 hl.window_rule({ name = "ws6-discord",     match = { class = "discord" },    workspace = 6 })
+hl.window_rule({ name = "discord-focus-on-activate", match = { class = "discord" }, focus_on_activate = true })
 hl.window_rule({ name = "ws7-mail",        match = { class = "(thunderbird|Thunderbird|betterbird|Mailspring|Mail)" }, workspace = 7 })
 hl.window_rule({ name = "ws8-calendar",    match = { class = "(Morgen|MineTime)" }, workspace = 8 })
 hl.window_rule({ name = "ws9-spotify",     match = { class = "Spotify" },    workspace = 9 })
