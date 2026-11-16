@@ -10,6 +10,7 @@ set_on_every_desktop() {
 
 case "${1:-}" in
     --current)
+        [ -s "$STATE/wallpaper" ] || exit 1
         cat "$STATE/wallpaper"
         ;;
     --reapply)
@@ -29,7 +30,7 @@ case "${1:-}" in
             echo "celestia-wallpaper: no such file: $path" >&2
             exit 1
         fi
-        set_on_every_desktop "$path"
+        set_on_every_desktop "$path" || { echo "celestia-wallpaper: osascript failed" >&2; exit 1; }
         mkdir -p "$STATE"
         printf '%s\n' "$path" > "$STATE/wallpaper"
         if ! matugen image "$path" -t scheme-tonal-spot -m dark -c "$HOME/.config/celestia/matugen.toml"; then

@@ -79,6 +79,20 @@ test_matugen_failure_keeps_wallpaper() {
     check matugen_failure_keeps_wallpaper $?
 }
 
+test_osascript_failure_keeps_state() {
+    setup; touch "$tmp/a.jpg"; STUB_EXIT_osascript=1 run "$tmp/a.jpg"
+    [ "$rc" -eq 1 ] && [ "$(cat "$tmp/err")" = "celestia-wallpaper: osascript failed" ] \
+        && [ ! -e "$CELESTIA_STATE_DIR/wallpaper" ] && [ "$(grep -v '^  ' "$log")" = "osascript" ]
+    check osascript_failure_keeps_state $?
+}
+
+test_current_without_state() {
+    setup; run --current
+    [ "$rc" -eq 1 ] && [ ! -s "$tmp/out" ] && [ ! -s "$tmp/err" ]
+    check current_without_state $?
+}
+
 for t in test_sets_all_then_colours test_relative_path_is_absolutised test_path_with_quotes \
-         test_missing_file test_reapply test_matugen_failure_keeps_wallpaper; do "$t"; done
+         test_missing_file test_reapply test_matugen_failure_keeps_wallpaper \
+         test_osascript_failure_keeps_state test_current_without_state; do "$t"; done
 if [ "$fails" -eq 0 ]; then echo "PASS wallpaper"; else echo "$fails failed"; exit 1; fi
