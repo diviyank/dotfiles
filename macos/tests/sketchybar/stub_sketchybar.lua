@@ -74,7 +74,8 @@ end
 function stub.exec(cmd, callback)
   record("exec", cmd)
   local response = ""
-  for pattern, answer in pairs(stub.responses) do
+  for _, entry in ipairs(stub.responses) do
+    local pattern, answer = entry[1], entry[2]
     if cmd:find(pattern) then
       response = type(answer) == "function" and answer(cmd) or answer
       break
