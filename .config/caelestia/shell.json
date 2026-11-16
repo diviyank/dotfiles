@@ -1,0 +1,28 @@
+{
+    "appearance": {
+        "rounding": { "scale": 0.75 }
+    },
+    "border": {
+        "rounding": 12
+    },
+    "bar": {
+        "persistent": true
+    },
+    "general": {
+        "idle": {
+            "lockBeforeSleep": true,
+            "inhibitWhenAudio": true,
+            "timeouts": [
+                { "timeout": 600, "idleAction": "lock", "respectInhibitors": true },
+                { "timeout": 900, "idleAction": "dpms off", "returnAction": "dpms on" }
+            ]
+        }
+    },
+    "services": {
+        "weatherLocation": "Paris",
+        "weatherUnits": "Celsius"
+    },
+    "paths": {
+        "wallpaperDir": "~/Pictures/Wallpapers"
+    }
+}
