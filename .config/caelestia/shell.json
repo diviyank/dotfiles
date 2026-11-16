@@ -6,7 +6,8 @@
         "rounding": 12
     },
     "bar": {
-        "persistent": true
+        "persistent": true,
+        "workspaces": { "displayType": "text", "label": "", "occupiedLabel": "", "activeLabel": "" }
     },
     "general": {
         "idle": {
