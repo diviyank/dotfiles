@@ -42,3 +42,13 @@ wm_gap_for_display() {
         *)                                    printf '3\n' ;;
     esac
 }
+
+# Frame thickness of the Celestia shell, from its settings file. Anything that
+# is not a non-negative integer falls back to the shell's default of 6.
+wm_border() {
+    _border=$("$WM_JQ" -r '.border // 6' "$HOME/.config/celestia/shell.json" 2>/dev/null)
+    case "$_border" in
+        ''|*[!0-9]*) printf '6\n' ;;
+        *) printf '%s\n' "$_border" ;;
+    esac
+}

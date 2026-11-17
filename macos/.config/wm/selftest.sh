@@ -102,9 +102,9 @@ for lbl in $(grep -oE -- '--add label=[A-Za-z0-9_-]+' "$WM_DIR/apply-yabai.sh" |
 done
 [ "$rule_fail" -eq 0 ] && ok "every declared rule label is live exactly once"
 
-[ "$("$YABAI" -m config external_bar)" = "all:40:0" ] \
-    && ok "external_bar = all:40:0" \
-    || bad "external_bar = $("$YABAI" -m config external_bar), expected all:40:0"
+[ "$("$YABAI" -m config external_bar)" = "all:0:0" ] \
+    && ok "external_bar = all:0:0" \
+    || bad "external_bar = $("$YABAI" -m config external_bar), expected all:0:0"
 
 # --- apply-yabai.sh must capture wm_* exit status, not iterate a substitution ---
 # `for x in $(wm_display_uuids)` discards the function's `return 1`: the loop
@@ -135,6 +135,26 @@ for u in $gap_uuids; do
     i=$((i + 1))
 done
 [ "$gap_fail" -eq 0 ] && ok "per-space window_gap matches wm_gap_for_display on every display"
+
+# --- the shell frame: wm_border reads shell.json, padding clears bar and frame ---
+border_home=$(mktemp -d)
+mkdir -p "$border_home/.config/celestia"
+[ "$(HOME="$border_home" wm_border)" = "6" ] && ok "wm_border default = 6" || bad "wm_border default = '$(HOME="$border_home" wm_border)', expected 6"
+printf '{"border":2}' > "$border_home/.config/celestia/shell.json"
+[ "$(HOME="$border_home" wm_border)" = "2" ] && ok "wm_border reads shell.json" || bad "wm_border = '$(HOME="$border_home" wm_border)', expected 2"
+printf '{"border":-1}' > "$border_home/.config/celestia/shell.json"
+[ "$(HOME="$border_home" wm_border)" = "6" ] && ok "wm_border rejects negatives" || bad "wm_border = '$(HOME="$border_home" wm_border)', expected 6"
+rm -rf "$border_home"
+
+pad_space=$(wm_spaces_on_display 1 | head -n 1)
+pad_gap=$(wm_gap_for_display "$(wm_display_uuids | head -n 1)")
+pad_border=$(wm_border)
+[ "$("$YABAI" -m config --space "$pad_space" left_padding)" = "$((40 + pad_gap))" ] \
+    && ok "left_padding = bar 40 + gap" \
+    || bad "left_padding = $("$YABAI" -m config --space "$pad_space" left_padding), expected $((40 + pad_gap))"
+[ "$("$YABAI" -m config --space "$pad_space" top_padding)" = "$((pad_border + pad_gap))" ] \
+    && ok "top_padding = border + gap" \
+    || bad "top_padding = $("$YABAI" -m config --space "$pad_space" top_padding), expected $((pad_border + pad_gap))"
 
 # --- debounce: one physical hotplug fires 3-4 signals; only the last must apply ---
 # WM_APPLY / WM_SKETCHYBAR are stubbed: this asserts the debounce, not the effects.

@@ -24,8 +24,11 @@ uuids=$(wm_display_uuids) || {
     exit 1
 }
 
-# Bar is height=40 (Caelestia innerWidth).
-"$YABAI" -m config external_bar all:40:0
+# The Celestia shell draws a 40 pt bar on the left and a frame of wm_border on
+# the other edges; padding keeps windows clear of both.
+BAR_WIDTH=40
+border=$(wm_border)
+"$YABAI" -m config external_bar all:0:0
 
 # wm_display_uuids yields one uuid per line in index order, so the counter is
 # the display index. UUIDs contain no whitespace, so word-splitting is safe.
@@ -39,8 +42,10 @@ for uuid in $uuids; do
     }
 
     for s in $spaces; do
-        for k in window_gap top_padding bottom_padding left_padding right_padding; do
-            "$YABAI" -m config --space "$s" "$k" "$gap"
+        "$YABAI" -m config --space "$s" window_gap "$gap"
+        "$YABAI" -m config --space "$s" left_padding $((BAR_WIDTH + gap))
+        for k in top_padding bottom_padding right_padding; do
+            "$YABAI" -m config --space "$s" "$k" $((border + gap))
         done
     done
     i=$((i + 1))
