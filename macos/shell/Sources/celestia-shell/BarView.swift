@@ -24,6 +24,7 @@ struct BarView: View {
             }
             Spacer(minLength: Theme.Spacing.large)
             ClockView(model: model)
+            StatusView(model: model)
         }
         .padding(.vertical, Theme.Spacing.small)
         .frame(width: Theme.Bar.width)
