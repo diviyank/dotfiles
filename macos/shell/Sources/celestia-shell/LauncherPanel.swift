@@ -68,7 +68,7 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         rescanApps()
     }
 
-    private static func loadCurrentPalette() -> Palette {
+    static func loadCurrentPalette() -> Palette {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return loadPalette(
             primary: home.appendingPathComponent(".local/state/celestia/colors.json"),

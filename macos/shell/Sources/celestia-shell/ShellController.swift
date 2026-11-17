@@ -1,0 +1,63 @@
+import AppKit
+import Combine
+import ShellCore
+
+@MainActor
+final class ShellController: NSObject {
+    private let model = BarModel()
+    private let launcher = LauncherController()
+    private var chromes: [String: DisplayChrome] = [:]
+    private var watchers: [FileWatcher] = []
+    private var subscriptions = Set<AnyCancellable>()
+
+    override init() {
+        super.init()
+        rebuildChromes()
+        watchers = [
+            FileWatcher(ShellPaths.colors) { [weak self] in self?.model.reloadPalette() },
+            FileWatcher(ShellPaths.settings) { [weak self] in self?.settingsChanged() },
+        ]
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(rebuildChromes), name: NSApplication.didChangeScreenParametersNotification, object: nil
+        )
+        DistributedNotificationCenter.default().addObserver(
+            self, selector: #selector(refresh), name: shellRefreshNotification, object: nil
+        )
+        let workspace = NSWorkspace.shared.notificationCenter
+        for name in [NSWorkspace.activeSpaceDidChangeNotification, NSWorkspace.didActivateApplicationNotification] {
+            workspace.addObserver(self, selector: #selector(refresh), name: name, object: nil)
+        }
+        model.$displays
+            .sink { [weak self] displays in self?.applyFullscreen(displays) }
+            .store(in: &subscriptions)
+        model.refresh()
+    }
+
+    @objc private func refresh() {
+        model.refresh()
+    }
+
+    @objc private func rebuildChromes() {
+        chromes.values.forEach { $0.close() }
+        chromes = [:]
+        for screen in NSScreen.screens {
+            guard let uuid = screen.displayUUID else { continue }
+            chromes[uuid] = DisplayChrome(screen: screen, uuid: uuid, model: model)
+        }
+        applyFullscreen(model.displays)
+        model.refresh()
+    }
+
+    private func applyFullscreen(_ displays: [ShellCore.BarDisplay]) {
+        for display in displays {
+            chromes[display.uuid]?.setVisible(!display.isFullscreen)
+        }
+    }
+
+    private func settingsChanged() {
+        guard model.reloadSettings() else { return }
+        Task.detached(priority: .utility) {
+            _ = runProcess("/bin/sh", [ShellPaths.applyYabai.path])
+        }
+    }
+}

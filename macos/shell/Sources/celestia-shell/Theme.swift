@@ -6,6 +6,7 @@ enum Theme {
     enum Family {
         static let text = "Google Sans Flex"
         static let icons = "Material Symbols Rounded"
+        static let numbers = "Rubik"
     }
 
     enum TextSize {
@@ -48,6 +49,16 @@ enum Theme {
     }
 
     static let animationDuration: TimeInterval = 0.2
+
+    enum Bar {
+        static let width: CGFloat = 40
+        static let innerRadius: CGFloat = 21
+        static let pillWidth: CGFloat = 32
+        static let cellWidth: CGFloat = 28
+        static let spaceIcon: CGFloat = 18
+        static let statusIcon: CGFloat = 20
+        static let clockSize: CGFloat = 18
+    }
 
     enum Glyph {
         static let search = glyph(0xE8B6)

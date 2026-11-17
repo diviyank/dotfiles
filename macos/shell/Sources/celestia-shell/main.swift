@@ -6,7 +6,7 @@ import AppKit
 private func serve() {
     let app = NSApplication.shared
     app.setActivationPolicy(.accessory)
-    let controller = LauncherController()
+    let controller = ShellController()
     withExtendedLifetime(controller) { app.run() }
 }
 

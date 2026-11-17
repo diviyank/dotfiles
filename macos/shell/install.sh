@@ -16,4 +16,9 @@ launchctl bootout "$domain/local.celestia.launcher" 2>/dev/null || true
 rm -f "$HOME/.local/bin/celestia-launcher"
 
 launchctl bootout "$domain/local.celestia.shell" 2>/dev/null || true
+tries=0
+while launchctl print "$domain/local.celestia.shell" >/dev/null 2>&1 && [ "$tries" -lt 50 ]; do
+    sleep 0.1
+    tries=$((tries + 1))
+done
 launchctl bootstrap "$domain" "$agent"
