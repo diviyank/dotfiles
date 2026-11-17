@@ -9,6 +9,15 @@ final class DashboardWindow: NSPanel {
 
     override var canBecomeKey: Bool { isPinned }
     override var canBecomeMain: Bool { false }
+    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
+
+    func slide(to frame: NSRect, entering: Bool, completion: (() -> Void)? = nil) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = entering ? Motion.enterDuration : Motion.exitDuration
+            context.timingFunction = entering ? Motion.enterCurve : Motion.exitCurve
+            animator().setFrame(frame, display: true)
+        } completionHandler: { completion?() }
+    }
 
     static func make() -> DashboardWindow {
         let window = DashboardWindow(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
@@ -34,7 +43,6 @@ final class DashboardPanel: ObservableObject {
     private var screen: NSScreen?
     private var overZone = false
     private var overPanel = false
-    private var pendingOpen: DispatchWorkItem?
     private var pendingClose: DispatchWorkItem?
     private var pendingTeardown: DispatchWorkItem?
     private var previousApp: NSRunningApplication?
@@ -42,9 +50,7 @@ final class DashboardPanel: ObservableObject {
     private var hasContent = false
 
     static let fillet: CGFloat = Theme.Bar.innerRadius
-    private static let openDelay = 0.08
     private static let closeDelay = 0.2
-    private static let growDuration = 0.4
 
     init(model: BarModel) {
         self.model = model
@@ -55,15 +61,10 @@ final class DashboardPanel: ObservableObject {
 
     func zoneHover(screen: NSScreen, inside: Bool) {
         overZone = inside
-        pendingOpen?.cancel()
         guard !window.isPinned else { return }
         guard inside else { return scheduleClose() }
         pendingClose?.cancel()
-        if isOpen {
-            if self.screen != screen { show(on: screen) }
-        } else {
-            pendingOpen = schedule(after: Self.openDelay) { [weak self] in self?.show(on: screen) }
-        }
+        if !isOpen || self.screen != screen { show(on: screen) }
     }
 
     func panelHover(_ inside: Bool) {
@@ -73,7 +74,6 @@ final class DashboardPanel: ObservableObject {
 
     func togglePinned(on screen: NSScreen) {
         if window.isPinned && isOpen { return close() }
-        pendingOpen?.cancel()
         pendingClose?.cancel()
         let front = NSWorkspace.shared.frontmostApplication
         previousApp = front?.processIdentifier == ProcessInfo.processInfo.processIdentifier ? nil : front
@@ -93,7 +93,6 @@ final class DashboardPanel: ObservableObject {
     }
 
     func close(restoringFocus: Bool = true) {
-        pendingOpen?.cancel()
         pendingClose?.cancel()
         overZone = false
         overPanel = false
@@ -102,11 +101,12 @@ final class DashboardPanel: ObservableObject {
         if let escapeMonitor { NSEvent.removeMonitor(escapeMonitor) }
         escapeMonitor = nil
         guard window.isVisible else { return }
-        withAnimation(Motion.emphasized) { revealed = false }
+        revealed = false
+        window.slide(to: window.frame.offsetBy(dx: 0, dy: window.frame.height), entering: false)
         if wasPinned && restoringFocus { previousApp?.activate() }
         previousApp = nil
         pendingTeardown?.cancel()
-        pendingTeardown = schedule(after: Self.growDuration) { [weak self] in
+        pendingTeardown = schedule(after: Motion.exitDuration + 0.05) { [weak self] in
             guard let self, !self.revealed else { return }
             self.window.orderOut(nil)
             self.window.contentView = NSView()
@@ -128,10 +128,16 @@ final class DashboardPanel: ObservableObject {
             window.contentView = host
             data.opened()
         }
-        window.setFrame(frame, display: true)
+        let wasRevealed = revealed && window.isVisible && self.screen == screen
         self.screen = screen
+        revealed = true
+        guard !wasRevealed else { return }
+        if !window.isVisible || window.frame.size != frame.size {
+            window.setFrame(frame.offsetBy(dx: 0, dy: frame.height), display: false)
+        }
+        window.contentView?.layoutSubtreeIfNeeded()
         window.orderFrontRegardless()
-        withAnimation(Motion.emphasized) { revealed = true }
+        window.slide(to: frame, entering: true)
     }
 
     private func scheduleClose() {
@@ -161,13 +167,8 @@ struct DashboardHost: View {
             DashboardView(panel: panel, model: model, data: data)
                 .padding(.top, panel.topInset)
                 .padding(.horizontal, DashboardPanel.fillet)
-                .opacity(panel.revealed ? 1 : 0)
-                .animation(Motion.fade, value: panel.revealed)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .mask(alignment: .top) {
-            Rectangle().scaleEffect(y: panel.revealed ? 1 : 0.001, anchor: .top)
-        }
         .overlay(HoverTracker { inside, _ in panel.panelHover(inside) })
         .ignoresSafeArea()
     }

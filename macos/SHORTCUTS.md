@@ -64,6 +64,9 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | `Esc` | Close a pinned dashboard |
 | Gear | Open System Settings |
 | Calendar arrows / month name | Previous or next month / back to today |
+| Click a day | Show that day's events; click it again or today to go back |
+| Click an event | Join its Meet, Zoom or Teams call, or open it in Calendar.app |
+| Click the CPU or RAM header | Sort the processes by it |
 
 ## Terminal
 

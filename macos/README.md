@@ -66,15 +66,22 @@ Frame and bar
 - [ ] Volume popout slider drags the volume
 - [ ] Lock locks the screen; Restart shows macOS's confirmation (cancel it)
 - [x] Idle: about 0 % CPU, footprint ≈ 21 MB
+- [x] Bar popouts open instantly, slide out of the bar and glide between items
+- [ ] Clicks right of the bar still reach windows while a popout is open
 
 Dashboard
-- [ ] `codesign -dv ~/.local/bin/celestia-shell` shows `Authority=Celestia Local`; Calendar and Spotify grants survive re-running `install.sh`
-- [ ] Hovering the top centre opens it within about 0.1 s; the very top still reveals the menu bar; leaving closes it
+- [x] `codesign -dv ~/.local/bin/celestia-shell` shows `Authority=Celestia Local`
+- [ ] Calendar and Spotify grants survive re-running `install.sh`
+- [x] Hovering the top centre (notch height) opens it instantly, sliding out of the top edge; leaving closes it
+- [ ] The very top still reveals the menu bar
 - [ ] alt+u and clicking the clock pin it; Esc, alt+u or a second click close it; hovering never moves focus
 - [x] On the built-in display the content sits below the notch
 - [ ] The gear opens System Settings
 - [x] Performance: `yes > /dev/null` shows at the top at about 100 % with its PID; closed, the shell is back to 0 % CPU
-- [ ] Calendar shows today's and tomorrow's events; an event added in Calendar.app appears without reopening; arrows change month
+- [x] Calendar shows today's and tomorrow's events
+- [ ] An event added in Calendar.app appears without reopening; arrows change month
+- [ ] Clicking a day shows its events; clicking an event joins its call (video icon) or opens it in Calendar.app
+- [ ] Clicking CPU or RAM in the process table sorts by it; processes appear about 0.5 s after opening
 - [x] Weather shows Paris and writes `~/.local/state/celestia/weather.json`
 - [ ] Offline, reopening shows the cached weather with its age; changing `weather.location` refetches on the next open
 - [ ] Spotify: track, artist, artwork and progress follow playback; controls work; quitting Spotify shows "Nothing playing" and opening the dashboard doesn't relaunch it

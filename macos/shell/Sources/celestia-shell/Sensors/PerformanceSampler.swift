@@ -22,6 +22,7 @@ final class PerformanceSampler: ObservableObject {
     let memoryTotal = ProcessInfo.processInfo.physicalMemory
 
     private static let interval: TimeInterval = 3
+    private static let warmUp: TimeInterval = 0.5
     private let queue = DispatchQueue(label: "local.celestia.shell.performance", qos: .utility)
     private let probe = SystemProbe()
     private var timer: DispatchSourceTimer?
@@ -36,6 +37,10 @@ final class PerformanceSampler: ObservableObject {
         }
         timer.resume()
         self.timer = timer
+        queue.asyncAfter(deadline: .now() + Self.warmUp) { [probe, weak self] in
+            let snapshot = probe.sample()
+            Task { @MainActor in self?.apply(snapshot) }
+        }
     }
 
     func stop() {
