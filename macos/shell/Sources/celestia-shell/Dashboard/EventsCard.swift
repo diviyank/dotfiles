@@ -7,6 +7,7 @@ struct EventsCard: View {
 
     private static let todayLimit = 3
     private static let tomorrowLimit = 2
+    private static let dayLimit = 5
 
     var body: some View {
         DashboardCard(model: model) {
@@ -18,12 +19,17 @@ struct EventsCard: View {
         }
     }
 
-    private var lists: some View {
-        let lists = agenda(store.events, now: store.now, calendar: .current)
-        return VStack(alignment: .leading, spacing: Theme.Spacing.extraSmall) {
-            section("TODAY", lists.today, limit: Self.todayLimit)
-            section("TOMORROW", lists.tomorrow, limit: Self.tomorrowLimit)
-                .padding(.top, Theme.Spacing.extraSmall)
+    @ViewBuilder private var lists: some View {
+        if let day = store.selectedDay {
+            section(day.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)).uppercased(),
+                    eventsOn(day, store.events, calendar: .current), limit: Self.dayLimit)
+        } else {
+            let lists = agenda(store.events, now: store.now, calendar: .current)
+            VStack(alignment: .leading, spacing: Theme.Spacing.extraSmall) {
+                section("TODAY", lists.today, limit: Self.todayLimit)
+                section("TOMORROW", lists.tomorrow, limit: Self.tomorrowLimit)
+                    .padding(.top, Theme.Spacing.extraSmall)
+            }
         }
     }
 
@@ -50,16 +56,25 @@ struct EventsCard: View {
                 .fill(Color(hex: event.colorHex) ?? model.color("tertiary"))
                 .frame(width: 3)
             VStack(alignment: .leading, spacing: 0) {
-                Text(event.title)
-                    .font(Font(Theme.text(Theme.Dashboard.smallText)))
-                    .foregroundStyle(model.color("on_surface"))
-                    .lineLimit(1)
+                HStack(spacing: Theme.Spacing.extraSmall) {
+                    Text(event.title)
+                        .font(Font(Theme.text(Theme.Dashboard.smallText)))
+                        .foregroundStyle(model.color("on_surface"))
+                        .lineLimit(1)
+                    if event.meetingURL != nil {
+                        Text(Glyph.videocam)
+                            .font(Font(Theme.icon(Theme.Dashboard.smallText)))
+                            .foregroundStyle(model.color("primary"))
+                    }
+                }
                 Text(timeRange(event))
                     .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Dashboard.tinyText)))
                     .foregroundStyle(model.color("on_surface_variant"))
             }
         }
         .fixedSize(horizontal: false, vertical: true)
+        .contentShape(Rectangle())
+        .onTapGesture { store.open(event) }
     }
 
     private func muted(_ text: String) -> some View {

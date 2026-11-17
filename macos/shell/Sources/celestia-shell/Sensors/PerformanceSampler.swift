@@ -6,7 +6,8 @@ struct PerformanceSnapshot: Sendable {
     let cpu: Double
     let memoryUsed: UInt64
     let diskFraction: Double
-    let top: [ProcessUsage]?
+    let topByCPU: [ProcessUsage]?
+    let topByMemory: [ProcessUsage]?
 }
 
 @MainActor
@@ -14,10 +15,13 @@ final class PerformanceSampler: ObservableObject {
     @Published private(set) var cpu: Double = 0
     @Published private(set) var memoryUsed: UInt64 = 0
     @Published private(set) var diskFraction: Double = 0
-    @Published private(set) var top: [ProcessUsage] = []
+    @Published private(set) var topByCPU: [ProcessUsage] = []
+    @Published private(set) var topByMemory: [ProcessUsage] = []
+    @Published var order = ProcessOrder.cpu
+    var top: [ProcessUsage] { order == .cpu ? topByCPU : topByMemory }
     let memoryTotal = ProcessInfo.processInfo.physicalMemory
 
-    private static let interval: TimeInterval = 2
+    private static let interval: TimeInterval = 3
     private let queue = DispatchQueue(label: "local.celestia.shell.performance", qos: .utility)
     private let probe = SystemProbe()
     private var timer: DispatchSourceTimer?
@@ -38,7 +42,9 @@ final class PerformanceSampler: ObservableObject {
         timer?.cancel()
         timer = nil
         queue.async { [probe] in probe.reset() }
-        top = []
+        topByCPU = []
+        topByMemory = []
+        order = .cpu
     }
 
     private func apply(_ snapshot: PerformanceSnapshot) {
@@ -46,7 +52,8 @@ final class PerformanceSampler: ObservableObject {
         cpu = snapshot.cpu
         memoryUsed = snapshot.memoryUsed
         diskFraction = snapshot.diskFraction
-        if let processes = snapshot.top { top = processes }
+        if let processes = snapshot.topByCPU { topByCPU = processes }
+        if let processes = snapshot.topByMemory { topByMemory = processes }
     }
 }
 
@@ -71,15 +78,17 @@ final class SystemProbe: @unchecked Sendable {
         let ticks = cpuTicks()
         let processes = processSamples()
         let cpu = previousTicks.isEmpty ? 0 : cpuBusyFraction(previous: previousTicks, current: ticks)
-        var top: [ProcessUsage]?
+        var byCPU: [ProcessUsage]?
+        var byMemory: [ProcessUsage]?
         if previousTime != 0 {
             let interval = Double(now - previousTime) * nanosPerTick / 1e9
-            top = topProcesses(previous: previousProcesses, current: processes, interval: interval)
+            byCPU = topProcesses(previous: previousProcesses, current: processes, interval: interval)
+            byMemory = topProcesses(previous: previousProcesses, current: processes, interval: interval, sortedBy: .memory)
         }
         previousTicks = ticks
         previousTime = now
         previousProcesses = Dictionary(processes.map { ($0.pid, $0) }, uniquingKeysWith: { $1 })
-        return PerformanceSnapshot(cpu: cpu, memoryUsed: memoryInUse(), diskFraction: diskUsage(), top: top)
+        return PerformanceSnapshot(cpu: cpu, memoryUsed: memoryInUse(), diskFraction: diskUsage(), topByCPU: byCPU, topByMemory: byMemory)
     }
 
     private func cpuTicks() -> [UInt64] {

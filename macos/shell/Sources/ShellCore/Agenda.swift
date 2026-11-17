@@ -7,14 +7,21 @@ public struct AgendaEvent: Equatable, Sendable {
     public let isAllDay: Bool
     public let isDeclined: Bool
     public let colorHex: String
+    public let meetingURL: URL?
+    public let detailURL: URL?
 
-    public init(title: String, start: Date, end: Date, isAllDay: Bool, isDeclined: Bool, colorHex: String) {
+    public init(
+        title: String, start: Date, end: Date, isAllDay: Bool, isDeclined: Bool, colorHex: String,
+        meetingURL: URL? = nil, detailURL: URL? = nil
+    ) {
         self.title = title
         self.start = start
         self.end = end
         self.isAllDay = isAllDay
         self.isDeclined = isDeclined
         self.colorHex = colorHex
+        self.meetingURL = meetingURL
+        self.detailURL = detailURL
     }
 
     func overlaps(_ interval: DateInterval) -> Bool {
@@ -39,6 +46,11 @@ public func agenda(_ events: [AgendaEvent], now: Date, calendar: Calendar) -> (t
     let todays = accepted.filter { $0.overlaps(today) && $0.end > now }
     let tomorrows = accepted.filter { $0.overlaps(tomorrow) }
     return (ordered(todays), ordered(tomorrows))
+}
+
+public func eventsOn(_ day: Date, _ events: [AgendaEvent], calendar: Calendar) -> [AgendaEvent] {
+    let interval = dayInterval(containing: day, calendar: calendar)
+    return ordered(events.filter { !$0.isDeclined && $0.overlaps(interval) })
 }
 
 public func eventDays(_ events: [AgendaEvent], year: Int, month: Int, calendar: Calendar) -> Set<Int> {

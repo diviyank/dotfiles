@@ -21,7 +21,11 @@ public struct ProcessUsage: Equatable, Sendable {
     public let footprint: UInt64
 }
 
-public func topProcesses(previous: [Int32: ProcessSample], current: [ProcessSample], interval: TimeInterval, limit: Int = 5) -> [ProcessUsage] {
+public enum ProcessOrder: Sendable { case cpu, memory }
+
+public func topProcesses(
+    previous: [Int32: ProcessSample], current: [ProcessSample], interval: TimeInterval, sortedBy order: ProcessOrder = .cpu, limit: Int = 5
+) -> [ProcessUsage] {
     let usages = current.map { sample -> ProcessUsage in
         let before = previous[sample.pid]?.cpuNanos ?? sample.cpuNanos
         let delta = sample.cpuNanos >= before ? sample.cpuNanos - before : 0
@@ -29,7 +33,10 @@ public func topProcesses(previous: [Int32: ProcessSample], current: [ProcessSamp
         return ProcessUsage(pid: sample.pid, name: sample.name, cpuPercent: percent, footprint: sample.footprint)
     }
     return Array(usages.sorted { lhs, rhs in
-        lhs.cpuPercent != rhs.cpuPercent ? lhs.cpuPercent > rhs.cpuPercent : lhs.footprint > rhs.footprint
+        switch order {
+        case .cpu: lhs.cpuPercent != rhs.cpuPercent ? lhs.cpuPercent > rhs.cpuPercent : lhs.footprint > rhs.footprint
+        case .memory: lhs.footprint != rhs.footprint ? lhs.footprint > rhs.footprint : lhs.cpuPercent > rhs.cpuPercent
+        }
     }.prefix(limit))
 }
 

@@ -75,7 +75,7 @@ final class DisplayChrome {
 
 extension DisplayChrome {
     private static func zoneFrame(_ screen: NSScreen, border: Double) -> NSRect {
-        hoverZone(screen: screen.frame, width: Theme.Dashboard.width, border: border)
+        hoverZone(screen: screen.frame, width: Theme.Dashboard.width, border: border, safeAreaTop: screen.safeAreaInsets.top)
     }
 }
 

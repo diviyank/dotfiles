@@ -76,3 +76,13 @@ private func event(_ title: String, _ start: Date, _ end: Date, allDay: Bool = f
     let intervals = eventFetchIntervals(year: 2026, month: 11, now: date(30, 12), calendar: paris)
     #expect(intervals == [DateInterval(start: date(1, 0), end: date(2, 0, month: 12))])
 }
+
+@Test func eventsOnPicksOneDay() {
+    let events = [
+        event("standup", date(25, 10), date(25, 11)),
+        event("declined", date(25, 12), date(25, 13), declined: true),
+        event("trip", date(24, 0), date(26, 0), allDay: true),
+        event("other", date(26, 9), date(26, 10)),
+    ]
+    #expect(eventsOn(date(25, 15), events, calendar: paris).map(\.title) == ["trip", "standup"])
+}

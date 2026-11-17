@@ -57,8 +57,8 @@ struct PerformanceCard: View {
             GridRow {
                 header("PID")
                 header("Process")
-                header("CPU").gridColumnAlignment(.trailing)
-                header("RAM").gridColumnAlignment(.trailing)
+                sortHeader("CPU", .cpu).gridColumnAlignment(.trailing)
+                sortHeader("RAM", .memory).gridColumnAlignment(.trailing)
             }
             ForEach(sampler.top, id: \.pid) { process in
                 GridRow {
@@ -79,6 +79,14 @@ struct PerformanceCard: View {
         Text(text)
             .font(Font(Theme.text(Theme.Dashboard.smallText)))
             .foregroundStyle(model.color("outline"))
+    }
+
+    private func sortHeader(_ text: String, _ order: ProcessOrder) -> some View {
+        Text(text)
+            .font(Font(Theme.text(Theme.Dashboard.smallText, weight: sampler.order == order ? .medium : .regular)))
+            .foregroundStyle(model.color(sampler.order == order ? "primary" : "outline"))
+            .contentShape(Rectangle())
+            .onTapGesture { sampler.order = order }
     }
 
     private func number(_ text: String, alarm: Bool = false) -> some View {

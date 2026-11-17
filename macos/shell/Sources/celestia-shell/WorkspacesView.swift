@@ -25,7 +25,7 @@ struct WorkspacesView: View {
     private func cell(_ space: BarSpace) -> some View {
         VStack(spacing: Theme.Spacing.extraSmall) {
             Text("\(space.number)")
-                .font(Font(Theme.font(Theme.Family.numbers, size: Theme.TextSize.labelMedium, weight: .medium)))
+                .font(Font(Theme.font(Theme.Family.numbers, size: Theme.TextSize.labelMedium)))
                 .foregroundStyle(model.color(space.isVisible ? "on_primary" : "on_surface_variant"))
             ForEach(Self.distinctApps(space.windows), id: \.app) { window in
                 if let icon = AppIcons.icon(pid: window.pid) {

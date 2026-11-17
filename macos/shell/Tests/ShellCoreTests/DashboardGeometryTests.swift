@@ -28,3 +28,8 @@ import Testing
 @Test func dashboardTopInsetWithoutNotch() {
     #expect(dashboardTopInset(border: 6, safeAreaTop: 0) == 6)
 }
+
+@Test func hoverZoneCoversNotchHeight() {
+    let zone = hoverZone(screen: CGRect(x: 0, y: 0, width: 1470, height: 956), width: 760, border: 6, safeAreaTop: 32)
+    #expect(zone == CGRect(x: 355, y: 924, width: 760, height: 30))
+}

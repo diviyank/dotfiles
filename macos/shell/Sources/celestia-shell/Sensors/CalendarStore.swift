@@ -25,6 +25,7 @@ final class CalendarStore: ObservableObject {
     @Published private(set) var events: [AgendaEvent] = []
     @Published private(set) var shown = MonthRef.containing(Date())
     @Published private(set) var now = Date()
+    @Published private(set) var selectedDay: Date?
 
     private lazy var store = EKEventStore()
     private var observers: [NSObjectProtocol] = []
@@ -67,12 +68,23 @@ final class CalendarStore: ObservableObject {
         observers = []
         generation += 1
         events = []
+        selectedDay = nil
         shown = .containing(Date())
     }
 
     func showPrevious() { show(shown.adding(months: -1)) }
     func showNext() { show(shown.adding(months: 1)) }
     func showToday() { show(.containing(Date())) }
+
+    func select(day: Int) {
+        let calendar = Calendar.current
+        guard let date = calendar.date(from: DateComponents(year: shown.year, month: shown.month, day: day)) else { return }
+        selectedDay = calendar.isDate(date, inSameDayAs: now) || selectedDay.map({ calendar.isDate($0, inSameDayAs: date) }) == true ? nil : date
+    }
+
+    func open(_ event: AgendaEvent) {
+        if let url = event.meetingURL ?? event.detailURL { NSWorkspace.shared.open(url) }
+    }
 
     func openPrivacySettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars") {
@@ -82,6 +94,7 @@ final class CalendarStore: ObservableObject {
 
     private func show(_ month: MonthRef) {
         shown = month
+        selectedDay = nil
         reload()
     }
 
@@ -112,7 +125,11 @@ final class CalendarStore: ObservableObject {
                     end: event.endDate,
                     isAllDay: event.isAllDay,
                     isDeclined: event.attendees?.first(where: \.isCurrentUser)?.participantStatus == .declined,
-                    colorHex: hex(event.calendar?.color)
+                    colorHex: hex(event.calendar?.color),
+                    meetingURL: meetingLink(url: event.url, location: event.location, notes: event.notes),
+                    detailURL: event.calendarItemExternalIdentifier
+                        .flatMap { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) }
+                        .flatMap { URL(string: "ical://ekevent/\($0)?method=show&options=more") }
                 )
             }
     }

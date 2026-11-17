@@ -60,19 +60,28 @@ struct MediaCard: View {
     }
 
     private func progress(_ track: SpotifyTrack) -> some View {
-        TimelineView(.periodic(from: spotify.measuredAt, by: 1)) { context in
-            let elapsed = track.isPlaying ? context.date.timeIntervalSince(spotify.measuredAt) : 0
-            let fraction = track.duration > 0 ? min((track.position + elapsed) / track.duration, 1) : 0
-            Capsule()
-                .fill(model.color("surface_container_highest"))
-                .frame(height: 4)
-                .overlay(alignment: .leading) {
-                    GeometryReader { proxy in
-                        Capsule().fill(model.color("primary")).frame(width: proxy.size.width * fraction)
-                    }
+        Group {
+            if track.isPlaying {
+                TimelineView(.periodic(from: spotify.measuredAt, by: 1)) { context in
+                    progressBar(track, elapsed: context.date.timeIntervalSince(spotify.measuredAt))
                 }
+            } else {
+                progressBar(track, elapsed: 0)
+            }
         }
         .padding(.vertical, Theme.Spacing.extraSmall)
+    }
+
+    private func progressBar(_ track: SpotifyTrack, elapsed: TimeInterval) -> some View {
+        let fraction = track.duration > 0 ? min((track.position + elapsed) / track.duration, 1) : 0
+        return Capsule()
+            .fill(model.color("surface_container_highest"))
+            .frame(height: 4)
+            .overlay(alignment: .leading) {
+                GeometryReader { proxy in
+                    Capsule().fill(model.color("primary")).frame(width: proxy.size.width * fraction)
+                }
+            }
     }
 
     private func controls(isPlaying: Bool) -> some View {

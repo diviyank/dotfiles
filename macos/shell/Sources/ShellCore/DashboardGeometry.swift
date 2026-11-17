@@ -1,7 +1,7 @@
 import CoreGraphics
 
-public func hoverZone(screen: CGRect, width: CGFloat, border: CGFloat, menuBarGap: CGFloat = 2) -> CGRect {
-    let height = max(border - menuBarGap, 2)
+public func hoverZone(screen: CGRect, width: CGFloat, border: CGFloat, safeAreaTop: CGFloat = 0, menuBarGap: CGFloat = 2) -> CGRect {
+    let height = max(dashboardTopInset(border: border, safeAreaTop: safeAreaTop) - menuBarGap, 2)
     return CGRect(x: screen.midX - width / 2, y: screen.maxY - menuBarGap - height, width: width, height: height)
 }
 

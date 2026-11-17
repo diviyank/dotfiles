@@ -52,3 +52,9 @@ private func sample(_ pid: Int32, _ cpuNanos: UInt64, footprint: UInt64 = 0) -> 
     #expect(formatBytes(62_914_560) == "60 MB")
     #expect(formatBytes(7_408_779_264) == "6.9 GB")
 }
+
+@Test func topProcessesRanksByMemory() {
+    let current = [sample(1, 9_000_000_000, footprint: 10), sample(2, 0, footprint: 300), sample(3, 0, footprint: 200)]
+    let top = topProcesses(previous: [:], current: current, interval: 2, sortedBy: .memory, limit: 2)
+    #expect(top.map { $0.pid } == [2, 3])
+}
