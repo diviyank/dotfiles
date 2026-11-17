@@ -1,6 +1,6 @@
 # macOS rice
 
-SketchyBar (SbarLua) bar, clock dashboard popup, native Swift launcher and wallpaper-derived colours (matugen), on top of yabai and skhd. Shortcuts: [SHORTCUTS.md](SHORTCUTS.md).
+A native Swift shell (`celestia-shell`): the Caelestia frame with a left bar, hover popouts and the launcher, coloured from the wallpaper (matugen), on top of yabai and skhd. Shortcuts: [SHORTCUTS.md](SHORTCUTS.md).
 
 ## Setup
 
@@ -8,8 +8,7 @@ Run from the repo root, in this order.
 
 ```sh
 xcode-select --install
-brew install lua jq rust sketchybar skhd yabai
-git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && (cd /tmp/SbarLua && make install) && rm -rf /tmp/SbarLua
+brew install jq rust skhd yabai
 cargo install matugen --locked --version 2.4.1
 brew install --cask font-google-sans-flex font-rubik font-material-symbols font-caskaydia-cove-nerd-font
 stow .
@@ -27,20 +26,18 @@ Then:
 
 ```sh
 macos/shell/install.sh           # builds, installs ~/.local/bin/celestia-shell, loads the LaunchAgent
-~/.local/bin/celestia-wallpaper ~/Pictures/Wallpapers/lakes-02-lake-hawea-05.jpg
-brew services restart sketchybar
+~/.local/bin/celestia-wallpaper ~/Pictures/Wallpapers/<file>
 skhd --restart-service
 ~/.config/wm/apply-yabai.sh
 ```
 
-Launcher log: `/tmp/celestia-shell.log`. Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
+Shell log: `/tmp/celestia-shell.log`. Settings: `~/.config/celestia/shell.json` (`border` in pt, default 6; `weather.location`). Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
 
 ## Tests
 
 ```sh
-lua macos/tests/sketchybar/run.lua        # Lua 5.5, as embedded by SbarLua
 sh macos/tests/wallpaper/test.sh
-sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper
+sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper already set
 (cd macos/shell && swift test)
 ~/.config/wm/selftest.sh
 ```
@@ -49,26 +46,21 @@ sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper
 
 Authored on Linux and never run on a Mac: tick each item.
 
-Bar
-- [ ] Bar on every display at 40 pt, not under the notch
-- [ ] yabai windows do not overlap the bar
-- [ ] One space item per display; its number updates on Cmd+N and when a space moves
-- [ ] Space numbers stay left of the front app on every display (async ordering via the hidden `spaces` anchor)
-- [ ] Fonts render: Google Sans Flex text, Rubik space numbers, Material Symbols Rounded icons, no tofu boxes
-- [ ] Status pill height and corner radius look right
-- [ ] Battery, weather, pomodoro, mail and Discord items show and update
-- [ ] Attention item appears when an app demands attention (yabai field `is-demanding-attention` is unverified; 10 s poll)
-- [ ] Spotify not running or not installed: no "Where is Spotify?" dialog and Spotify is not launched
-- [ ] Spotify running: item and dashboard media row, including the play/pause glyph, update after its own controls
-- [ ] Scrolling on the volume item changes the volume; click mutes
-- [ ] Built-in display with Spotify playing and a long app name: nothing under the notch
-
-Dashboard
-- [ ] Clicking the clock opens the popup; `cal -h` shows a clean 8-line calendar with today highlighted
-- [ ] Weather row shows icon, temperature, condition and moon phase
-- [ ] Prev / play-pause / next controls drive Spotify
-- [ ] Popup alignment and padding look right
-- [ ] Moving the mouse onto the popup keeps it open; leaving closes it
+Frame and bar
+- [x] Frame on every display: 40 pt left bar, 6 pt border, rounded inner corners; windows sit inside it
+- [x] Changing `border` in `shell.json` resizes the frame and yabai padding within a second
+- [x] Spaces column lists only this display's spaces with app icons; the highlight follows Cmd+N
+- [ ] Opening or closing a window updates the icons within a second
+- [ ] `move-space-to-display.sh` moves the space between bars; unplugging a display leaves one bar with every space
+- [x] Logo, active window title (vertical, clipped) and clock (flips on the minute)
+- [ ] Clicking the logo opens the launcher
+- [x] Volume icon follows the volume keys; Mail/Discord badges show within 30 s
+- [ ] Scrolling on volume changes it; clicking mutes
+- [ ] Battery follows plugging and unplugging the charger
+- [x] Hover popouts grow from the bar for the title, volume, Wi-Fi, battery and power, without taking focus
+- [ ] Volume popout slider drags the volume
+- [ ] Lock locks the screen; Restart shows macOS's confirmation (cancel it)
+- [x] Idle: about 0 % CPU, footprint ≈ 21 MB
 
 Launcher
 - [ ] `macos/shell/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes
@@ -83,10 +75,10 @@ Launcher
 - [ ] Errors, if any, appear in `/tmp/celestia-shell.log`
 
 Wallpaper
-- [ ] `celestia-wallpaper <file>` sets every display and creates `~/.local/state/celestia/colors.lua`
-- [ ] Bar recolours after the reload and the launcher on its next open
+- [ ] `celestia-wallpaper <file>` sets every display and creates `~/.local/state/celestia/colors.json`
+- [ ] The frame and bar recolour live; the launcher on its next open
 - [ ] Plugging a display re-applies the wallpaper (display-change hook)
 - [ ] System Events Automation is allowed for `celestia-shell` and `yabai`; a wallpaper picked in the launcher applies
 
 Scripts
-- [ ] Lua, wallpaper and template tests pass; `~/.config/wm/selftest.sh` passes
+- [x] Swift, wallpaper and template tests pass; `~/.config/wm/selftest.sh` passes

@@ -12,7 +12,6 @@ LOCK="${WM_LOCK:-${TMPDIR:-/tmp}/wm-display-change.lock}"
 LOG="${WM_LOG:-$HOME/.cache/wm/display-change.log}"
 DEBOUNCE="${WM_DEBOUNCE:-1.5}"
 APPLY="${WM_APPLY:-$WM_DIR/apply-yabai.sh}"
-SKETCHYBAR="${WM_SKETCHYBAR:-/opt/homebrew/bin/sketchybar}"
 
 mkdir -p "$(dirname "$LOG")"
 
@@ -28,5 +27,3 @@ if ! "$APPLY" >> "$LOG" 2>&1; then
 fi
 
 "${WM_WALLPAPER:-$HOME/.local/bin/celestia-wallpaper}" --reapply >> "$LOG" 2>&1
-
-"$SKETCHYBAR" --reload >> "$LOG" 2>&1

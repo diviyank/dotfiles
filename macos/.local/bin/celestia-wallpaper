@@ -41,6 +41,5 @@ case "${1:-}" in
             echo "celestia-wallpaper: matugen failed" >&2
             exit 1
         fi
-        sketchybar --reload
         ;;
 esac

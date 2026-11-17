@@ -34,4 +34,4 @@ esac
 # nudge the bar to re-read (current_space.sh queries yabai directly). The short
 # settle lets yabai finish marking the new visible spaces before the bar reads.
 sleep 0.15
-exec /opt/homebrew/bin/sketchybar --trigger space_change
+exec "$HOME/.local/bin/celestia-shell" refresh

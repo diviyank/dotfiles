@@ -45,12 +45,11 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 
 | Mouse | Action |
 |---|---|
-| Click a space number | Reload the bar |
-| Click the clock | Toggle the dashboard popup (closes when the mouse leaves) |
-| Click a dashboard media control | Previous / play-pause / next track |
-| Click Spotify (left / right / middle) | Play-pause / next track / previous track |
+| Click a space | Focus that space |
+| Click the logo | Open the launcher |
 | Click volume | Toggle mute |
-| Scroll volume | Change volume |
+| Scroll volume | Change volume by 5 % |
 | Click Mail | Focus space seven |
 | Click Discord | Focus space six |
-| Click the pomodoro | Skip to the next phase |
+| Hover the title, volume, Wi-Fi, battery or power | Open its popout (stays open while the mouse is on it) |
+| Power popout | Lock, sleep, restart or shut down |

@@ -8,7 +8,7 @@ setup() {
     tmp="$(cd "$(mktemp -d)" && pwd -P)"
     stubs="$tmp/stubs"; mkdir -p "$stubs"
     log="$tmp/log"; : > "$log"
-    for tool in osascript sips matugen sketchybar; do
+    for tool in osascript sips matugen; do
         cat > "$stubs/$tool" <<STUB
 #!/bin/sh
 echo "$tool" >> "$log"
@@ -35,12 +35,11 @@ test_sets_all_then_colours() {
     a=$?
     sargs="$(sed -n '/^sips$/,/^matugen$/p' "$log" | sed '1d;$d' | sed 's/^  //' | tr '\n' ' ')"
     b=0; [ "$sargs" = "-s format jpeg -Z 1024 $tmp/a.jpg --out $CELESTIA_STATE_DIR/source.jpg " ] || b=1
-    c=0; [ "$(grep -v '^  ' "$log" | tr '\n' ' ')" = "osascript sips matugen sketchybar " ] || c=1
-    has "  --reload"; d=$?
+    c=0; [ "$(grep -v '^  ' "$log" | tr '\n' ' ')" = "osascript sips matugen " ] || c=1
     e=0; [ "$("$script" --current)" = "$tmp/a.jpg" ] || e=1
-    margs="$(sed -n '/^matugen$/,/^sketchybar$/p' "$log" | sed '1d;$d' | sed 's/^  //' | tr '\n' ' ')"
+    margs="$(sed -n '/^matugen$/,$p' "$log" | sed '1d' | sed 's/^  //' | tr '\n' ' ')"
     [ "$margs" = "image $CELESTIA_STATE_DIR/source.jpg -t scheme-tonal-spot -m dark -c $HOME/.config/celestia/matugen.toml " ]; f=$?
-    check sets_all_then_colours $((rc + a + b + c + d + e + f))
+    check sets_all_then_colours $((rc + a + b + c + e + f))
 }
 
 test_relative_path_is_absolutised() {
@@ -75,7 +74,7 @@ test_reapply() {
 test_matugen_failure_keeps_wallpaper() {
     setup; touch "$tmp/a.jpg"; STUB_EXIT_matugen=1 run "$tmp/a.jpg"
     [ "$rc" -eq 1 ] && [ "$(cat "$tmp/err")" = "celestia-wallpaper: matugen failed" ] \
-        && [ "$(cat "$CELESTIA_STATE_DIR/wallpaper")" = "$tmp/a.jpg" ] && ! grep -q '^sketchybar$' "$log"
+        && [ "$(cat "$CELESTIA_STATE_DIR/wallpaper")" = "$tmp/a.jpg" ]
     check matugen_failure_keeps_wallpaper $?
 }
 

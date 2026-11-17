@@ -1,9 +1,0 @@
-#!/opt/homebrew/bin/lua
-
-local home = os.getenv("HOME")
-local config_dir = home .. "/.config/sketchybar"
-
-package.cpath = package.cpath .. ";" .. home .. "/.local/share/sketchybar_lua/?.so"
-package.path = config_dir .. "/?.lua;" .. config_dir .. "/?/init.lua;" .. package.path
-
-require("init")

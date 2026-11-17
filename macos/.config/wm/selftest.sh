@@ -4,7 +4,6 @@ set -u
 
 WM_DIR="$(cd "$(dirname "$0")" && pwd)"
 YABAI=/opt/homebrew/bin/yabai
-SKETCHYBAR=/opt/homebrew/bin/sketchybar
 JQ=/usr/bin/jq
 
 fails=0
@@ -12,7 +11,7 @@ ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
 
 # --- binaries exist ---
-for b in "$YABAI" "$SKETCHYBAR" "$JQ"; do
+for b in "$YABAI" "$JQ"; do
     if [ -x "$b" ]; then ok "binary $b"; else bad "binary $b missing"; fi
 done
 
@@ -49,7 +48,7 @@ gap=$(wm_gap_for_display EFF5329B-AEAE-4210-80F0-953761D1FC53)
 #
 # The `-` in the character class matters: `printf 'apply-yabai FAILED'` would
 # otherwise match, since `yabai ` there is preceded by a hyphen.
-BARE='(^|[^-/[:alnum:]_.])(yabai|jq|sketchybar)[[:space:]]'
+BARE='(^|[^-/[:alnum:]_.])(yabai|jq)[[:space:]]'
 for f in "$WM_DIR"/*.sh; do
     if grep -vE '^[[:space:]]*#' "$f" | grep -qE "$BARE"; then
         bad "$(basename "$f") invokes bare executable (should use absolute /opt/homebrew/bin paths)"
@@ -157,12 +156,12 @@ pad_border=$(wm_border)
     || bad "top_padding = $("$YABAI" -m config --space "$pad_space" top_padding), expected $((pad_border + pad_gap))"
 
 # --- debounce: one physical hotplug fires 3-4 signals; only the last must apply ---
-# WM_APPLY / WM_SKETCHYBAR are stubbed: this asserts the debounce, not the effects.
+# WM_APPLY and WM_WALLPAPER are stubbed: this asserts the debounce, not the effects.
 tmp=$(mktemp -d)
 i=1
 while [ "$i" -le 4 ]; do
     WM_LOCK="$tmp/lock" WM_LOG="$tmp/log" WM_DEBOUNCE=0.4 \
-    WM_APPLY=/usr/bin/true WM_SKETCHYBAR=/usr/bin/true \
+    WM_APPLY=/usr/bin/true WM_WALLPAPER=/usr/bin/true \
         sh "$WM_DIR/on-display-change.sh" &
     i=$((i + 1))
 done
@@ -213,15 +212,10 @@ after=$("$YABAI" -m query --displays --display | "$JQ" -r '.index')
 [ "$before" = "$after" ] && ok "bad input did not move focus (display $before)" \
                          || bad "focus moved from display $before to $after on bad input"
 
-# --- the bar must come back after a reload (on-display-change.sh depends on it) ---
-"$SKETCHYBAR" --reload >/dev/null 2>&1
-sleep 1
-items=$("$SKETCHYBAR" --query bar | "$JQ" '.items | length')
-case "$items" in
-    ''|*[!0-9]*) bad "bar item count unreadable: '$items'" ;;
-    *) [ "$items" -gt 0 ] && ok "bar has $items items after reload" \
-                          || bad "bar has no items after reload" ;;
-esac
+# --- the shell draws the bar; it must be running ---
+launchctl print "gui/$(id -u)/local.celestia.shell" 2>/dev/null | grep -q 'state = running' \
+    && ok "celestia-shell service running" \
+    || bad "celestia-shell service not running (run macos/shell/install.sh)"
 
 # --- every .yabairc signal must be labelled and registered exactly once ---
 # `signal --add` WITHOUT a label appends, so re-sourcing .yabairc duplicates every
