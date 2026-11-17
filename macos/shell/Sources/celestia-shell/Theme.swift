@@ -70,7 +70,7 @@ enum Theme {
         static let clockWidth: CGFloat = 170
         static let calendarWidth: CGFloat = 210
         static let topRowHeight: CGFloat = 160
-        static let bottomRowHeight: CGFloat = 124
+        static let bottomRowHeight: CGFloat = 150
         static let height: CGFloat = topRowHeight + gap + bottomRowHeight + 2 * padding
         static let clockSize: CGFloat = 40
         static let smallText: CGFloat = 12

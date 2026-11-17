@@ -20,7 +20,7 @@ struct DashboardView: View {
             HStack(spacing: Theme.Dashboard.gap) {
                 DashboardCard(model: model) { Color.clear }
                     .frame(width: Theme.Dashboard.clockWidth + Theme.Dashboard.calendarWidth / 2)
-                DashboardCard(model: model) { Color.clear }
+                PerformanceCard(model: model, sampler: data.performance)
             }
             .frame(height: Theme.Dashboard.bottomRowHeight)
         }

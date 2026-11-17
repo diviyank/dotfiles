@@ -2,7 +2,13 @@ import Foundation
 
 @MainActor
 final class DashboardModel: ObservableObject {
-    func opened() {}
+    let performance = PerformanceSampler()
 
-    func closed() {}
+    func opened() {
+        performance.start()
+    }
+
+    func closed() {
+        performance.stop()
+    }
 }
