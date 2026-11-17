@@ -40,6 +40,7 @@ public enum Glyph {
     public static let chevronRight = g(0xE5CC)
     public static let musicNote = g(0xE405)
     public static let videocam = g(0xE04B)
+    public static let brightness6 = g(0xE3AB)
 
     static let named: [(String, String)] = [
         ("spa", logo), ("battery_full", batteryFull), ("battery_charging_full", batteryChargingFull),
@@ -54,7 +55,7 @@ public enum Glyph {
         ("weather_snowy", snowy), ("thunderstorm", thunderstorm), ("settings", settings),
         ("skip_previous", skipPrevious), ("skip_next", skipNext), ("play_circle", playCircle),
         ("pause_circle", pauseCircle), ("chevron_left", chevronLeft), ("chevron_right", chevronRight),
-        ("music_note", musicNote), ("videocam", videocam),
+        ("music_note", musicNote), ("videocam", videocam), ("brightness_6", brightness6),
     ]
 }
 
