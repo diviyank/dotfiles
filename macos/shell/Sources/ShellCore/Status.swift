@@ -24,6 +24,21 @@ public enum Glyph {
     public static let lock = g(0xE897)
     public static let sleep = g(0xF159)
     public static let restart = g(0xF053)
+    public static let clearDay = g(0xF157)
+    public static let partlyCloudyDay = g(0xF172)
+    public static let cloud = g(0xE2BD)
+    public static let foggy = g(0xE818)
+    public static let rainy = g(0xF176)
+    public static let snowy = g(0xE2CD)
+    public static let thunderstorm = g(0xEBDB)
+    public static let settings = g(0xE8B8)
+    public static let skipPrevious = g(0xE045)
+    public static let skipNext = g(0xE044)
+    public static let playCircle = g(0xE1C4)
+    public static let pauseCircle = g(0xE1A2)
+    public static let chevronLeft = g(0xE5CB)
+    public static let chevronRight = g(0xE5CC)
+    public static let musicNote = g(0xE405)
 
     static let named: [(String, String)] = [
         ("spa", logo), ("battery_full", batteryFull), ("battery_charging_full", batteryChargingFull),
@@ -33,7 +48,12 @@ public enum Glyph {
         ("volume_mute", volumeMute), ("volume_off", volumeOff), ("wifi", wifi), ("wifi_off", wifiOff),
         ("network_wifi_1_bar", wifi1Bar), ("network_wifi_2_bar", wifi2Bar), ("network_wifi_3_bar", wifi3Bar),
         ("mail", mail), ("forum", forum), ("power_settings_new", power), ("lock", lock),
-        ("bedtime", sleep), ("restart_alt", restart),
+        ("bedtime", sleep), ("restart_alt", restart), ("clear_day", clearDay),
+        ("partly_cloudy_day", partlyCloudyDay), ("cloud", cloud), ("foggy", foggy), ("rainy", rainy),
+        ("weather_snowy", snowy), ("thunderstorm", thunderstorm), ("settings", settings),
+        ("skip_previous", skipPrevious), ("skip_next", skipNext), ("play_circle", playCircle),
+        ("pause_circle", pauseCircle), ("chevron_left", chevronLeft), ("chevron_right", chevronRight),
+        ("music_note", musicNote),
     ]
 }
 
