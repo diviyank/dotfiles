@@ -171,6 +171,15 @@ applied=$(grep -c '^apply ' "$tmp/log" 2>/dev/null || printf '0')
                      || bad "debounce: got $applied applies, expected 1"
 rm -rf "$tmp"
 
+# --- after a hotplug the shell re-reads the relabelled spaces ---
+tmp=$(mktemp -d)
+printf '#!/bin/sh\necho "$@" >> "%s/refreshed"\n' "$tmp" > "$tmp/shell"; chmod +x "$tmp/shell"
+WM_LOCK="$tmp/lock" WM_LOG="$tmp/log" WM_DEBOUNCE=0 WM_APPLY=/usr/bin/true WM_WALLPAPER=/usr/bin/true \
+    WM_SHELL="$tmp/shell" sh "$WM_DIR/on-display-change.sh"
+[ "$(cat "$tmp/refreshed" 2>/dev/null)" = "refresh" ] && ok "on-display-change refreshes the shell" \
+                                                       || bad "on-display-change does not refresh the shell"
+rm -rf "$tmp"
+
 # --- .skhdrc must not read $? after a pipeline (bug 5) ---
 SKHDRC="${SKHDRC:-$HOME/dotfiles/.skhdrc}"
 grep -q '\$?' "$SKHDRC" && bad ".skhdrc still tests \$? (unreliable after a pipeline)" \

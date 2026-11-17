@@ -27,3 +27,5 @@ if ! "$APPLY" >> "$LOG" 2>&1; then
 fi
 
 "${WM_WALLPAPER:-$HOME/.local/bin/celestia-wallpaper}" --reapply >> "$LOG" 2>&1
+
+"${WM_SHELL:-$HOME/.local/bin/celestia-shell}" refresh >> "$LOG" 2>&1

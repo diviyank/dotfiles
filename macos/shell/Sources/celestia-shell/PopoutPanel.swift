@@ -15,6 +15,7 @@ final class PopoutPanel: ObservableObject {
     private var overPopout = false
     private var pendingOpen: DispatchWorkItem?
     private var pendingClose: DispatchWorkItem?
+    private var isClosed = false
 
     static let fillet: CGFloat = Theme.Bar.innerRadius
     static let width: CGFloat = 240
@@ -44,6 +45,7 @@ final class PopoutPanel: ObservableObject {
     }
 
     func show(kind: PopoutKind, anchorY: CGFloat) {
+        guard !isClosed else { return }
         let body = NSHostingView(rootView: PopoutContent(kind: kind, model: model, popouts: self)).fittingSize
         let height = body.height + 2 * Self.fillet
         let y = min(max(anchorY - height / 2, screen.minY), screen.maxY - height)
@@ -63,7 +65,13 @@ final class PopoutPanel: ObservableObject {
         }
     }
 
-    func close() { panel.close() }
+    func close() {
+        isClosed = true
+        pendingOpen?.cancel()
+        pendingClose?.cancel()
+        panel.contentView = nil
+        panel.close()
+    }
 
     private func scheduleClose() {
         pendingClose?.cancel()
