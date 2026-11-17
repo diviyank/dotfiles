@@ -22,6 +22,7 @@ System Settings:
 - Wallpaper: set "Show on all Spaces".
 - Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change), and `celestia-shell` to control Spotify (prompted on the first dashboard open while Spotify runs).
 - Privacy & Security > Calendars: allow `celestia-shell` full access (prompted on the first dashboard open).
+- Privacy & Security > Accessibility: allow `celestia-shell` (prompted on first launch) so it handles the volume and brightness keys; without it the keys stay stock.
 
 Then:
 
@@ -86,6 +87,17 @@ Dashboard
 - [ ] Offline, reopening shows the cached weather with its age; changing `weather.location` refetches on the next open
 - [ ] Spotify: track, artist, artwork and progress follow playback; controls work; quitting Spotify shows "Nothing playing" and opening the dashboard doesn't relaunch it
 - [x] Footprint ≈ 24 MB closed, 27 MB open, 25 MB a minute after closing (before Spotify artwork)
+
+On-screen display
+- [ ] Volume and brightness keys show the OSD in the top half of the right border, never macOS's overlay
+- [ ] Steps are 1/16; Shift+Option gives 1/64; Option+key opens Sound or Displays settings
+- [ ] Mute shows the muted icon; volume up while muted unmutes
+- [ ] AirPods or Control Centre volume changes show the OSD too
+- [ ] It hides 1.5 s after the last change, unless the mouse is on it
+- [ ] Hovering the top half of the right edge opens it; the middle of the right edge still reveals the Dock
+- [ ] Dragging or scrolling a slider sets the level
+- [ ] Without Accessibility, or with the shell stopped, the keys behave as stock macOS
+- [ ] Closed, the shell is back to 0 % CPU
 
 Launcher
 - [ ] `macos/shell/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes

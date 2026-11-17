@@ -8,6 +8,7 @@ final class ShellController: NSObject {
     private let launcher = LauncherController()
     private lazy var dashboard = DashboardPanel(model: model)
     private lazy var osd = OSDPanel(model: model)
+    private lazy var mediaKeys = MediaKeyTap { [weak self] key, step in self?.apply(key, step: step) }
     private var chromes: [String: DisplayChrome] = [:]
     private var watchers: [FileWatcher] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -39,6 +40,7 @@ final class ShellController: NSObject {
             .sink { [weak self] displays in self?.applyFullscreen(displays) }
             .store(in: &subscriptions)
         model.refresh()
+        mediaKeys.start()
     }
 
     @objc private func refresh() {
@@ -48,6 +50,18 @@ final class ShellController: NSObject {
     @objc private func toggleDashboard() {
         guard let screen = screenUnderMouse() else { return }
         dashboard.togglePinned(on: screen)
+    }
+
+    private func apply(_ key: MediaKey, step: KeyStep) {
+        let fine = step == .fine
+        let volume = VolumeSensor.shared
+        let brightness = BrightnessSensor.shared
+        switch key {
+        case .soundUp, .soundDown: volume.set(level: stepLevel(volume.level, up: key == .soundUp, fine: fine))
+        case .mute: volume.toggleMute()
+        case .brightnessUp, .brightnessDown: brightness.set(stepLevel(brightness.level, up: key == .brightnessUp, fine: fine))
+        }
+        flashOSD()
     }
 
     private func flashOSD() {

@@ -68,6 +68,17 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Click an event | Join its Meet, Zoom or Teams call, or open it in Calendar.app |
 | Click the CPU or RAM header | Sort the processes by it |
 
+## On-screen display
+
+| Key or mouse | Action |
+|---|---|
+| Volume up / down, mute | Change the volume by 1/16 and show the OSD (no macOS overlay) |
+| Brightness up / down | Change the built-in display's brightness by 1/16 and show the OSD |
+| `shift + option` + volume or brightness key | Fine steps of 1/64 |
+| `option` + volume or brightness key | Open Sound or Displays settings (stock macOS) |
+| Hover the top half of the right border | Open the OSD while the mouse stays on it |
+| Drag or scroll a slider | Set its level |
+
 ## Terminal
 
 | Command | Action |
