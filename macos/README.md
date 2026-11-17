@@ -92,6 +92,7 @@ On-screen display
 - [ ] Volume and brightness keys show the OSD in the top half of the right border, never macOS's overlay
 - [ ] Steps are 1/16; Shift+Option gives 1/64; Option+key opens Sound or Displays settings
 - [ ] Mute shows the muted icon; volume up while muted unmutes
+- [ ] Brightness never goes below 10 % (keys, drag or scroll)
 - [ ] AirPods or Control Centre volume changes show the OSD too
 - [ ] It hides 1.5 s after the last change, unless the mouse is on it
 - [ ] Hovering the top half of the right edge opens it; the middle of the right edge still reveals the Dock

@@ -58,3 +58,11 @@ import Testing
     #expect(stepOrigin(current: 0.30, lastTarget: 0.5625) == 0.30)
     #expect(stepOrigin(current: 0.30, lastTarget: nil) == 0.30)
 }
+
+@Test func brightnessNeverGoesBelowTenPercent() {
+    #expect(clampBrightness(0.0625) == 0.1)
+    #expect(clampBrightness(-1) == 0.1)
+    #expect(clampBrightness(0.5) == 0.5)
+    #expect(clampBrightness(2) == 1)
+    #expect(clampBrightness(stepLevel(0.1, up: true, fine: false)) == 0.125)
+}

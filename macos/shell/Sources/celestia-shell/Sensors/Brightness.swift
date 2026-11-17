@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import ShellCore
 
 @MainActor
 final class BrightnessSensor: ObservableObject {
@@ -32,7 +33,7 @@ final class BrightnessSensor: ObservableObject {
 
     func set(_ level: Double) {
         guard let display, let setBrightness else { return }
-        let clamped = min(max(level, 0), 1)
+        let clamped = clampBrightness(level)
         guard setBrightness(display, Float(clamped)) == 0 else { return }
         self.level = clamped
     }

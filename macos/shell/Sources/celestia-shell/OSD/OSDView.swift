@@ -48,27 +48,33 @@ struct OSDSliders: View {
     private func slider(
         level: Double, role: String, glyph: String, set: @escaping (Double) -> Void, step: @escaping (Bool) -> Void
     ) -> some View {
-        VStack(spacing: Theme.Spacing.extraSmall) {
-            Text("\(Int((level * 100).rounded()))")
-                .font(Font(Theme.font(Theme.Family.numbers, size: Theme.OSD.labelSize)))
-                .foregroundStyle(model.color("on_surface"))
+        let clamped = min(max(level, 0), 1)
+        let percent = Int((clamped * 100).rounded())
+        return VStack(spacing: Theme.Spacing.small) {
+            Text("\(percent)")
+                .font(Font(Theme.font(Theme.Family.numbers, size: Theme.OSD.labelSize, weight: .medium)))
+                .foregroundStyle(model.color("on_surface_variant"))
                 .monospacedDigit()
+                .contentTransition(.numericText(value: Double(percent)))
             GeometryReader { proxy in
+                let knob = proxy.size.width
                 ZStack(alignment: .bottom) {
-                    Capsule().fill(model.color("surface_container_highest"))
+                    Capsule().fill(model.color("surface_container_high"))
                     Capsule()
                         .fill(model.color(role))
-                        .frame(height: max(proxy.size.width, proxy.size.height * min(max(level, 0), 1)))
-                        .opacity(level > 0 ? 1 : 0)
+                        .frame(height: knob + (proxy.size.height - knob) * clamped)
+                        .overlay(alignment: .top) {
+                            Text(glyph)
+                                .font(Font(Theme.icon(Theme.OSD.iconSize)))
+                                .foregroundStyle(model.color("on_" + role))
+                                .frame(width: knob, height: knob)
+                        }
                 }
                 .overlay(LevelCatcher(onLevel: set, onStep: step))
             }
-            .frame(width: Theme.OSD.sliderWidth)
-            Text(glyph)
-                .font(Font(Theme.icon(Theme.OSD.iconSize)))
-                .foregroundStyle(model.color("on_surface"))
         }
         .frame(width: Theme.OSD.sliderWidth)
+        .animation(.smooth(duration: Theme.OSD.levelAnimation), value: clamped)
     }
 }
 
@@ -103,8 +109,11 @@ struct LevelCatcher: NSViewRepresentable {
 
         private func report(_ event: NSEvent) {
             guard bounds.height > 0 else { return }
-            let y = convert(event.locationInWindow, from: nil).y
-            onLevel(Double(min(max(y / bounds.height, 0), 1)))
+            let knob = bounds.width
+            let travel = bounds.height - knob
+            guard travel > 0 else { return }
+            let y = convert(event.locationInWindow, from: nil).y - knob / 2
+            onLevel(Double(min(max(y / travel, 0), 1)))
         }
     }
 }

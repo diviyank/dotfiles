@@ -49,6 +49,12 @@ public func stepLevel(_ level: Double, up: Bool, fine: Bool) -> Double {
     return min(max(target / steps, 0), 1)
 }
 
+public let minimumBrightness = 0.1
+
+public func clampBrightness(_ level: Double) -> Double {
+    min(max(level, minimumBrightness), 1)
+}
+
 private let deviceRoundingTolerance = 0.5 / fineSteps
 
 public func stepOrigin(current: Double, lastTarget: Double?) -> Double {
