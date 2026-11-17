@@ -72,21 +72,21 @@ fi
 # Every signal carries a label. `signal --add` WITHOUT a label APPENDS, so
 # re-sourcing this file silently duplicates every signal and each hook then fires
 # twice. With a label it replaces. Same trap as the app rules.
-yabai -m signal --add label=wm_win_focused   event=window_focused   action="sketchybar --trigger window_focus"
-yabai -m signal --add label=wm_win_created   event=window_created   action="sketchybar --trigger windows_on_spaces"
-yabai -m signal --add label=wm_win_destroyed event=window_destroyed action="sketchybar --trigger windows_on_spaces"
-
-# yabai -m signal --add event=window_focused \
-#     action="sketchybar --trigger window_attention_changed"
-
-yabai -m signal --add label=wm_win_title event=window_title_changed \
-    action="sketchybar --trigger window_attention_changed"
-
-yabai -m signal --add label=wm_app_activated event=application_activated \
-    action="sketchybar --trigger window_attention_changed"
-
-yabai -m signal --add label=wm_app_launched event=application_launched \
-    action="sketchybar --trigger window_attention_changed"
+refresh="$HOME/.local/bin/celestia-shell refresh"
+yabai -m signal --add label=shell_window_focused event=window_focused action="$refresh"
+yabai -m signal --add label=shell_window_created event=window_created action="$refresh"
+yabai -m signal --add label=shell_window_destroyed event=window_destroyed action="$refresh"
+yabai -m signal --add label=shell_window_moved event=window_moved action="$refresh"
+yabai -m signal --add label=shell_window_title_changed event=window_title_changed action="$refresh"
+yabai -m signal --add label=shell_window_minimized event=window_minimized action="$refresh"
+yabai -m signal --add label=shell_window_deminimized event=window_deminimized action="$refresh"
+yabai -m signal --add label=shell_application_activated event=application_activated action="$refresh"
+yabai -m signal --add label=shell_application_launched event=application_launched action="$refresh"
+yabai -m signal --add label=shell_application_terminated event=application_terminated action="$refresh"
+yabai -m signal --add label=shell_application_hidden event=application_hidden action="$refresh"
+yabai -m signal --add label=shell_application_visible event=application_visible action="$refresh"
+yabai -m signal --add label=shell_space_changed event=space_changed action="$refresh"
+yabai -m signal --add label=shell_display_changed event=display_changed action="$refresh"
 
 # apply-yabai.sh owns external_bar, per-space gaps and the app rules.
 # It must run after setup_spaces and the space labels.
