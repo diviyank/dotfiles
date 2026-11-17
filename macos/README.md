@@ -31,12 +31,15 @@ skhd --restart-service
 ~/.config/wm/apply-yabai.sh
 ```
 
+Control: `celestia start|stop|restart|status [shell|yabai|skhd]` (all three by default).
+
 Shell log: `/tmp/celestia-shell.log`. Settings: `~/.config/celestia/shell.json` (`border` in pt, default 6; `weather.location`). Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
 
 ## Tests
 
 ```sh
 sh macos/tests/wallpaper/test.sh
+sh macos/tests/celestia/test.sh
 sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper already set
 (cd macos/shell && swift test)
 ~/.config/wm/selftest.sh

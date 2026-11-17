@@ -1,0 +1,44 @@
+#!/bin/sh
+# celestia start|stop|restart|status [shell|yabai|skhd]   (default: all three)
+set -u
+
+usage() { echo "usage: celestia start|stop|restart|status [shell|yabai|skhd]" >&2; exit 2; }
+
+domain="gui/$(id -u)"
+shell_label="local.celestia.shell"
+
+shell_service() {
+    case "$1" in
+        start) launchctl bootstrap "$domain" "$HOME/Library/LaunchAgents/$shell_label.plist" ;;
+        stop) launchctl bootout "$domain/$shell_label" ;;
+        restart) launchctl kickstart -k "$domain/$shell_label" ;;
+    esac
+}
+
+brew_service() { "$2" "--$1-service"; }
+
+status() {
+    if launchctl print "$domain/$shell_label" 2>/dev/null | grep -q 'state = running'; then s=running; else s=stopped; fi
+    printf 'shell  %s\n' "$s"
+    for daemon in yabai skhd; do
+        if pgrep -x "$daemon" >/dev/null; then s=running; else s=stopped; fi
+        printf '%-6s %s\n' "$daemon" "$s"
+    done
+}
+
+[ $# -ge 1 ] && [ $# -le 2 ] || usage
+action="$1"
+case "$action" in start|stop|restart|status) ;; *) usage ;; esac
+[ "$action" = status ] && { status; exit 0; }
+
+targets="${2:-shell yabai skhd}"
+for target in $targets; do
+    case "$target" in shell|yabai|skhd) ;; *) usage ;; esac
+done
+
+rc=0
+for target in $targets; do
+    if [ "$target" = shell ]; then shell_service "$action"; else brew_service "$action" "$target"; fi \
+        || { echo "celestia: $action $target failed" >&2; rc=1; }
+done
+exit "$rc"

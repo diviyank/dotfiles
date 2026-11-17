@@ -53,3 +53,11 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Click Discord | Focus space six |
 | Hover the title, volume, Wi-Fi, battery or power | Open its popout (stays open while the mouse is on it) |
 | Power popout | Lock, sleep, restart or shut down |
+
+## Terminal
+
+| Command | Action |
+|---|---|
+| `celestia status` | Show whether the shell, yabai and skhd are running |
+| `celestia restart` | Restart all three (or name one: `shell`, `yabai`, `skhd`) |
+| `celestia stop` / `celestia start` | Stop or start them |
