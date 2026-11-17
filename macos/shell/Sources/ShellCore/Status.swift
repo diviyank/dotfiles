@@ -92,3 +92,10 @@ public func parseStatusLabel(_ lsappinfoOutput: String) -> String? {
     let label = lsappinfoOutput[range].dropFirst(#""label"=""#.count).dropLast()
     return label.isEmpty ? nil : String(label)
 }
+
+private let badgeLimit = 99
+
+public func badgeText(_ label: String) -> String {
+    guard let count = Int(label), count > badgeLimit else { return label }
+    return "\(badgeLimit)+"
+}

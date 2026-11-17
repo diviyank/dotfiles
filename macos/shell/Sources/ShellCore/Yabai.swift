@@ -99,3 +99,7 @@ public func decodeBarDisplays(displays: Data, spaces: Data, windows: Data) -> [B
 public func focusedWindow(_ displays: [BarDisplay]) -> BarWindow? {
     displays.lazy.flatMap(\.spaces).flatMap(\.windows).first(where: \.hasFocus)
 }
+
+public func shownSpaces(_ spaces: [BarSpace]) -> [BarSpace] {
+    spaces.filter { $0.isVisible || !$0.windows.isEmpty }
+}

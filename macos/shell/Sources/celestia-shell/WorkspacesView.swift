@@ -11,7 +11,7 @@ struct WorkspacesView: View {
 
     var body: some View {
         VStack(spacing: Theme.Spacing.extraSmall) {
-            ForEach(spaces, id: \.label) { space in
+            ForEach(shownSpaces(spaces), id: \.label) { space in
                 cell(space)
             }
         }

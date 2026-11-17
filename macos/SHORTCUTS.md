@@ -58,8 +58,9 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Scroll volume | Change volume by 5 % |
 | Click Mail | Focus space seven |
 | Click Discord | Focus space six |
-| Hover the title, volume, Wi-Fi, battery or power | Open its popout (stays open while the mouse is on it) |
+| Hover the title, Mail, volume, Wi-Fi, battery or power | Open its popout (stays open while the mouse is on it) |
 | Power popout | Lock, sleep, restart or shut down |
+| Click a mail in the Mail popout | Open it in Mail |
 
 ## Dashboard
 

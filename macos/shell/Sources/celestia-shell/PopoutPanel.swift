@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-enum PopoutKind { case window, volume, wifi, battery, power }
+enum PopoutKind { case window, volume, wifi, battery, power, mail }
 
 @MainActor
 final class PopoutPanel: ObservableObject {
@@ -21,6 +21,7 @@ final class PopoutPanel: ObservableObject {
     static let fillet: CGFloat = Theme.Bar.innerRadius
     static let width: CGFloat = 240
     private static let closeDelay = 0.2
+    private var anchorY: CGFloat = 0
 
     init(screen: NSRect, model: BarModel) {
         self.screen = screen
@@ -39,8 +40,14 @@ final class PopoutPanel: ObservableObject {
         if inside { pendingClose?.cancel() } else { scheduleClose() }
     }
 
+    func refit() {
+        guard let kind, revealed else { return }
+        show(kind: kind, anchorY: anchorY)
+    }
+
     func show(kind: PopoutKind, anchorY: CGFloat) {
         guard !isClosed else { return }
+        self.anchorY = anchorY
         let body = NSHostingView(rootView: PopoutContent(kind: kind, model: model, popouts: self)).fittingSize
         let height = body.height + 2 * Self.fillet
         let bottom = min(max(anchorY - height / 2, screen.minY), screen.maxY - height)
@@ -146,6 +153,7 @@ struct PopoutContent: View {
             case .wifi: WiFiPopout(model: model)
             case .battery: BatteryPopout(model: model)
             case .power: PowerPopout(model: model, popouts: popouts)
+            case .mail: MailPopout(model: model, popouts: popouts)
             }
         }
         .padding(Theme.Spacing.large)

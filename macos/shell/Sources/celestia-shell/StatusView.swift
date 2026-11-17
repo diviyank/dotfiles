@@ -16,6 +16,7 @@ struct StatusView: View {
         VStack(spacing: Theme.Spacing.medium) {
             if let count = badges.mail {
                 badged(Glyph.mail, count: count) { focus("seven") }
+                    .popout(.mail, popouts)
             }
             if let count = badges.discord {
                 badged(Glyph.forum, count: count) { focus("six") }
@@ -48,7 +49,9 @@ struct StatusView: View {
     private func badged(_ glyph: String, count: String, action: @escaping () -> Void) -> some View {
         icon(glyph)
             .overlay(alignment: .topTrailing) {
-                Text(count)
+                Text(badgeText(count))
+                    .lineLimit(1)
+                    .fixedSize()
                     .font(Font(Theme.font(Theme.Family.numbers, size: 9, weight: .semibold)))
                     .foregroundStyle(model.color("on_error"))
                     .padding(.horizontal, 3)

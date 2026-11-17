@@ -20,7 +20,7 @@ mkdir -p ~/Pictures/Wallpapers   # copy the 24 wallpapers here
 System Settings:
 - Keyboard > Keyboard Shortcuts > Spotlight: disable Cmd+Space.
 - Wallpaper: set "Show on all Spaces".
-- Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change), and `celestia-shell` to control Spotify (prompted on the first dashboard open while Spotify runs).
+- Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change), `celestia-shell` to control Spotify (prompted on the first dashboard open while Spotify runs), and Mail (prompted on the first mail popout).
 - Privacy & Security > Calendars: allow `celestia-shell` full access (prompted on the first dashboard open).
 - Privacy & Security > Accessibility: allow `celestia-shell` (prompted on first launch) so it handles the volume and brightness keys; without it the keys stay stock.
 
@@ -61,6 +61,8 @@ Frame and bar
 - [x] Logo, active window title (vertical, clipped) and clock (flips on the minute)
 - [ ] Clicking the logo opens the launcher
 - [x] Volume icon follows the volume keys; Mail/Discord badges show within 30 s
+- [x] Mail badge caps at 99+ on one line; hovering it lists the newest unread mails, clicking one opens it in Mail
+- [x] Empty spaces are hidden in the bar (the visible one always shows)
 - [ ] Scrolling on volume changes it; clicking mutes
 - [ ] Battery follows plugging and unplugging the charger
 - [x] Hover popouts grow from the bar for the title, volume, Wi-Fi, battery and power, without taking focus
