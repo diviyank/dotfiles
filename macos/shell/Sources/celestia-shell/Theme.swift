@@ -17,6 +17,7 @@ enum Theme {
     }
 
     enum IconSize {
+        static let medium: CGFloat = 24
         static let large: CGFloat = 32
         static let search: CGFloat = 22
     }
