@@ -10,6 +10,12 @@ swift build -c release --package-path "$package_dir"
 
 mkdir -p "$HOME/.local/bin"
 cp "$package_dir/.build/release/celestia-shell" "$dest.new"
+if security find-certificate -c "Celestia Local" >/dev/null 2>&1; then
+    codesign -f -s "Celestia Local" -i local.celestia.shell "$dest.new"
+else
+    codesign -f -s - -i local.celestia.shell "$dest.new"
+    echo 'celestia-shell: no "Celestia Local" certificate; permissions will reset on rebuild (run make-signing-cert.sh)' >&2
+fi
 mv -f "$dest.new" "$dest"
 
 launchctl bootout "$domain/local.celestia.launcher" 2>/dev/null || true

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>local.celestia.shell</string>
+	<key>CFBundleName</key>
+	<string>celestia-shell</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Shows your events in the Celestia dashboard.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Controls Spotify and sets the wallpaper.</string>
+</dict>
+</plist>
