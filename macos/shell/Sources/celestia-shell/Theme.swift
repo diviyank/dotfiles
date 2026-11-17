@@ -61,6 +61,26 @@ enum Theme {
         static let clockSize: CGFloat = 18
     }
 
+    enum OSD {
+        static let sliderWidth: CGFloat = 30
+        static let sliderHeight: CGFloat = 180
+        static let gap: CGFloat = 8
+        static let padding: CGFloat = 10
+        static let labelSize: CGFloat = 11
+        static let iconSize: CGFloat = 18
+        static let hideDelay: TimeInterval = 1.5
+        static let leaveDelay: TimeInterval = 0.2
+        static let brightnessPoll: TimeInterval = 0.5
+
+        static func content(sliders: Int) -> CGSize {
+            let count = CGFloat(sliders)
+            return CGSize(
+                width: count * sliderWidth + (count - 1) * gap + 2 * padding + Bar.innerRadius,
+                height: sliderHeight + 2 * padding
+            )
+        }
+    }
+
     enum Dashboard {
         static let width: CGFloat = 760
         static let padding: CGFloat = 18

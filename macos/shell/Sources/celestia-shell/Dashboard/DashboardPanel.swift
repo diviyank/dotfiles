@@ -4,30 +4,15 @@ import SwiftUI
 
 let dashboardToggleNotification = Notification.Name("local.celestia.shell.dashboard")
 
-final class DashboardWindow: NSPanel {
+final class DashboardWindow: SlidingPanel {
     var isPinned = false
 
     override var canBecomeKey: Bool { isPinned }
     override var canBecomeMain: Bool { false }
-    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect { frameRect }
-
-    func slide(to frame: NSRect, entering: Bool, completion: (() -> Void)? = nil) {
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = entering ? Motion.enterDuration : Motion.exitDuration
-            context.timingFunction = entering ? Motion.enterCurve : Motion.exitCurve
-            animator().setFrame(frame, display: true)
-        } completionHandler: { completion?() }
-    }
 
     static func make() -> DashboardWindow {
         let window = DashboardWindow(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-        window.level = .statusBar
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenNone]
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = false
-        window.hidesOnDeactivate = false
-        window.isReleasedWhenClosed = false
+        window.configureAsChrome()
         return window
     }
 }

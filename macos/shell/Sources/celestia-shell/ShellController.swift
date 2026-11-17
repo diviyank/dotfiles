@@ -7,6 +7,7 @@ final class ShellController: NSObject {
     private let model = BarModel()
     private let launcher = LauncherController()
     private lazy var dashboard = DashboardPanel(model: model)
+    private lazy var osd = OSDPanel(model: model)
     private var chromes: [String: DisplayChrome] = [:]
     private var watchers: [FileWatcher] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -31,6 +32,9 @@ final class ShellController: NSObject {
         for name in [NSWorkspace.activeSpaceDidChangeNotification, NSWorkspace.didActivateApplicationNotification] {
             workspace.addObserver(self, selector: #selector(refresh), name: name, object: nil)
         }
+        VolumeSensor.shared.changes
+            .sink { [weak self] in self?.flashOSD() }
+            .store(in: &subscriptions)
         model.$displays
             .sink { [weak self] displays in self?.applyFullscreen(displays) }
             .store(in: &subscriptions)
@@ -42,18 +46,28 @@ final class ShellController: NSObject {
     }
 
     @objc private func toggleDashboard() {
-        let mouse = NSEvent.mouseLocation
-        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main else { return }
+        guard let screen = screenUnderMouse() else { return }
         dashboard.togglePinned(on: screen)
+    }
+
+    private func flashOSD() {
+        guard let screen = screenUnderMouse() else { return }
+        osd.flash(on: screen)
+    }
+
+    private func screenUnderMouse() -> NSScreen? {
+        let mouse = NSEvent.mouseLocation
+        return NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
     }
 
     @objc private func rebuildChromes() {
         dashboard.close()
+        osd.close()
         chromes.values.forEach { $0.close() }
         chromes = [:]
         for screen in NSScreen.screens {
             guard let uuid = screen.displayUUID else { continue }
-            chromes[uuid] = DisplayChrome(screen: screen, uuid: uuid, model: model, dashboard: dashboard)
+            chromes[uuid] = DisplayChrome(screen: screen, uuid: uuid, model: model, dashboard: dashboard, osd: osd)
         }
         applyFullscreen(model.displays)
         model.refresh()

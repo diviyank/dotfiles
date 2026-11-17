@@ -32,10 +32,11 @@ final class DisplayChrome {
     private let bar: ChromePanel
     private let popouts: PopoutPanel
     private let zone: ChromePanel
+    private let osdZone: ChromePanel
     private var settingsSubscription: AnyCancellable?
     private var isVisible = false
 
-    init(screen: NSScreen, uuid: String, model: BarModel, dashboard: DashboardPanel) {
+    init(screen: NSScreen, uuid: String, model: BarModel, dashboard: DashboardPanel, osd: OSDPanel) {
         self.uuid = uuid
         frame = ChromePanel.make(frame: screen.frame, clickThrough: true, content: FrameView(model: model))
         popouts = PopoutPanel(screen: screen.frame, model: model)
@@ -49,9 +50,17 @@ final class DisplayChrome {
                 dashboard?.zoneHover(screen: screen, inside: inside)
             }
         )
-        settingsSubscription = model.$settings.sink { [weak zone, weak screen] settings in
+        osdZone = ChromePanel.make(
+            frame: Self.osdZoneFrame(screen, osd: osd), clickThrough: false,
+            content: OSDZone { [weak osd, weak screen] inside in
+                guard let screen else { return }
+                osd?.zoneHover(screen: screen, inside: inside)
+            }
+        )
+        settingsSubscription = model.$settings.sink { [weak zone, weak osdZone, weak osd, weak screen] settings in
             guard let zone, let screen else { return }
             zone.setFrame(Self.zoneFrame(screen, border: settings.border), display: true)
+            if let osdZone, let osd { osdZone.setFrame(Self.osdZoneFrame(screen, osd: osd, border: settings.border), display: true) }
         }
         setVisible(true)
     }
@@ -59,7 +68,7 @@ final class DisplayChrome {
     func setVisible(_ visible: Bool) {
         guard visible != isVisible else { return }
         isVisible = visible
-        for panel in [frame, bar, zone] {
+        for panel in [frame, bar, zone, osdZone] {
             if visible { panel.orderFrontRegardless() } else { panel.orderOut(nil) }
         }
         if !visible { popouts.hide() }
@@ -69,11 +78,16 @@ final class DisplayChrome {
         frame.close()
         bar.close()
         zone.close()
+        osdZone.close()
         popouts.close()
     }
 }
 
 extension DisplayChrome {
+    private static func osdZoneFrame(_ screen: NSScreen, osd: OSDPanel, border: Double? = nil) -> NSRect {
+        osdHoverZone(frame: osd.frame(on: screen), screen: screen.frame, border: border ?? osd.model.settings.border)
+    }
+
     private static func zoneFrame(_ screen: NSScreen, border: Double) -> NSRect {
         hoverZone(screen: screen.frame, width: Theme.Dashboard.width, border: border, safeAreaTop: screen.safeAreaInsets.top)
     }
