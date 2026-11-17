@@ -1,4 +1,5 @@
 import AudioToolbox
+import Combine
 import CoreAudio
 import Foundation
 
@@ -9,6 +10,10 @@ final class VolumeSensor: ObservableObject {
     @Published private(set) var percent = 0
     @Published private(set) var muted = false
     @Published private(set) var deviceName = ""
+    @Published private(set) var level: Double = 0
+    let changes = PassthroughSubject<Void, Never>()
+    private var hasRead = false
+    private static let levelTolerance = 1e-4
 
     private var device = AudioObjectID(kAudioObjectUnknown)
     private lazy var onChange: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
@@ -31,7 +36,12 @@ final class VolumeSensor: ObservableObject {
     }
 
     func set(percent: Int) {
-        var value = Float32(min(max(percent, 0), 100)) / 100
+        set(level: Double(percent) / 100)
+    }
+
+    func set(level: Double) {
+        if muted { toggleMute() }
+        var value = Float32(min(max(level, 0), 1))
         var address = Self.watched[0]
         AudioObjectSetPropertyData(device, &address, 0, nil, UInt32(MemoryLayout<Float32>.size), &value)
     }
@@ -63,8 +73,14 @@ final class VolumeSensor: ObservableObject {
     private func read() {
         var volume = Self.watched[0]
         var mute = Self.watched[1]
-        percent = Int(((Self.value(device, &volume, as: Float32.self) ?? 0) * 100).rounded())
-        muted = (Self.value(device, &mute, as: UInt32.self) ?? 0) != 0
+        let newLevel = Double(Self.value(device, &volume, as: Float32.self) ?? 0)
+        let newMuted = (Self.value(device, &mute, as: UInt32.self) ?? 0) != 0
+        let changed = abs(newLevel - level) > Self.levelTolerance || newMuted != muted
+        level = newLevel
+        percent = Int((newLevel * 100).rounded())
+        muted = newMuted
+        if hasRead && changed { changes.send() }
+        hasRead = true
     }
 
     private static func value<T>(_ object: AudioObjectID, _ address: inout AudioObjectPropertyAddress, as: T.Type) -> T? {
