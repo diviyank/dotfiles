@@ -64,3 +64,15 @@ private func event(_ title: String, _ start: Date, _ end: Date, allDay: Bool = f
     #expect(result.tomorrow.map(\.title) == ["trip"])
     #expect(eventDays([trip], year: 2026, month: 11, calendar: paris) == [17, 18, 19])
 }
+
+@Test func fetchIntervalsSplitDistantMonth() {
+    let intervals = eventFetchIntervals(year: 2027, month: 6, now: date(17, 12), calendar: paris)
+    let june = paris.date(from: DateComponents(year: 2027, month: 6, day: 1))!
+    let july = paris.date(from: DateComponents(year: 2027, month: 7, day: 1))!
+    #expect(intervals == [DateInterval(start: june, end: july), DateInterval(start: date(17, 0), end: date(19, 0))])
+}
+
+@Test func fetchIntervalsMergeCurrentMonth() {
+    let intervals = eventFetchIntervals(year: 2026, month: 11, now: date(30, 12), calendar: paris)
+    #expect(intervals == [DateInterval(start: date(1, 0), end: date(2, 0, month: 12))])
+}

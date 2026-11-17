@@ -24,3 +24,13 @@ private func payload(state: String) -> [AnyHashable: Any] {
     missing["Track ID"] = nil
     #expect(parseSpotifyPayload(missing) == nil)
 }
+
+@Test func spotifyScriptNeverLaunchesAndTimesOut() {
+    let script = spotifyScript("playpause")
+    let lines = script.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+    #expect(lines.first == #"if application id "com.spotify.client" is running then"#)
+    #expect(lines.contains("with timeout of 2 seconds"))
+    #expect(lines.contains(#"tell application id "com.spotify.client""#))
+    #expect(lines.contains("playpause"))
+    #expect(lines.last == "end if")
+}

@@ -36,6 +36,7 @@ final class DashboardPanel: ObservableObject {
     private var overPanel = false
     private var pendingOpen: DispatchWorkItem?
     private var pendingClose: DispatchWorkItem?
+    private var pendingTeardown: DispatchWorkItem?
     private var previousApp: NSRunningApplication?
     private var escapeMonitor: Any?
     private var hasContent = false
@@ -80,29 +81,32 @@ final class DashboardPanel: ObservableObject {
         show(on: screen)
         window.makeKey()
         escapeMonitor = escapeMonitor ?? NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard event.keyCode == 53 else { return event }
-            self?.close()
+            guard let self, event.keyCode == 53, event.window === self.window else { return event }
+            self.close()
             return nil
         }
     }
 
     func openSystemSettings() {
         NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/System Settings.app"))
-        close()
+        close(restoringFocus: false)
     }
 
-    func close() {
+    func close(restoringFocus: Bool = true) {
         pendingOpen?.cancel()
         pendingClose?.cancel()
+        overZone = false
+        overPanel = false
         let wasPinned = window.isPinned
         window.isPinned = false
         if let escapeMonitor { NSEvent.removeMonitor(escapeMonitor) }
         escapeMonitor = nil
         guard window.isVisible else { return }
         withAnimation(Motion.emphasized) { revealed = false }
-        if wasPinned { previousApp?.activate() }
+        if wasPinned && restoringFocus { previousApp?.activate() }
         previousApp = nil
-        pendingClose = schedule(after: Self.growDuration) { [weak self] in
+        pendingTeardown?.cancel()
+        pendingTeardown = schedule(after: Self.growDuration) { [weak self] in
             guard let self, !self.revealed else { return }
             self.window.orderOut(nil)
             self.window.contentView = NSView()
@@ -116,6 +120,7 @@ final class DashboardPanel: ObservableObject {
         let content = CGSize(width: Theme.Dashboard.width, height: Theme.Dashboard.height)
         topInset = dashboardTopInset(border: model.settings.border, safeAreaTop: screen.safeAreaInsets.top)
         let frame = dashboardFrame(screen: screen.frame, content: content, topInset: topInset, fillet: Self.fillet)
+        pendingTeardown?.cancel()
         if !hasContent {
             hasContent = true
             let host = NSHostingView(rootView: DashboardHost(panel: self, model: model, data: data))

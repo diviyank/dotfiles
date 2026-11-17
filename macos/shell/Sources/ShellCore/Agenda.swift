@@ -51,6 +51,18 @@ public func eventDays(_ events: [AgendaEvent], year: Int, month: Int, calendar: 
     })
 }
 
+public func eventFetchIntervals(year: Int, month: Int, now: Date, calendar: Calendar) -> [DateInterval] {
+    let today = calendar.startOfDay(for: now)
+    guard let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1)),
+          let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart),
+          let agendaEnd = calendar.date(byAdding: .day, value: 2, to: today)
+    else { return [] }
+    let shownMonth = DateInterval(start: monthStart, end: monthEnd)
+    let upcoming = DateInterval(start: today, end: agendaEnd)
+    guard shownMonth.start <= upcoming.end, upcoming.start <= shownMonth.end else { return [shownMonth, upcoming] }
+    return [DateInterval(start: min(shownMonth.start, upcoming.start), end: max(shownMonth.end, upcoming.end))]
+}
+
 private func dayInterval(containing date: Date, calendar: Calendar) -> DateInterval {
     calendar.dateInterval(of: .day, for: date) ?? DateInterval(start: date, duration: 86_400)
 }

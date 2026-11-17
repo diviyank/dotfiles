@@ -32,3 +32,17 @@ public func parseSpotifyPayload(_ info: [AnyHashable: Any]) -> SpotifyTrack? {
         duration: durationMs / 1000
     )
 }
+
+public let spotifyBundleID = "com.spotify.client"
+
+public func spotifyScript(_ body: String) -> String {
+    """
+    if application id "\(spotifyBundleID)" is running then
+        with timeout of 2 seconds
+            tell application id "\(spotifyBundleID)"
+                \(body)
+            end tell
+        end timeout
+    end if
+    """
+}

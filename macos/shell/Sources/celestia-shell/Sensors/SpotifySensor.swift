@@ -2,7 +2,7 @@ import AppKit
 import ShellCore
 
 @MainActor
-final class SpotifySensor: ObservableObject {
+final class SpotifySensor: NSObject, ObservableObject {
     enum State: Equatable {
         case notRunning
         case denied
@@ -21,33 +21,46 @@ final class SpotifySensor: ObservableObject {
     @Published private(set) var artwork: NSImage?
     @Published private(set) var measuredAt = Date()
 
-    private static let bundleID = "com.spotify.client"
     private static let changed = Notification.Name("com.spotify.client.PlaybackStateChanged")
     nonisolated private static let automationDenied = -1743
     nonisolated private static let artworkPixels = 128
     private static let queue = DispatchQueue(label: "local.celestia.shell.spotify", qos: .userInitiated)
 
-    private var observer: NSObjectProtocol?
+    private var isObserving = false
+    private var terminationObserver: NSObjectProtocol?
     private var artworkTrackID: String?
 
     private var isRunning: Bool {
-        !NSRunningApplication.runningApplications(withBundleIdentifier: Self.bundleID).isEmpty
+        !NSRunningApplication.runningApplications(withBundleIdentifier: spotifyBundleID).isEmpty
     }
 
     func start() {
-        guard observer == nil else { return }
-        observer = DistributedNotificationCenter.default().addObserver(forName: Self.changed, object: nil, queue: .main) { [weak self] note in
-            let track = parseSpotifyPayload(note.userInfo ?? [:])
-            MainActor.assumeIsolated { self?.apply(track) }
+        guard !isObserving else { return }
+        isObserving = true
+        DistributedNotificationCenter.default().addObserver(
+            self, selector: #selector(playbackChanged(_:)), name: Self.changed, object: nil, suspensionBehavior: .deliverImmediately
+        )
+        terminationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] note in
+            let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+            guard app?.bundleIdentifier == spotifyBundleID else { return }
+            MainActor.assumeIsolated { self?.apply(nil) }
         }
         query()
     }
 
     func stop() {
-        if let observer { DistributedNotificationCenter.default().removeObserver(observer) }
-        observer = nil
+        DistributedNotificationCenter.default().removeObserver(self, name: Self.changed, object: nil)
+        if let terminationObserver { NSWorkspace.shared.notificationCenter.removeObserver(terminationObserver) }
+        terminationObserver = nil
+        isObserving = false
         artwork = nil
         artworkTrackID = nil
+    }
+
+    @objc private func playbackChanged(_ note: Notification) {
+        apply(parseSpotifyPayload(note.userInfo ?? [:]))
     }
 
     func previous() { send("previous track") }
@@ -58,6 +71,8 @@ final class SpotifySensor: ObservableObject {
         measuredAt = Date()
         guard let track else {
             state = .notRunning
+            artwork = nil
+            artworkTrackID = nil
             return
         }
         state = track.isPlaying ? .playing(track) : .paused(track)
@@ -69,20 +84,18 @@ final class SpotifySensor: ObservableObject {
             state = .notRunning
             return
         }
-        let source = """
-        tell application id "\(Self.bundleID)"
-            if player state is stopped then return {}
-            set t to current track
-            return {id of t, name of t, artist of t, duration of t, player state as string, player position}
-        end tell
-        """
+        let source = spotifyScript("""
+        if player state is stopped then return {}
+                set t to current track
+                return {id of t, name of t, artist of t, duration of t, player state as string, player position}
+        """)
         Self.queue.async { [weak self] in
             var error: NSDictionary?
             let result = NSAppleScript(source: source)?.executeAndReturnError(&error)
             let denied = (error?[NSAppleScript.errorNumber] as? Int) == Self.automationDenied
             let track = result.flatMap(Self.track(from:))
             Task { @MainActor in
-                guard let self, self.observer != nil else { return }
+                guard let self, self.isObserving else { return }
                 if denied { self.state = .denied } else { self.apply(track) }
             }
         }
@@ -102,7 +115,7 @@ final class SpotifySensor: ObservableObject {
 
     private func send(_ command: String) {
         guard isRunning else { return }
-        let source = "tell application id \"\(Self.bundleID)\" to \(command)"
+        let source = spotifyScript(command)
         Self.queue.async {
             var error: NSDictionary?
             NSAppleScript(source: source)?.executeAndReturnError(&error)
@@ -113,21 +126,25 @@ final class SpotifySensor: ObservableObject {
         guard trackID != artworkTrackID else { return }
         artworkTrackID = trackID
         artwork = nil
-        let source = "tell application id \"\(Self.bundleID)\" to return artwork url of current track"
+        let source = spotifyScript("return {id of current track, artwork url of current track}")
         Self.queue.async { [weak self] in
             var error: NSDictionary?
-            let url = NSAppleScript(source: source)?.executeAndReturnError(&error).stringValue.flatMap(URL.init(string:))
-            Task { @MainActor in
-                guard let url, let (data, _) = try? await URLSession.shared.data(from: url),
-                      let image = Self.thumbnail(data),
-                      let self, self.artworkTrackID == trackID, self.observer != nil
-                else { return }
-                self.artwork = image
+            let result = NSAppleScript(source: source)?.executeAndReturnError(&error)
+            guard result?.atIndex(1)?.stringValue == trackID,
+                  let url = result?.atIndex(2)?.stringValue.flatMap(URL.init(string:))
+            else { return }
+            Task { @MainActor [weak self] in
+                let thumbnail = await Task.detached(priority: .utility) { () -> CGImage? in
+                    guard let (data, _) = try? await URLSession.shared.data(from: url) else { return nil }
+                    return Self.thumbnail(data)
+                }.value
+                guard let thumbnail, let self, self.artworkTrackID == trackID, self.isObserving else { return }
+                self.artwork = NSImage(cgImage: thumbnail, size: NSSize(width: Self.artworkPixels / 2, height: Self.artworkPixels / 2))
             }
         }
     }
 
-    nonisolated private static func thumbnail(_ data: Data) -> NSImage? {
+    nonisolated private static func thumbnail(_ data: Data) -> CGImage? {
         guard let source = NSBitmapImageRep(data: data)?.cgImage,
               let context = CGContext(
                 data: nil, width: artworkPixels, height: artworkPixels, bitsPerComponent: 8, bytesPerRow: 0,
@@ -135,6 +152,6 @@ final class SpotifySensor: ObservableObject {
         else { return nil }
         context.interpolationQuality = .high
         context.draw(source, in: CGRect(x: 0, y: 0, width: artworkPixels, height: artworkPixels))
-        return context.makeImage().map { NSImage(cgImage: $0, size: NSSize(width: artworkPixels / 2, height: artworkPixels / 2)) }
+        return context.makeImage()
     }
 }

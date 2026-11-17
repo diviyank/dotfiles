@@ -1,5 +1,5 @@
 import AppKit
-import EventKit
+@preconcurrency import EventKit
 import ShellCore
 
 struct MonthRef: Equatable {
@@ -28,6 +28,8 @@ final class CalendarStore: ObservableObject {
 
     private lazy var store = EKEventStore()
     private var observers: [NSObjectProtocol] = []
+    private var generation = 0
+    private static let queue = DispatchQueue(label: "local.celestia.shell.calendar", qos: .userInitiated)
 
     func start() {
         now = Date()
@@ -63,6 +65,7 @@ final class CalendarStore: ObservableObject {
     func stop() {
         observers.forEach(NotificationCenter.default.removeObserver)
         observers = []
+        generation += 1
         events = []
         shown = .containing(Date())
     }
@@ -84,26 +87,37 @@ final class CalendarStore: ObservableObject {
 
     private func reload() {
         guard access == .granted, !observers.isEmpty else { return }
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: now)
-        guard let monthStart = calendar.date(from: DateComponents(year: shown.year, month: shown.month, day: 1)),
-              let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart),
-              let agendaEnd = calendar.date(byAdding: .day, value: 2, to: today)
-        else { return }
-        let predicate = store.predicateForEvents(withStart: min(monthStart, today), end: max(monthEnd, agendaEnd), calendars: nil)
-        events = store.events(matching: predicate).map { event in
-            AgendaEvent(
-                title: event.title ?? "",
-                start: event.startDate,
-                end: event.endDate,
-                isAllDay: event.isAllDay,
-                isDeclined: event.attendees?.first(where: \.isCurrentUser)?.participantStatus == .declined,
-                colorHex: Self.hex(event.calendar?.color)
-            )
+        generation += 1
+        let request = generation
+        let intervals = eventFetchIntervals(year: shown.year, month: shown.month, now: now, calendar: .current)
+        let store = store
+        Self.queue.async { [weak self] in
+            let fetched = Self.fetch(intervals, from: store)
+            Task { @MainActor in
+                guard let self, self.generation == request, !self.observers.isEmpty else { return }
+                self.events = fetched
+            }
         }
     }
 
-    private static func hex(_ color: NSColor?) -> String {
+    nonisolated private static func fetch(_ intervals: [DateInterval], from store: EKEventStore) -> [AgendaEvent] {
+        var seen = Set<String>()
+        return intervals
+            .flatMap { store.events(matching: store.predicateForEvents(withStart: $0.start, end: $0.end, calendars: nil)) }
+            .filter { seen.insert("\($0.calendarItemIdentifier)|\($0.startDate.timeIntervalSince1970)").inserted }
+            .map { event in
+                AgendaEvent(
+                    title: event.title ?? "",
+                    start: event.startDate,
+                    end: event.endDate,
+                    isAllDay: event.isAllDay,
+                    isDeclined: event.attendees?.first(where: \.isCurrentUser)?.participantStatus == .declined,
+                    colorHex: hex(event.calendar?.color)
+                )
+            }
+    }
+
+    nonisolated private static func hex(_ color: NSColor?) -> String {
         guard let rgb = color?.usingColorSpace(.sRGB) else { return "" }
         let channel = { (value: CGFloat) in Int((value * 255).rounded()) }
         return String(format: "#%02x%02x%02x", channel(rgb.redComponent), channel(rgb.greenComponent), channel(rgb.blueComponent))
