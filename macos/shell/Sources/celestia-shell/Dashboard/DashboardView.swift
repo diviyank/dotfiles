@@ -11,9 +11,9 @@ struct DashboardView: View {
             HStack(spacing: Theme.Dashboard.gap) {
                 ClockWeatherCard(model: model)
                     .frame(width: Theme.Dashboard.clockWidth)
-                DashboardCard(model: model) { Color.clear }
+                CalendarCard(model: model, store: data.calendar)
                     .frame(width: Theme.Dashboard.calendarWidth)
-                DashboardCard(model: model) { Color.clear }
+                EventsCard(model: model, store: data.calendar)
                     .overlay(alignment: .topTrailing) { settingsButton }
             }
             .frame(height: Theme.Dashboard.topRowHeight)
