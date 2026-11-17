@@ -33,7 +33,11 @@ case "${1:-}" in
         set_on_every_desktop "$path" || { echo "celestia-wallpaper: osascript failed" >&2; exit 1; }
         mkdir -p "$STATE"
         printf '%s\n' "$path" > "$STATE/wallpaper"
-        if ! matugen image "$path" -t scheme-tonal-spot -m dark -c "$HOME/.config/celestia/matugen.toml"; then
+        if ! sips -s format jpeg -Z 1024 "$path" --out "$STATE/source.jpg" >/dev/null; then
+            echo "celestia-wallpaper: sips failed" >&2
+            exit 1
+        fi
+        if ! matugen image "$STATE/source.jpg" -t scheme-tonal-spot -m dark -c "$HOME/.config/celestia/matugen.toml"; then
             echo "celestia-wallpaper: matugen failed" >&2
             exit 1
         fi

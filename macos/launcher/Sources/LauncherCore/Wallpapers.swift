@@ -25,7 +25,7 @@ public func thumbnailURL(for wallpaper: URL, cacheDir: URL) -> URL {
 
 public func thumbnailIsStale(thumb: URL, source: URL) -> Bool {
     func modified(_ url: URL) -> Date? {
-        try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate
+        (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
     }
     guard let thumbDate = modified(thumb) else { return true }
     guard let sourceDate = modified(source) else { return false }

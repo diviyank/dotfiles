@@ -38,7 +38,7 @@ Launcher log: `/tmp/celestia-launcher.log`. Generated colours: `~/.local/state/c
 ## Tests
 
 ```sh
-lua5.4 macos/tests/sketchybar/run.lua     # or `lua`
+lua macos/tests/sketchybar/run.lua        # Lua 5.5, as embedded by SbarLua
 sh macos/tests/wallpaper/test.sh
 sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper
 (cd macos/launcher && swift test)
