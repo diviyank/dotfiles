@@ -1,8 +1,8 @@
 import Foundation
 
 public func evaluate(_ expression: String) -> Double? {
-    var parser = ExpressionParser(Array(expression.filter { !$0.isWhitespace }))
-    guard let value = parser.parseExpression(), parser.isAtEnd, value.isFinite else { return nil }
+    var parser = ExpressionParser(Array(expression))
+    guard let value = parser.parseExpression(), parser.isAtEnd(), value.isFinite else { return nil }
     return value
 }
 
@@ -28,11 +28,17 @@ private struct ExpressionParser {
 
     init(_ chars: [Character]) { self.chars = chars }
 
-    var isAtEnd: Bool { index == chars.count }
     private var current: Character? { index < chars.count ? chars[index] : nil }
 
+    mutating func isAtEnd() -> Bool { peek() == nil }
+
+    private mutating func peek() -> Character? {
+        while let char = current, char.isWhitespace { index += 1 }
+        return current
+    }
+
     private mutating func take(_ options: Set<Character>) -> Character? {
-        guard let char = current, options.contains(char) else { return nil }
+        guard let char = peek(), options.contains(char) else { return nil }
         index += 1
         return char
     }
@@ -58,7 +64,7 @@ private struct ExpressionParser {
                 case "%": value = fmod(value, rhs)
                 default: value /= rhs
                 }
-            } else if let char = current, char == "(" || char.isLetter || char == "π" {
+            } else if let char = peek(), char == "(" || char.isLetter || char == "π" {
                 guard let rhs = parsePower() else { return nil }
                 value *= rhs
             } else {
@@ -68,11 +74,12 @@ private struct ExpressionParser {
     }
 
     private mutating func parseUnary() -> Double? {
-        if let sign = take(["-", "+"]) {
-            guard let value = parseUnary() else { return nil }
-            return sign == "-" ? -value : value
+        var negative = false
+        while let sign = take(["-", "+"]) {
+            if sign == "-" { negative.toggle() }
         }
-        return parsePower()
+        guard let value = parsePower() else { return nil }
+        return negative ? -value : value
     }
 
     private mutating func parsePower() -> Double? {
@@ -85,7 +92,7 @@ private struct ExpressionParser {
     }
 
     private mutating func parsePrimary() -> Double? {
-        guard let char = current else { return nil }
+        guard let char = peek() else { return nil }
         if take(["("]) != nil {
             guard let value = parseExpression(), take([")"]) != nil else { return nil }
             return value

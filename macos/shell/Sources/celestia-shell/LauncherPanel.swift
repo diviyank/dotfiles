@@ -56,6 +56,8 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
     private var isPreviewing = false
     private var previewGeneration = 0
     private var pendingPreview: DispatchWorkItem?
+    private var previewProcess: Process?
+    private var previewed: SchemeState?
 
     var onPreview: ((Palette?) -> Void)?
 
@@ -172,9 +174,11 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         defer { isHiding = false }
         panel.orderOut(nil)
         pendingPreview?.cancel()
+        previewProcess?.terminate()
         previewGeneration += 1
         if isPreviewing && !committing { revertPreview() }
         isPreviewing = false
+        previewed = nil
     }
 
     private func rescanApps() {
@@ -307,57 +311,89 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         schedulePreview()
     }
 
-    private func previewTarget() -> (SchemeState, URL)? {
+    private enum PreviewTarget {
+        case current, waitForThumbnail
+        case colours(SchemeState, URL)
+    }
+
+    private func previewTarget() -> PreviewTarget {
         switch resultsView.results {
         case .rows(let rows):
-            guard rows.indices.contains(selected) else { return nil }
+            guard rows.indices.contains(selected) else { return .current }
             var state = scheme
             switch rows[selected].action {
             case .scheme(let name): state.name = name
             case .variant(let type): state.variant = type
-            default: return nil
+            default: return .current
             }
-            return (state, ShellPaths.wallpaperSource)
+            return state == scheme ? .current : .colours(state, ShellPaths.wallpaperSource)
         case .wallpapers(let wallpapers):
-            guard scheme.seed == nil, wallpapers.indices.contains(selected) else { return nil }
-            let wallpaper = wallpapers[selected]
-            let thumb = thumbnailURL(for: wallpaper, cacheDir: ShellPaths.thumbnails)
-            return (scheme, FileManager.default.fileExists(atPath: thumb.path) ? thumb : wallpaper)
+            guard scheme.seed == nil, wallpapers.indices.contains(selected) else { return .current }
+            let thumb = thumbnailURL(for: wallpapers[selected], cacheDir: ShellPaths.thumbnails)
+            return FileManager.default.fileExists(atPath: thumb.path) ? .colours(scheme, thumb) : .waitForThumbnail
         case .apps:
-            return nil
+            return .current
         }
     }
 
     private func schedulePreview() {
         pendingPreview?.cancel()
         previewGeneration += 1
-        guard let (state, source) = previewTarget(), let matugen = ShellPaths.matugen else {
+        let generation = previewGeneration
+        switch previewTarget() {
+        case .waitForThumbnail:
+            return
+        case .current:
+            previewProcess?.terminate()
+            if isPreviewing { revertPreview() }
+        case .colours(let state, let source):
+            let item = DispatchWorkItem { [weak self] in
+                MainActor.assumeIsolated { self?.runPreview(state, source: source, generation: generation) }
+            }
+            pendingPreview = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + Theme.Launcher.previewDelay, execute: item)
+        }
+    }
+
+    private func runPreview(_ state: SchemeState, source: URL, generation: Int) {
+        previewProcess?.terminate()
+        guard let matugen = ShellPaths.matugen else { return }
+        let process = Process()
+        let output = Pipe()
+        process.executableURL = URL(fileURLWithPath: matugen)
+        process.arguments = matugenPreviewArguments(state, source: source)
+        process.standardOutput = output
+        process.standardError = FileHandle.nullDevice
+        process.terminationHandler = { finished in
+            let data = output.fileHandleForReading.readDataToEndOfFile()
+            let palette = finished.terminationStatus == 0 ? parseMatugenPalette(data, mode: state.mode) : nil
+            DispatchQueue.main.async { [weak self] in
+                MainActor.assumeIsolated { self?.applyPreview(palette, of: state, generation: generation) }
+            }
+        }
+        do {
+            try process.run()
+            previewProcess = process
+        } catch {
+            logError("cannot run matugen: \(error.localizedDescription)")
+        }
+    }
+
+    private func applyPreview(_ preview: Palette?, of state: SchemeState, generation: Int) {
+        guard generation == previewGeneration, panel.isVisible else { return }
+        guard let preview else {
             if isPreviewing { revertPreview() }
             return
         }
-        let generation = previewGeneration
-        let item = DispatchWorkItem {
-            DispatchQueue.global(qos: .userInitiated).async {
-                let palette = runProcess(matugen, matugenPreviewArguments(state, source: source))
-                    .flatMap { parseMatugenPalette($0, mode: state.mode) }
-                DispatchQueue.main.async { [weak self] in
-                    MainActor.assumeIsolated { self?.applyPreview(palette, generation: generation) }
-                }
-            }
-        }
-        pendingPreview = item
-        DispatchQueue.main.asyncAfter(deadline: .now() + Theme.Launcher.previewDelay, execute: item)
-    }
-
-    private func applyPreview(_ preview: Palette?, generation: Int) {
-        guard generation == previewGeneration, panel.isVisible, let preview else { return }
         isPreviewing = true
+        previewed = state
         show(preview)
         onPreview?(preview)
     }
 
     private func revertPreview() {
         isPreviewing = false
+        previewed = nil
         show(Self.loadCurrentPalette())
         onPreview?(nil)
     }
@@ -393,7 +429,7 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         case .wallpapers(let wallpapers):
             guard wallpapers.indices.contains(selected) else { return }
             runWallpaperScript([wallpapers[selected].path])
-            hide(committing: true)
+            hide(committing: isPreviewing)
         }
     }
 
@@ -432,7 +468,7 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         }
         scheme = state
         runWallpaperScript(["--recolour"])
-        hide(committing: true)
+        hide(committing: isPreviewing && previewed == state)
     }
 
     private func setRandomWallpaper() {
@@ -453,6 +489,9 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
         process.terminationHandler = { finished in
             guard finished.terminationStatus != 0 else { return }
             logError("celestia-wallpaper exited with status \(finished.terminationStatus)")
+            DispatchQueue.main.async { [weak self] in
+                MainActor.assumeIsolated { self?.onPreview?(nil) }
+            }
         }
         do {
             try process.run()

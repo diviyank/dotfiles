@@ -94,3 +94,16 @@ import Testing
     #expect(parseMatugenPalette(Data(json.utf8), mode: "light")?["primary"] == RGB(r: 0x3e / 255.0, g: 0x68 / 255.0, b: 0x37 / 255.0))
     #expect(parseMatugenPalette(Data("nope".utf8), mode: "dark") == nil)
 }
+
+@Test func calculatorSurvivesLongSignChains() {
+    #expect(evaluate(String(repeating: "-", count: 10_000) + "1") == 1)
+    #expect(evaluate(String(repeating: "-", count: 10_001) + "1") == -1)
+}
+
+@Test func calculatorKeepsSpacesBetweenTokens() {
+    #expect(evaluate("1 2 + 3") == nil)
+    #expect(evaluate("2 e 3") == nil)
+    #expect(evaluate(" 2 + 3 ") == 5)
+    #expect(evaluate("sqrt (16)") == 4)
+    #expect(evaluate("2 pi") == 2 * .pi)
+}

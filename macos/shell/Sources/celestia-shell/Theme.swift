@@ -47,7 +47,7 @@ enum Theme {
         static let highlightAlpha: CGFloat = 0.08
         static let dimmedCardAlpha: CGFloat = 0.6
         static let swatchScale: CGFloat = 0.6
-        static let previewDelay: TimeInterval = 0.05
+        static let previewDelay: TimeInterval = 0.15
         static let placeholder = "Type \">\" for commands"
     }
 
