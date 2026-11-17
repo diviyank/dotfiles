@@ -10,7 +10,7 @@ struct ClockView: View {
                 Text(Self.twoDigits(.hour, of: context.date))
                 Text(Self.twoDigits(.minute, of: context.date))
             }
-            .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Bar.clockSize)))
+            .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Bar.clockSize, weight: Theme.Bar.textWeight)))
             .foregroundStyle(model.color("tertiary"))
             .monospacedDigit()
             .contentShape(Rectangle())

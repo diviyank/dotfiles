@@ -61,6 +61,7 @@ enum Theme {
         static let spaceIcon: CGFloat = 18
         static let statusIcon: CGFloat = 20
         static let clockSize: CGFloat = 18
+        static let textWeight: NSFont.Weight = .light
     }
 
     enum OSD {

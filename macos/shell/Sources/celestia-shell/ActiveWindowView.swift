@@ -14,7 +14,7 @@ struct ActiveWindowView: View {
             }
             VerticalLayout {
                 Text(window.title.isEmpty ? window.app : window.title)
-                    .font(Font(Theme.text(Theme.TextSize.bodySmall)))
+                    .font(Font(Theme.text(Theme.TextSize.bodySmall, weight: Theme.Bar.textWeight)))
                     .foregroundStyle(model.color("primary"))
                     .lineLimit(1)
                     .rotationEffect(.degrees(-90))
