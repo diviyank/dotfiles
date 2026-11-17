@@ -21,8 +21,10 @@ case "toggle":
     post(launcherToggleNotification)
 case "refresh":
     post(shellRefreshNotification)
+case "dashboard":
+    post(dashboardToggleNotification)
 default:
-    FileHandle.standardError.write(Data("usage: celestia-shell serve | toggle | refresh\n".utf8))
+    FileHandle.standardError.write(Data("usage: celestia-shell serve | toggle | refresh | dashboard\n".utf8))
     exit(2)
 }
 #else

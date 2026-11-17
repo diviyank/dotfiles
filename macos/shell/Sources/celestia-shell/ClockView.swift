@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ClockView: View {
     @ObservedObject var model: BarModel
+    let onTap: () -> Void
 
     var body: some View {
         TimelineView(.everyMinute) { context in
@@ -12,10 +13,12 @@ struct ClockView: View {
             .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Bar.clockSize, weight: .medium)))
             .foregroundStyle(model.color("tertiary"))
             .monospacedDigit()
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onTap)
         }
     }
 
-    private static func twoDigits(_ component: Calendar.Component, of date: Date) -> String {
+    static func twoDigits(_ component: Calendar.Component, of date: Date) -> String {
         String(format: "%02d", Calendar.current.component(component, from: date))
     }
 }

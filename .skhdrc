@@ -54,6 +54,7 @@ cmd + ctrl + shift - down  : $HOME/.config/wm/move-space-to-display.sh south
 cmd - return : open -na /Applications/kitty.app/Contents/MacOS/kitty
 # LAUNCHER
 cmd - space : $HOME/.local/bin/celestia-shell toggle
+alt - u : $HOME/.local/bin/celestia-shell dashboard
 # Toggle Scratchpad
 cmd - tab : scratchpad --toggle kitty
 # cmd - tab : ~/.config/yabai/scripts/scratchpad.sh

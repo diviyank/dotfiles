@@ -61,6 +61,23 @@ enum Theme {
         static let clockSize: CGFloat = 18
     }
 
+    enum Dashboard {
+        static let width: CGFloat = 760
+        static let padding: CGFloat = 18
+        static let gap: CGFloat = 10
+        static let cardRadius: CGFloat = 16
+        static let cardPadding: CGFloat = 14
+        static let clockWidth: CGFloat = 170
+        static let calendarWidth: CGFloat = 210
+        static let topRowHeight: CGFloat = 160
+        static let bottomRowHeight: CGFloat = 124
+        static let height: CGFloat = topRowHeight + gap + bottomRowHeight + 2 * padding
+        static let clockSize: CGFloat = 40
+        static let smallText: CGFloat = 12
+        static let bodyText: CGFloat = 13
+        static let gearSize: CGFloat = 18
+    }
+
     enum Glyph {
         static let search = glyph(0xE8B6)
         static let image = glyph(0xE3F4)

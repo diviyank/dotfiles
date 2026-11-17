@@ -5,6 +5,7 @@ struct BarView: View {
     @ObservedObject var model: BarModel
     let uuid: String
     let popouts: PopoutPanel
+    let dashboard: DashboardPanel
 
     var body: some View {
         VStack(spacing: Theme.Spacing.small) {
@@ -25,7 +26,11 @@ struct BarView: View {
                     .layoutPriority(-1)
             }
             Spacer(minLength: Theme.Spacing.large)
-            ClockView(model: model)
+            ClockView(model: model) {
+                if let screen = NSScreen.screens.first(where: { $0.displayUUID == uuid }) {
+                    dashboard.togglePinned(on: screen)
+                }
+            }
             StatusView(model: model, popouts: popouts)
             Text(Glyph.power)
                 .font(Font(Theme.icon(Theme.Bar.statusIcon)))
