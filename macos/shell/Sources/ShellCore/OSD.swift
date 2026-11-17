@@ -49,6 +49,13 @@ public func stepLevel(_ level: Double, up: Bool, fine: Bool) -> Double {
     return min(max(target / steps, 0), 1)
 }
 
+private let deviceRoundingTolerance = 0.5 / fineSteps
+
+public func stepOrigin(current: Double, lastTarget: Double?) -> Double {
+    guard let lastTarget, abs(current - lastTarget) <= deviceRoundingTolerance else { return current }
+    return lastTarget
+}
+
 public func osdFrame(screen: CGRect, content: CGSize, border: CGFloat, fillet: CGFloat) -> CGRect {
     let height = content.height + 2 * fillet
     let centre = screen.maxY - screen.height / 4

@@ -12,6 +12,8 @@ final class ShellController: NSObject {
     private var chromes: [String: DisplayChrome] = [:]
     private var watchers: [FileWatcher] = []
     private var subscriptions = Set<AnyCancellable>()
+    private var volumeTarget: Double?
+    private var brightnessTarget: Double?
 
     override init() {
         super.init()
@@ -57,9 +59,16 @@ final class ShellController: NSObject {
         let volume = VolumeSensor.shared
         let brightness = BrightnessSensor.shared
         switch key {
-        case .soundUp, .soundDown: volume.set(level: stepLevel(volume.level, up: key == .soundUp, fine: fine))
+        case .soundUp, .soundDown:
+            let target = stepLevel(stepOrigin(current: volume.level, lastTarget: volumeTarget), up: key == .soundUp, fine: fine)
+            volumeTarget = target
+            volume.set(level: target)
         case .mute: volume.toggleMute()
-        case .brightnessUp, .brightnessDown: brightness.set(stepLevel(brightness.level, up: key == .brightnessUp, fine: fine))
+        case .brightnessUp, .brightnessDown:
+            let origin = stepOrigin(current: brightness.level, lastTarget: brightnessTarget)
+            let target = stepLevel(origin, up: key == .brightnessUp, fine: fine)
+            brightnessTarget = target
+            brightness.set(target)
         }
         flashOSD()
     }

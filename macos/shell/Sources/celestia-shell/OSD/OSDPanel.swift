@@ -95,12 +95,19 @@ final class OSDPanel: ObservableObject {
         pendingHide?.cancel()
         let item = DispatchWorkItem { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, !self.overPanel, !self.overZone else { return }
-                self.close()
+                guard let self else { return }
+                if self.isMouseOver() { self.scheduleHide(after: Theme.OSD.hideDelay) } else { self.close() }
             }
         }
         pendingHide = item
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
+    }
+
+    private func isMouseOver() -> Bool {
+        guard let screen, overPanel || overZone else { return false }
+        let mouse = NSEvent.mouseLocation
+        let zone = osdHoverZone(frame: frame(on: screen), screen: screen.frame, border: model.settings.border)
+        return NSMouseInRect(mouse, window.frame, false) || NSMouseInRect(mouse, zone, false)
     }
 
     private func startPolling() {

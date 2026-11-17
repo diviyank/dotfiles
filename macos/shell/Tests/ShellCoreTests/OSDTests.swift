@@ -47,3 +47,14 @@ import Testing
     #expect(zone == CGRect(x: 1464, y: 596, width: 6, height: 242))
     #expect(zone.minY >= screen.midY)
 }
+
+@Test func stepOriginPrefersLastTargetWhenDeviceRounded() {
+    #expect(stepOrigin(current: 71.0 / 127, lastTarget: 0.5625) == 0.5625)
+    #expect(stepLevel(stepOrigin(current: 71.0 / 127, lastTarget: 0.5625), up: true, fine: false) == 0.625)
+    #expect(stepLevel(stepOrigin(current: 56.0 / 127, lastTarget: 0.4375), up: false, fine: false) == 0.375)
+}
+
+@Test func stepOriginFollowsExternalChanges() {
+    #expect(stepOrigin(current: 0.30, lastTarget: 0.5625) == 0.30)
+    #expect(stepOrigin(current: 0.30, lastTarget: nil) == 0.30)
+}

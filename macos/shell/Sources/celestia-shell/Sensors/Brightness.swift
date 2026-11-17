@@ -6,7 +6,7 @@ final class BrightnessSensor: ObservableObject {
     static let shared = BrightnessSensor()
 
     @Published private(set) var level: Double = 0
-    var isAvailable: Bool { display != nil && getBrightness != nil && setBrightness != nil }
+    var isAvailable: Bool { getBrightness != nil && setBrightness != nil && display != nil }
 
     private typealias Getter = @convention(c) (CGDirectDisplayID, UnsafeMutablePointer<Float>) -> Int32
     private typealias Setter = @convention(c) (CGDirectDisplayID, Float) -> Int32
@@ -14,7 +14,7 @@ final class BrightnessSensor: ObservableObject {
 
     private let getBrightness: Getter?
     private let setBrightness: Setter?
-    private let display = BrightnessSensor.builtInDisplay()
+    private var display: CGDirectDisplayID? { Self.activeBuiltInDisplay() }
 
     private init() {
         let handle = dlopen(Self.frameworkPath, RTLD_LAZY)
@@ -37,11 +37,11 @@ final class BrightnessSensor: ObservableObject {
         self.level = clamped
     }
 
-    private static func builtInDisplay() -> CGDirectDisplayID? {
+    private static func activeBuiltInDisplay() -> CGDirectDisplayID? {
         var count: UInt32 = 0
-        guard CGGetOnlineDisplayList(0, nil, &count) == .success, count > 0 else { return nil }
+        guard CGGetActiveDisplayList(0, nil, &count) == .success, count > 0 else { return nil }
         var displays = [CGDirectDisplayID](repeating: 0, count: Int(count))
-        guard CGGetOnlineDisplayList(count, &displays, &count) == .success else { return nil }
+        guard CGGetActiveDisplayList(count, &displays, &count) == .success else { return nil }
         return displays.prefix(Int(count)).first { CGDisplayIsBuiltin($0) != 0 }
     }
 }
