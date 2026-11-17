@@ -9,7 +9,7 @@ struct DashboardView: View {
     var body: some View {
         VStack(spacing: Theme.Dashboard.gap) {
             HStack(spacing: Theme.Dashboard.gap) {
-                ClockWeatherCard(model: model)
+                ClockWeatherCard(model: model, weather: data.weather)
                     .frame(width: Theme.Dashboard.clockWidth)
                 CalendarCard(model: model, store: data.calendar)
                     .frame(width: Theme.Dashboard.calendarWidth)

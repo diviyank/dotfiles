@@ -3,6 +3,7 @@ import Foundation
 enum ShellPaths {
     static let home = FileManager.default.homeDirectoryForCurrentUser
     static let colors = home.appendingPathComponent(".local/state/celestia/colors.json")
+    static let weather = home.appendingPathComponent(".local/state/celestia/weather.json")
     static let settings = home.appendingPathComponent(".config/celestia/shell.json")
     static let applyYabai = home.appendingPathComponent(".config/wm/apply-yabai.sh")
     static let yabai = "/opt/homebrew/bin/yabai"

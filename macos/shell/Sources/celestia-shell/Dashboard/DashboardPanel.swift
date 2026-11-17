@@ -29,7 +29,7 @@ final class DashboardPanel: ObservableObject {
     @Published private(set) var topInset: CGFloat = 0
 
     let model: BarModel
-    let data = DashboardModel()
+    let data: DashboardModel
     private let window = DashboardWindow.make()
     private var screen: NSScreen?
     private var overZone = false
@@ -47,6 +47,7 @@ final class DashboardPanel: ObservableObject {
 
     init(model: BarModel) {
         self.model = model
+        data = DashboardModel { [weak model] in model?.settings ?? .defaults }
     }
 
     var isOpen: Bool { window.isVisible && revealed }
