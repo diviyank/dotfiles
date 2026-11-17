@@ -4,6 +4,7 @@ import SwiftUI
 
 struct StatusView: View {
     @ObservedObject var model: BarModel
+    let popouts: PopoutPanel
     @ObservedObject private var volume = VolumeSensor.shared
     @ObservedObject private var battery = BatterySensor.shared
     @ObservedObject private var wifi = WiFiSensor.shared
@@ -24,12 +25,12 @@ struct StatusView: View {
                     onScroll: { up in volume.set(percent: volume.percent + (up ? 1 : -1) * Self.volumeStep) },
                     onClick: { volume.toggleMute() }
                 ))
-                .help("\(volume.deviceName) \(volume.percent)%")
+                .popout(.volume, popouts)
             icon(wifiGlyph(rssi: wifi.rssi))
-                .help(wifi.ssid ?? "Wi-Fi")
+                .popout(.wifi, popouts)
             if battery.present {
                 icon(batteryGlyph(percent: battery.percent, charging: battery.charging))
-                    .help("\(battery.percent)%")
+                    .popout(.battery, popouts)
             }
         }
         .padding(.vertical, Theme.Spacing.small)

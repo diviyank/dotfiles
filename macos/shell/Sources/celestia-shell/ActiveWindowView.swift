@@ -20,7 +20,6 @@ struct ActiveWindowView: View {
                     .rotationEffect(.degrees(-90))
             }
         }
-        .help(window.title)
     }
 }
 

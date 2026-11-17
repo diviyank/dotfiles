@@ -28,14 +28,16 @@ final class DisplayChrome {
     let uuid: String
     private let frame: ChromePanel
     private let bar: ChromePanel
+    private let popouts: PopoutPanel
     private var isVisible = false
 
     init(screen: NSScreen, uuid: String, model: BarModel) {
         self.uuid = uuid
         frame = ChromePanel.make(frame: screen.frame, clickThrough: true, content: FrameView(model: model))
+        popouts = PopoutPanel(screen: screen.frame, model: model)
         var strip = screen.frame
         strip.size.width = Theme.Bar.width
-        bar = ChromePanel.make(frame: strip, clickThrough: false, content: BarView(model: model, uuid: uuid))
+        bar = ChromePanel.make(frame: strip, clickThrough: false, content: BarView(model: model, uuid: uuid, popouts: popouts))
         setVisible(true)
     }
 
@@ -45,11 +47,13 @@ final class DisplayChrome {
         for panel in [frame, bar] {
             if visible { panel.orderFrontRegardless() } else { panel.orderOut(nil) }
         }
+        if !visible { popouts.hide() }
     }
 
     func close() {
         frame.close()
         bar.close()
+        popouts.close()
     }
 }
 

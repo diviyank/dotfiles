@@ -4,6 +4,7 @@ import SwiftUI
 struct BarView: View {
     @ObservedObject var model: BarModel
     let uuid: String
+    let popouts: PopoutPanel
 
     var body: some View {
         VStack(spacing: Theme.Spacing.small) {
@@ -20,11 +21,17 @@ struct BarView: View {
             }
             if let window = focusedWindow(model.displays) {
                 ActiveWindowView(model: model, window: window)
+                    .popout(.window, popouts)
                     .layoutPriority(-1)
             }
             Spacer(minLength: Theme.Spacing.large)
             ClockView(model: model)
-            StatusView(model: model)
+            StatusView(model: model, popouts: popouts)
+            Text(Glyph.power)
+                .font(Font(Theme.icon(Theme.Bar.statusIcon)))
+                .foregroundStyle(model.color("error"))
+                .frame(width: Theme.Bar.cellWidth, height: Theme.Bar.cellWidth)
+                .popout(.power, popouts)
         }
         .padding(.vertical, Theme.Spacing.small)
         .frame(width: Theme.Bar.width)
