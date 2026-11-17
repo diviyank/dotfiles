@@ -54,6 +54,17 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Hover the title, volume, Wi-Fi, battery or power | Open its popout (stays open while the mouse is on it) |
 | Power popout | Lock, sleep, restart or shut down |
 
+## Dashboard
+
+| Key or mouse | Action |
+|---|---|
+| `alt + u` | Toggle the dashboard on the display under the mouse (pinned) |
+| Hover the top border, centre | Open it while the mouse stays on it |
+| Click the clock | Toggle it pinned |
+| `Esc` | Close a pinned dashboard |
+| Gear | Open System Settings |
+| Calendar arrows / month name | Previous or next month / back to today |
+
 ## Terminal
 
 | Command | Action |
@@ -61,3 +72,4 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | `celestia status` | Show whether the shell, yabai and skhd are running |
 | `celestia restart` | Restart all three (or name one: `shell`, `yabai`, `skhd`) |
 | `celestia stop` / `celestia start` | Stop or start them |
+| `celestia-shell dashboard` | Toggle the dashboard |

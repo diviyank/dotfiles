@@ -20,11 +20,13 @@ mkdir -p ~/Pictures/Wallpapers   # copy the 24 wallpapers here
 System Settings:
 - Keyboard > Keyboard Shortcuts > Spotlight: disable Cmd+Space.
 - Wallpaper: set "Show on all Spaces".
-- Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change); re-check after re-running `install.sh`.
+- Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change), and `celestia-shell` to control Spotify (prompted on the first dashboard open while Spotify runs).
+- Privacy & Security > Calendars: allow `celestia-shell` full access (prompted on the first dashboard open).
 
 Then:
 
 ```sh
+sh macos/shell/make-signing-cert.sh   # once: "Celestia Local" code-signing certificate, so permissions survive rebuilds
 macos/shell/install.sh           # builds, installs ~/.local/bin/celestia-shell, loads the LaunchAgent
 ~/.local/bin/celestia-wallpaper ~/Pictures/Wallpapers/<file>
 skhd --restart-service
@@ -64,6 +66,19 @@ Frame and bar
 - [ ] Volume popout slider drags the volume
 - [ ] Lock locks the screen; Restart shows macOS's confirmation (cancel it)
 - [x] Idle: about 0 % CPU, footprint ≈ 21 MB
+
+Dashboard
+- [ ] `codesign -dv ~/.local/bin/celestia-shell` shows `Authority=Celestia Local`; Calendar and Spotify grants survive re-running `install.sh`
+- [ ] Hovering the top centre opens it within about 0.1 s; the very top still reveals the menu bar; leaving closes it
+- [ ] alt+u and clicking the clock pin it; Esc, alt+u or a second click close it; hovering never moves focus
+- [x] On the built-in display the content sits below the notch
+- [ ] The gear opens System Settings
+- [x] Performance: `yes > /dev/null` shows at the top at about 100 % with its PID; closed, the shell is back to 0 % CPU
+- [ ] Calendar shows today's and tomorrow's events; an event added in Calendar.app appears without reopening; arrows change month
+- [x] Weather shows Paris and writes `~/.local/state/celestia/weather.json`
+- [ ] Offline, reopening shows the cached weather with its age; changing `weather.location` refetches on the next open
+- [ ] Spotify: track, artist, artwork and progress follow playback; controls work; quitting Spotify shows "Nothing playing" and opening the dashboard doesn't relaunch it
+- [x] Footprint ≈ 24 MB closed, 27 MB open, 25 MB a minute after closing (before Spotify artwork)
 
 Launcher
 - [ ] `macos/shell/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes
