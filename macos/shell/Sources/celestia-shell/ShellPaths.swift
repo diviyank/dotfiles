@@ -7,6 +7,14 @@ enum ShellPaths {
     static let settings = home.appendingPathComponent(".config/celestia/shell.json")
     static let applyYabai = home.appendingPathComponent(".config/wm/apply-yabai.sh")
     static let yabai = "/opt/homebrew/bin/yabai"
+    static let scheme = home.appendingPathComponent(".local/state/celestia/scheme.json")
+    static let wallpaperSource = home.appendingPathComponent(".local/state/celestia/source.jpg")
+    static let currentWallpaper = home.appendingPathComponent(".local/state/celestia/wallpaper")
+    static let wallpapers = home.appendingPathComponent("Pictures/Wallpapers", isDirectory: true)
+    static let thumbnails = home.appendingPathComponent(".cache/celestia/thumbs", isDirectory: true)
+    static let wallpaperScript = home.appendingPathComponent(".local/bin/celestia-wallpaper")
+    static let matugen = [home.appendingPathComponent(".cargo/bin/matugen").path, "/opt/homebrew/bin/matugen"]
+        .first { FileManager.default.isExecutableFile(atPath: $0) }
 }
 
 func runProcess(_ path: String, _ arguments: [String]) -> Data? {

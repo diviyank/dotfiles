@@ -2,29 +2,40 @@
 import AppKit
 import LauncherCore
 
+enum RowIcon {
+    case glyph(String)
+    case swatch(RGB)
+}
+
+enum RowAction {
+    case action(LauncherAction)
+    case copy(String)
+    case scheme(String)
+    case variant(String)
+    case none
+}
+
+struct LauncherRow {
+    let title: String
+    let subtitle: String
+    let icon: RowIcon
+    let action: RowAction
+}
+
 enum Results {
     case apps([AppEntry])
-    case commands([String])
+    case rows([LauncherRow])
     case wallpapers([URL])
 
     var count: Int {
         switch self {
         case .apps(let apps): return apps.count
-        case .commands(let commands): return commands.count
+        case .rows(let rows): return rows.count
         case .wallpapers(let wallpapers): return wallpapers.count
         }
     }
 }
 
-private struct CommandInfo {
-    let glyph: String
-    let title: String
-    let subtitle: String
-}
-
-private let commandInfo = [
-    "wallpaper": CommandInfo(glyph: Theme.Glyph.wallpaper, title: "Wallpaper", subtitle: "Change the current wallpaper"),
-]
 
 private final class FlippedCanvas: NSView {
     var drawer: ((NSRect) -> Void)?
@@ -99,7 +110,7 @@ final class ResultsView: NSView {
     private func moveHighlight(animated: Bool) {
         let showsRows: Bool
         switch results {
-        case .apps, .commands: showsRows = results.count > 0
+        case .apps, .rows: showsRows = results.count > 0
         case .wallpapers: showsRows = false
         }
         highlight.isHidden = !showsRows
@@ -141,12 +152,9 @@ final class ResultsView: NSView {
                                                 fraction: 1, respectFlipped: true, hints: nil)
                 }
             }
-        case .commands(let commands):
-            for (index, command) in commands.enumerated() {
-                let info = commandInfo[command] ?? CommandInfo(glyph: Theme.Glyph.search, title: command, subtitle: "")
-                drawRow(index, title: info.title, subtitle: info.subtitle) { rect in
-                    drawCentered(info.glyph, font: commandIconFont, role: "on_surface_variant", in: rect)
-                }
+        case .rows(let rows):
+            for (index, row) in rows.enumerated() {
+                drawRow(index, title: row.title, subtitle: row.subtitle) { rect in drawIcon(row.icon, in: rect) }
             }
         case .wallpapers(let wallpapers):
             let first = firstVisibleCard
@@ -167,6 +175,18 @@ final class ResultsView: NSView {
         let height = Theme.lineHeight(font)
         let line = NSRect(x: rect.minX, y: rect.midY - height / 2, width: rect.width, height: height)
         (text as NSString).draw(in: line, withAttributes: attributes(font, role, alignment: .center))
+    }
+
+    private func drawIcon(_ icon: RowIcon, in rect: NSRect) {
+        switch icon {
+        case .glyph(let glyph):
+            drawCentered(glyph, font: commandIconFont, role: "on_surface_variant", in: rect)
+        case .swatch(let rgb):
+            let side = rect.width * Theme.Launcher.swatchScale
+            let circle = NSRect(x: rect.midX - side / 2, y: rect.midY - side / 2, width: side, height: side)
+            NSColor(srgbRed: CGFloat(rgb.r), green: CGFloat(rgb.g), blue: CGFloat(rgb.b), alpha: 1).setFill()
+            NSBezierPath(ovalIn: circle).fill()
+        }
     }
 
     private func drawEmpty() {

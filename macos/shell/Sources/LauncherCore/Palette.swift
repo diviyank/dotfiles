@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RGB: Equatable {
+public struct RGB: Equatable, Sendable {
     public let r, g, b: Double
 
     public init(r: Double, g: Double, b: Double) {
@@ -10,7 +10,7 @@ public struct RGB: Equatable {
     }
 }
 
-public struct Palette {
+public struct Palette: Sendable {
     fileprivate let colors: [String: RGB]
 
     fileprivate init(colors: [String: RGB]) { self.colors = colors }
@@ -49,6 +49,16 @@ private func readPalette(_ url: URL) -> Palette? {
     return Palette(colors: json.compactMapValues(parseHex))
 }
 
+public func rgb(hex: String) -> RGB? { parseHex(hex) }
+
 public func loadPalette(primary: URL, fallback: URL) -> Palette {
     readPalette(primary) ?? readPalette(fallback) ?? neutralPalette
+}
+
+public func parseMatugenPalette(_ data: Data, mode: String) -> Palette? {
+    guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let colors = json["colors"] as? [String: Any],
+          let roles = colors[mode] as? [String: String]
+    else { return nil }
+    return Palette(colors: roles.compactMapValues(parseHex))
 }

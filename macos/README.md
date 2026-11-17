@@ -36,7 +36,7 @@ skhd --restart-service
 
 Control: `celestia start|stop|restart|status [shell|yabai|skhd]` (all three by default).
 
-Shell log: `/tmp/celestia-shell.log`. Settings: `~/.config/celestia/shell.json` (`border` in pt, default 6; `weather.location`). Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
+Shell log: `/tmp/celestia-shell.log`. Settings: `~/.config/celestia/shell.json` (`border` in pt, default 6; `weather.location`). Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`); the scheme, variant and light/dark choice live in `~/.local/state/celestia/scheme.json`, and `celestia-wallpaper --recolour` regenerates the colours from it.
 
 ## Tests
 
@@ -108,6 +108,10 @@ Launcher
 - [ ] Esc and focus loss close it
 - [ ] Return on an app ends with that app focused; Utilities apps are found
 - [ ] `>wallpaper` shows thumbnails and applies the chosen one
+- [x] `>` lists the actions; `>calc 2^10/3` shows 341.333333333 and Return copies it
+- [x] `>scheme` and `>wallpaper` recolour the bar and launcher while moving; Esc reverts
+- [ ] `>variant` previews and applies; `>light` then `>dark` switch modes; `>scheme` presets survive a wallpaper change
+- [ ] `>random` picks another wallpaper; lock, sleep, log out, restart and shut down work (cancel the confirmations)
 - [ ] Activity Monitor shows about 0 % CPU for `celestia-shell` when idle
 - [ ] Running `install.sh` twice still leaves a working launcher
 - [ ] Errors, if any, appear in `/tmp/celestia-shell.log`

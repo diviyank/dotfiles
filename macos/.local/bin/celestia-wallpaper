@@ -1,11 +1,26 @@
 #!/bin/sh
-# celestia-wallpaper <file> | --reapply | --current
+# celestia-wallpaper <file> | --reapply | --recolour | --current
 PATH="$PATH:/opt/homebrew/bin:$HOME/.cargo/bin:$HOME/.local/bin"
 STATE="${CELESTIA_STATE_DIR:-$HOME/.local/state/celestia}"
 
 set_on_every_desktop() {
     escaped="$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
     osascript -e "tell application \"System Events\" to tell every desktop to set picture to POSIX file \"$escaped\""
+}
+
+scheme_field() { # key default
+    value="$(plutil -extract "$1" raw -o - "$STATE/scheme.json" 2>/dev/null)" || value=""
+    printf '%s' "${value:-$2}"
+}
+
+recolour() {
+    seed="$(scheme_field seed '')"
+    if [ -n "$seed" ]; then set -- color hex "$seed"; else set -- image "$STATE/source.jpg"; fi
+    if ! matugen "$@" -t "$(scheme_field variant scheme-tonal-spot)" -m "$(scheme_field mode dark)" \
+        -c "$HOME/.config/celestia/matugen.toml"; then
+        echo "celestia-wallpaper: matugen failed" >&2
+        exit 1
+    fi
 }
 
 case "${1:-}" in
@@ -17,8 +32,15 @@ case "${1:-}" in
         [ -s "$STATE/wallpaper" ] || exit 0
         set_on_every_desktop "$(cat "$STATE/wallpaper")"
         ;;
+    --recolour)
+        if [ -z "$(scheme_field seed '')" ] && [ ! -e "$STATE/source.jpg" ]; then
+            echo "celestia-wallpaper: no wallpaper set" >&2
+            exit 1
+        fi
+        recolour
+        ;;
     "")
-        echo "usage: celestia-wallpaper <file> | --reapply | --current" >&2
+        echo "usage: celestia-wallpaper <file> | --reapply | --recolour | --current" >&2
         exit 2
         ;;
     *)
@@ -37,9 +59,6 @@ case "${1:-}" in
             echo "celestia-wallpaper: sips failed" >&2
             exit 1
         fi
-        if ! matugen image "$STATE/source.jpg" -t scheme-tonal-spot -m dark -c "$HOME/.config/celestia/matugen.toml"; then
-            echo "celestia-wallpaper: matugen failed" >&2
-            exit 1
-        fi
+        recolour
         ;;
 esac

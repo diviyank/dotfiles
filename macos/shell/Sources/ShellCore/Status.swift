@@ -41,6 +41,14 @@ public enum Glyph {
     public static let musicNote = g(0xE405)
     public static let videocam = g(0xE04B)
     public static let brightness6 = g(0xE3AB)
+    public static let calculate = g(0xEA5F)
+    public static let palette = g(0xE40A)
+    public static let tune = g(0xE429)
+    public static let wallpaper = g(0xE1BC)
+    public static let shuffle = g(0xE043)
+    public static let lightMode = g(0xE518)
+    public static let darkMode = g(0xE51C)
+    public static let logout = g(0xE9BA)
 
     static let named: [(String, String)] = [
         ("spa", logo), ("battery_full", batteryFull), ("battery_charging_full", batteryChargingFull),
@@ -56,6 +64,8 @@ public enum Glyph {
         ("skip_previous", skipPrevious), ("skip_next", skipNext), ("play_circle", playCircle),
         ("pause_circle", pauseCircle), ("chevron_left", chevronLeft), ("chevron_right", chevronRight),
         ("music_note", musicNote), ("videocam", videocam), ("brightness_6", brightness6),
+        ("calculate", calculate), ("palette", palette), ("tune", tune), ("wallpaper", wallpaper),
+        ("shuffle", shuffle), ("light_mode", lightMode), ("dark_mode", darkMode), ("logout", logout),
     ]
 }
 

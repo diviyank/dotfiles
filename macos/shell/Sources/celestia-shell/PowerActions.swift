@@ -13,6 +13,7 @@ enum PowerActions {
 
     static func sleep() { run(#"tell application "System Events" to sleep"#) }
     static func restart() { run(#"tell application "loginwindow" to «event aevtrrst»"#) }
+    static func logOut() { run(#"tell application "loginwindow" to «event aevtlogo»"#) }
     static func shutDown() { run(#"tell application "loginwindow" to «event aevtrsdn»"#) }
 
     private static func run(_ script: String) {

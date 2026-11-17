@@ -34,12 +34,19 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Keys | Action |
 |---|---|
 | `cmd - space` | Toggle the launcher (Spotlight's Cmd+Space must be disabled) |
-| `Return` | Open the selected app, apply the selected wallpaper, or complete the selected command |
-| `Esc` | Close |
+| `Return` | Open the selected app, apply the selected wallpaper, scheme or variant, run the action, or copy the result |
+| `Esc` | Close (and drop any colour preview) |
 | `Up` / `Down` | Move selection |
 | `Shift+Tab` / `Tab` | Move selection up / down |
 | `Left` / `Right` | Move selection in wallpaper mode |
-| `>wallpaper` | Wallpaper picker with thumbnails |
+| `>` | List the actions |
+| `>calc <expr>` | Calculator: `+ - * / % ^`, brackets, `sqrt sin cos tan log ln abs…`, `pi`, `e`; Return copies |
+| `>scheme` | Colour scheme: Dynamic (from the wallpaper) or a preset; previews live |
+| `>variant` | Scheme variant (tonal spot, expressive, fidelity…); previews live |
+| `>wallpaper` | Wallpaper picker with thumbnails; previews its colours live |
+| `>random` | Random wallpaper |
+| `>light` / `>dark` | Light or dark colours |
+| `>lock` `>sleep` `>logout` `>restart` `>shutdown` | Power actions (log out, restart and shut down ask first) |
 
 ## Bar
 

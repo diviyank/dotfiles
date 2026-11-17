@@ -80,8 +80,8 @@ final class LauncherCoreTests {
     @Test func parsesModes() {
         #expect(parseMode("") == .apps(""))
         #expect(parseMode("saf") == .apps("saf"))
-        #expect(parseMode(">") == .commands(""))
-        #expect(parseMode(">wa") == .commands("wa"))
+        #expect(parseMode(">") == .actions(""))
+        #expect(parseMode(">wa") == .actions("wa"))
         #expect(parseMode(">wallpaper") == .wallpapers(""))
         #expect(parseMode(">wallpaper  lake ") == .wallpapers("lake"))
     }

@@ -20,6 +20,10 @@ final class BarModel: ObservableObject {
         palette = LauncherController.loadCurrentPalette()
     }
 
+    func preview(_ palette: Palette) {
+        self.palette = palette
+    }
+
     func reloadSettings() -> Bool {
         let fresh = loadSettings(ShellPaths.settings)
         guard fresh != settings else { return false }

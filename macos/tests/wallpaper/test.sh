@@ -98,7 +98,34 @@ test_current_without_state() {
     check current_without_state $?
 }
 
-for t in test_sets_all_then_colours test_relative_path_is_absolutised test_path_with_quotes \
+matugen_args() { sed -n '/^matugen$/,$p' "$log" | sed '1d' | sed 's/^  //' | tr '\n' ' '; }
+
+write_scheme() { mkdir -p "$CELESTIA_STATE_DIR"; printf '%s\n' "$1" > "$CELESTIA_STATE_DIR/scheme.json"; }
+
+test_preset_scheme_uses_its_seed() {
+    setup; touch "$tmp/a.jpg"
+    write_scheme '{"mode":"light","name":"nord","seed":"#88c0d0","variant":"scheme-content"}'
+    run "$tmp/a.jpg"
+    [ "$(matugen_args)" = "color hex #88c0d0 -t scheme-content -m light -c $HOME/.config/celestia/matugen.toml " ]
+    check preset_scheme_uses_its_seed $((rc + $?))
+}
+
+test_recolour_uses_the_scheme() {
+    setup; write_scheme '{"mode":"light","name":"dynamic","variant":"scheme-fidelity"}'
+    touch "$CELESTIA_STATE_DIR/source.jpg"; run --recolour
+    [ "$(grep -v '^  ' "$log")" = "matugen" ]; a=$?
+    [ "$(matugen_args)" = "image $CELESTIA_STATE_DIR/source.jpg -t scheme-fidelity -m light -c $HOME/.config/celestia/matugen.toml " ]
+    check recolour_uses_the_scheme $((rc + a + $?))
+}
+
+test_recolour_without_wallpaper() {
+    setup; run --recolour
+    [ "$rc" -eq 1 ] && [ "$(cat "$tmp/err")" = "celestia-wallpaper: no wallpaper set" ] && [ ! -s "$log" ]
+    check recolour_without_wallpaper $?
+}
+
+for t in test_preset_scheme_uses_its_seed test_recolour_uses_the_scheme test_recolour_without_wallpaper \
+         test_sets_all_then_colours test_relative_path_is_absolutised test_path_with_quotes \
          test_missing_file test_reapply test_matugen_failure_keeps_wallpaper test_sips_failure_skips_colours \
          test_osascript_failure_keeps_state test_current_without_state; do "$t"; done
 if [ "$fails" -eq 0 ]; then echo "PASS wallpaper"; else echo "$fails failed"; exit 1; fi

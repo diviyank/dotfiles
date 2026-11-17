@@ -18,6 +18,10 @@ final class ShellController: NSObject {
     override init() {
         super.init()
         rebuildChromes()
+        launcher.onPreview = { [weak self] palette in
+            guard let self else { return }
+            if let palette { self.model.preview(palette) } else { self.model.reloadPalette() }
+        }
         watchers = [
             FileWatcher(ShellPaths.colors) { [weak self] in self?.model.reloadPalette() },
             FileWatcher(ShellPaths.settings) { [weak self] in self?.settingsChanged() },
