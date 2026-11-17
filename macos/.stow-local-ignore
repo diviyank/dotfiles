@@ -26,6 +26,6 @@ _darcs
 \.DS_Store
 ^/README.*
 ^/SHORTCUTS.md
-^/launcher
+^/shell
 ^/tests
 ^/docs

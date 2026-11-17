@@ -12,7 +12,7 @@ private func rasterize(_ image: NSImage, points: NSSize) -> NSImage {
 @MainActor
 final class IconCache {
     private var images: [String: NSImage] = [:]
-    private let queue = DispatchQueue(label: "local.celestia.launcher.icons", qos: .utility)
+    private let queue = DispatchQueue(label: "local.celestia.shell.icons", qos: .utility)
 
     func icon(for app: AppEntry) -> NSImage? {
         images[app.url.path]
@@ -81,7 +81,7 @@ private func loadThumbnail(for wallpaper: URL, cacheDir: URL) -> NSImage? {
 final class ThumbnailCache {
     private var images: [String: NSImage] = [:]
     private var pending = Set<String>()
-    private let queue = DispatchQueue(label: "local.celestia.launcher.thumbs", qos: .utility)
+    private let queue = DispatchQueue(label: "local.celestia.shell.thumbs", qos: .utility)
     private let cacheDir = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".cache/celestia/thumbs", isDirectory: true)
 

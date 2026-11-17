@@ -21,19 +21,19 @@ mkdir -p ~/Pictures/Wallpapers   # copy the 24 wallpapers here
 System Settings:
 - Keyboard > Keyboard Shortcuts > Spotlight: disable Cmd+Space.
 - Wallpaper: set "Show on all Spaces".
-- Privacy & Security > Automation: allow `celestia-launcher` and `yabai` to control System Events (prompted on the first wallpaper change); re-check after re-running `install.sh`.
+- Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change); re-check after re-running `install.sh`.
 
 Then:
 
 ```sh
-macos/launcher/install.sh        # builds, installs ~/.local/bin/celestia-launcher, loads the LaunchAgent
+macos/shell/install.sh           # builds, installs ~/.local/bin/celestia-shell, loads the LaunchAgent
 ~/.local/bin/celestia-wallpaper ~/Pictures/Wallpapers/lakes-02-lake-hawea-05.jpg
 brew services restart sketchybar
 skhd --restart-service
 ~/.config/wm/apply-yabai.sh
 ```
 
-Launcher log: `/tmp/celestia-launcher.log`. Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
+Launcher log: `/tmp/celestia-shell.log`. Generated colours: `~/.local/state/celestia/` (defaults in `macos/.config/celestia/`).
 
 ## Tests
 
@@ -41,7 +41,7 @@ Launcher log: `/tmp/celestia-launcher.log`. Generated colours: `~/.local/state/c
 lua macos/tests/sketchybar/run.lua        # Lua 5.5, as embedded by SbarLua
 sh macos/tests/wallpaper/test.sh
 sh macos/tests/templates/test.sh          # needs matugen 2.4.1 and a wallpaper
-(cd macos/launcher && swift test)
+(cd macos/shell && swift test)
 ~/.config/wm/selftest.sh
 ```
 
@@ -71,22 +71,22 @@ Dashboard
 - [ ] Moving the mouse onto the popup keeps it open; leaving closes it
 
 Launcher
-- [ ] `macos/launcher/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes
+- [ ] `macos/shell/install.sh` compiles (first real compile of the AppKit code) and `swift test` passes
 - [ ] Cmd+Space opens it in under ~100 ms, bottom-centre of the screen under the mouse
 - [ ] yabai does not tile it
 - [ ] Typing goes to the launcher straight away, without clicking it
 - [ ] Esc and focus loss close it
 - [ ] Return on an app ends with that app focused; Utilities apps are found
 - [ ] `>wallpaper` shows thumbnails and applies the chosen one
-- [ ] Activity Monitor shows about 0 % CPU for `celestia-launcher` when idle
+- [ ] Activity Monitor shows about 0 % CPU for `celestia-shell` when idle
 - [ ] Running `install.sh` twice still leaves a working launcher
-- [ ] Errors, if any, appear in `/tmp/celestia-launcher.log`
+- [ ] Errors, if any, appear in `/tmp/celestia-shell.log`
 
 Wallpaper
 - [ ] `celestia-wallpaper <file>` sets every display and creates `~/.local/state/celestia/colors.lua`
 - [ ] Bar recolours after the reload and the launcher on its next open
 - [ ] Plugging a display re-applies the wallpaper (display-change hook)
-- [ ] System Events Automation is allowed for `celestia-launcher` and `yabai`; a wallpaper picked in the launcher applies
+- [ ] System Events Automation is allowed for `celestia-shell` and `yabai`; a wallpaper picked in the launcher applies
 
 Scripts
 - [ ] Lua, wallpaper and template tests pass; `~/.config/wm/selftest.sh` passes

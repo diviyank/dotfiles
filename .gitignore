@@ -1,5 +1,5 @@
 pomodoro_offset.txt
-macos/launcher/.build/
+macos/shell/.build/
 macos/.local/state/
 macos/.local/bin/celestia-launcher
 .pomodoro_state

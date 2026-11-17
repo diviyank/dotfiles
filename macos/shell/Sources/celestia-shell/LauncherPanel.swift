@@ -2,10 +2,11 @@
 import AppKit
 import LauncherCore
 
-let launcherToggleNotification = Notification.Name("local.celestia.launcher.toggle")
+let launcherToggleNotification = Notification.Name("local.celestia.shell.toggle")
+let shellRefreshNotification = Notification.Name("local.celestia.shell.refresh")
 
 private func logError(_ message: String) {
-    FileHandle.standardError.write(Data("celestia-launcher: \(message)\n".utf8))
+    FileHandle.standardError.write(Data("celestia-shell: \(message)\n".utf8))
 }
 
 final class LauncherPanel: NSPanel {
