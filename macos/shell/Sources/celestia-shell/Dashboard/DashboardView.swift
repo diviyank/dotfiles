@@ -18,7 +18,7 @@ struct DashboardView: View {
             }
             .frame(height: Theme.Dashboard.topRowHeight)
             HStack(spacing: Theme.Dashboard.gap) {
-                DashboardCard(model: model) { Color.clear }
+                MediaCard(model: model, spotify: data.spotify)
                     .frame(width: Theme.Dashboard.clockWidth + Theme.Dashboard.calendarWidth / 2)
                 PerformanceCard(model: model, sampler: data.performance)
             }

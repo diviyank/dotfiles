@@ -77,6 +77,8 @@ enum Theme {
         static let tinyText: CGFloat = 11
         static let dayCell: CGFloat = 22
         static let weatherIcon: CGFloat = 30
+        static let artSize: CGFloat = 64
+        static let controlSize: CGFloat = 22
         static let temperatureSize: CGFloat = 20
         static let bodyText: CGFloat = 13
         static let gearSize: CGFloat = 18
