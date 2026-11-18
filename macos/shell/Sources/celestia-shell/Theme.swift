@@ -108,6 +108,16 @@ enum Theme {
         static let gearSize: CGFloat = 18
     }
 
+    enum Island {
+        static let radius: CGFloat = 10
+        static let padding: CGFloat = 14
+        static let timeSize: CGFloat = 14
+        static let textSize: CGFloat = 13
+        static let smallSize: CGFloat = 11
+        static let iconSize: CGFloat = 20
+        static let meterStep: TimeInterval = 0.3
+    }
+
     enum Glyph {
         static let search = glyph(0xE8B6)
         static let image = glyph(0xE3F4)

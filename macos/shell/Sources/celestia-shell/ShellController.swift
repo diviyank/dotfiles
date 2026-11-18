@@ -10,6 +10,7 @@ final class ShellController: NSObject {
     private lazy var osd = OSDPanel(model: model)
     private lazy var mediaKeys = MediaKeyTap { [weak self] key, step in self?.apply(key, step: step) }
     private var chromes: [String: DisplayChrome] = [:]
+    private var island: (uuid: String, controller: IslandController)?
     private var watchers: [FileWatcher] = []
     private var subscriptions = Set<AnyCancellable>()
     private var volumeTarget: Double?
@@ -93,9 +94,16 @@ final class ShellController: NSObject {
         osd.close()
         chromes.values.forEach { $0.close() }
         chromes = [:]
+        island?.controller.close()
+        island = nil
         for screen in NSScreen.screens {
             guard let uuid = screen.displayUUID else { continue }
             chromes[uuid] = DisplayChrome(screen: screen, uuid: uuid, model: model, dashboard: dashboard, osd: osd)
+        }
+        for screen in NSScreen.screens where island == nil {
+            guard let uuid = screen.displayUUID,
+                  let controller = IslandController(screen: screen, dashboard: dashboard, model: model) else { continue }
+            island = (uuid, controller)
         }
         applyFullscreen(model.displays)
         model.refresh()
@@ -104,6 +112,7 @@ final class ShellController: NSObject {
     private func applyFullscreen(_ displays: [ShellCore.BarDisplay]) {
         for display in displays {
             chromes[display.uuid]?.setVisible(!display.isFullscreen)
+            if island?.uuid == display.uuid { island?.controller.setVisible(!display.isFullscreen) }
         }
     }
 

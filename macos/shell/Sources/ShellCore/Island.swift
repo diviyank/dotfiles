@@ -1,9 +1,8 @@
 import Foundation
 
 public enum IslandMetrics {
-    public static let wing: CGFloat = 96
-    public static let toastWidth: CGFloat = 440
-    public static let toastHeight: CGFloat = 86
+    public static let wing: CGFloat = 140
+    public static let toastWing: CGFloat = 320
 }
 
 public func notchRect(left: CGRect?, right: CGRect?) -> CGRect? {
@@ -22,13 +21,7 @@ public func islandIdleFrame(notch: CGRect, screen: CGRect) -> CGRect {
 }
 
 public func islandToastFrame(notch: CGRect, screen: CGRect) -> CGRect {
-    let frame = CGRect(
-        x: notch.midX - IslandMetrics.toastWidth / 2,
-        y: notch.maxY - IslandMetrics.toastHeight,
-        width: IslandMetrics.toastWidth,
-        height: IslandMetrics.toastHeight
-    )
-    return clampedHorizontally(frame, in: screen)
+    clampedHorizontally(notch.insetBy(dx: -IslandMetrics.toastWing, dy: 0), in: screen)
 }
 
 public struct MeetingSlot: Equatable, Sendable {

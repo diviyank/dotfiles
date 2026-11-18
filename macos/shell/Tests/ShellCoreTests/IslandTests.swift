@@ -21,12 +21,13 @@ private let notch = CGRect(x: 2671, y: 1039, width: 209, height: 38)
     #expect(islandIdleFrame(notch: notch, screen: narrow).maxX <= narrow.maxX)
 }
 
-@Test func toastHangsFromTheTopEdge() {
+@Test func toastGrowsSidewaysAlongTheBand() {
     let frame = islandToastFrame(notch: notch, screen: screen)
-    #expect(frame.maxY == notch.maxY)
-    #expect(frame.height == IslandMetrics.toastHeight)
-    #expect(frame.width == IslandMetrics.toastWidth)
+    #expect(frame.minY == notch.minY)
+    #expect(frame.height == notch.height)
+    #expect(frame.width == notch.width + 2 * IslandMetrics.toastWing)
     #expect(frame.midX == notch.midX)
+    #expect(frame.width > islandIdleFrame(notch: notch, screen: screen).width)
     let narrow = CGRect(x: 2600, y: -35, width: 300, height: 1112)
     let clamped = islandToastFrame(notch: notch, screen: narrow)
     #expect(clamped.minX >= narrow.minX && clamped.maxX <= narrow.maxX)
