@@ -14,8 +14,10 @@ enum ShellPaths {
     static let wallpaperSource = home.appendingPathComponent(".local/state/celestia/source.jpg")
     static let currentWallpaper = home.appendingPathComponent(".local/state/celestia/wallpaper")
     static let wallpapers = home.appendingPathComponent("Pictures/Wallpapers", isDirectory: true)
+    static let downloadedAppleWallpapers = home.appendingPathComponent("Library/Application Support/com.apple.mobileAssetDesktop", isDirectory: true)
+    static let systemWallpaperIndex = home.appendingPathComponent("Library/Application Support/com.apple.wallpaper/Store/Index.plist")
     static var wallpaperFolders: [URL] {
-        [wallpapers] + appleWallpaperFolders(
+        [wallpapers, downloadedAppleWallpapers] + appleWallpaperFolders(
             desktopPictures: URL(fileURLWithPath: "/System/Library/Desktop Pictures", isDirectory: true),
             assets: URL(fileURLWithPath: "/System/Library/AssetsV2/com_apple_MobileAsset_DesktopPicture", isDirectory: true)
         )

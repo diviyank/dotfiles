@@ -32,6 +32,26 @@ public func appleWallpaperFolders(desktopPictures: URL, assets: URL) -> [URL] {
     return [desktopPictures] + packages + downloads
 }
 
+private func desktopChoices(in node: Any) -> [(set: Date, choice: [String: Any])] {
+    if let list = node as? [Any] { return list.flatMap(desktopChoices) }
+    guard let dict = node as? [String: Any] else { return [] }
+    var found = dict.filter { $0.key != "Desktop" }.values.flatMap(desktopChoices)
+    if let desktop = dict["Desktop"] as? [String: Any], let set = desktop["LastSet"] as? Date,
+       let choice = ((desktop["Content"] as? [String: Any])?["Choices"] as? [[String: Any]])?.first {
+        found.append((set, choice))
+    }
+    return found
+}
+
+public func latestDesktopImage(_ index: Data) -> URL? {
+    guard let root = try? PropertyListSerialization.propertyList(from: index, format: nil),
+          let latest = desktopChoices(in: root).max(by: { $0.set < $1.set })?.choice,
+          latest["Provider"] as? String == "com.apple.wallpaper.choice.image",
+          let file = (latest["Files"] as? [[String: Any]])?.first?["relative"] as? String
+    else { return nil }
+    return URL(string: file)
+}
+
 public func rankWallpapers(_ query: String, _ files: [URL]) -> [URL] {
     if query.isEmpty { return files }
     let scored = files.enumerated().compactMap { index, url in

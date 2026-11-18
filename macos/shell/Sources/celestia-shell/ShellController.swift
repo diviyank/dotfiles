@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import LauncherCore
 import ShellCore
 
 @MainActor
@@ -15,6 +16,7 @@ final class ShellController: NSObject {
     private var subscriptions = Set<AnyCancellable>()
     private var volumeTarget: Double?
     private var brightnessTarget: Double?
+    private var adoptingWallpaper: URL?
 
     override init() {
         super.init()
@@ -26,7 +28,9 @@ final class ShellController: NSObject {
         watchers = [
             FileWatcher(ShellPaths.colors) { [weak self] in self?.model.reloadPalette() },
             FileWatcher(ShellPaths.settings) { [weak self] in self?.settingsChanged() },
+            FileWatcher(ShellPaths.systemWallpaperIndex) { [weak self] in self?.adoptSystemWallpaper() },
         ]
+        adoptSystemWallpaper()
         NotificationCenter.default.addObserver(
             self, selector: #selector(rebuildChromes), name: NSApplication.didChangeScreenParametersNotification, object: nil
         )
@@ -113,6 +117,19 @@ final class ShellController: NSObject {
         for display in displays {
             chromes[display.uuid]?.setVisible(!display.isFullscreen)
             if island?.uuid == display.uuid { island?.controller.setVisible(!display.isFullscreen) }
+        }
+    }
+
+    private func adoptSystemWallpaper() {
+        guard let index = try? Data(contentsOf: ShellPaths.systemWallpaperIndex),
+              let chosen = latestDesktopImage(index)?.resolvingSymlinksInPath() else { return }
+        let current = (try? String(contentsOf: ShellPaths.currentWallpaper, encoding: .utf8))
+            .map { URL(fileURLWithPath: $0.trimmingCharacters(in: .whitespacesAndNewlines)).resolvingSymlinksInPath() }
+        guard chosen != current, chosen != adoptingWallpaper else { return }
+        adoptingWallpaper = chosen
+        Task.detached(priority: .utility) {
+            _ = runProcess(ShellPaths.wallpaperScript.path, [chosen.path])
+            await MainActor.run { [weak self] in self?.adoptingWallpaper = nil }
         }
     }
 

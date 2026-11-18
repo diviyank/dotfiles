@@ -118,6 +118,26 @@ final class LauncherCoreTests {
         #expect(zip(folders, expected).allSatisfy { $0.path.hasSuffix($1) })
     }
 
+    @Test func latestDesktopImageReadsSystemSettingsChoice() throws {
+        func desktop(_ provider: String, _ file: String?, _ set: TimeInterval) -> [String: Any] {
+            var choice: [String: Any] = ["Provider": provider]
+            if let file { choice["Files"] = [["relative": file]] }
+            return ["LastSet": Date(timeIntervalSince1970: set), "Content": ["Choices": [choice]]]
+        }
+        func index(_ entries: [[String: Any]]) throws -> Data {
+            let displays = Dictionary(uniqueKeysWithValues: entries.enumerated().map { ("d\($0.offset)", ["Desktop": $0.element]) })
+            let idle = desktop("com.apple.wallpaper.choice.image", "file:///idle.heic", 999)
+            let root: [String: Any] = ["SystemDefault": ["Idle": idle], "Spaces": ["": ["Displays": displays]]]
+            return try PropertyListSerialization.data(fromPropertyList: root, format: .binary, options: 0)
+        }
+        let image = "com.apple.wallpaper.choice.image"
+        let older = desktop(image, "file:///System/Library/Desktop%20Pictures/Sonoma.heic", 1)
+        let newer = desktop(image, "file:///Users/me/Catalina%20Shoreline.heic", 2)
+        #expect(latestDesktopImage(try index([older, newer]))?.path == "/Users/me/Catalina Shoreline.heic")
+        #expect(latestDesktopImage(try index([newer, desktop("com.apple.wallpaper.choice.aerials", nil, 3)])) == nil)
+        #expect(latestDesktopImage(Data("x".utf8)) == nil)
+    }
+
     @Test func ranksWallpapers() {
         let files = ["lake.jpg", "forest.png", "Mountain.jpg"].map { URL(fileURLWithPath: "/w/\($0)") }
         #expect(rankWallpapers("", files) == files)
