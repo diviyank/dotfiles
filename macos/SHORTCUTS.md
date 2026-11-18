@@ -62,6 +62,7 @@ Digit keys are bound by keycode so they work on AZERTY and QWERTY: the keys of t
 | Power popout | Lock, sleep, restart or shut down |
 | Click a mail in the Mail popout | Open it in Mail |
 | Click a message in the Discord popout | Open it in Discord |
+| Click a notch island toast | Open the message or app (Spotify for now playing) |
 
 ## Dashboard
 

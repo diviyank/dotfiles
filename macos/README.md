@@ -21,6 +21,7 @@ System Settings:
 - Keyboard > Keyboard Shortcuts > Spotlight: disable Cmd+Space.
 - Wallpaper: set "Show on all Spaces".
 - Privacy & Security > Automation: allow `celestia-shell` and `yabai` to control System Events (prompted on the first wallpaper change), `celestia-shell` to control Spotify (prompted on the first dashboard open while Spotify runs), and Mail (prompted on the first mail popout).
+- Notifications: the notch island shows every notification; to avoid seeing them twice, set the alert style to None per app in System Settings > Notifications (they still reach Notification Center).
 - Privacy & Security > Calendars: allow `celestia-shell` full access (prompted on the first dashboard open).
 - Privacy & Security > Accessibility: allow `celestia-shell` (prompted on first launch) so it handles the volume and brightness keys; without it the keys stay stock.
 
@@ -64,7 +65,11 @@ Frame and bar
 - [x] Mail badge caps at 99+ on one line; hovering it lists the newest unread mails, clicking one opens it in Mail
 - [ ] Hovering the Discord badge lists unread Discord notifications (sender, channel, message); clicking one opens that message; read messages drop off
 - [x] Battery shows a bolt whenever plugged in (charging or full); its popout says charging, plugged in or remaining time
-- [x] Empty spaces are hidden in the bar (the visible one always shows)
+- [x] Empty spaces are hidden in the bar
+- [x] Notch island (built-in screen only): time left of the notch, date (or "Meeting in N min") right, level meter while Spotify plays
+- [x] New notifications grow the island sideways for 5 s (sender left, message right); the island shrinks back and never blocks clicks when idle
+- [ ] Clicking an island toast opens the Discord message / brings the app forward; a new Spotify track shows for 4 s
+- [ ] Hovering the top centre still opens the dashboard over the island (the visible one always shows)
 - [ ] Scrolling on volume changes it; clicking mutes
 - [ ] Battery follows plugging and unplugging the charger
 - [x] Hover popouts grow from the bar for the title, volume, Wi-Fi, battery and power, without taking focus
