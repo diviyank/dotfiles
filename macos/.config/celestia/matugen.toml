@@ -1,5 +1,23 @@
 [config]
 
+[config.custom_colors]
+red = { color = "#ff5555", blend = true }
+green = { color = "#50fa7b", blend = true }
+yellow = { color = "#f1fa8c", blend = true }
+blue = { color = "#bd93f9", blend = true }
+magenta = { color = "#ff79c6", blend = true }
+cyan = { color = "#8be9fd", blend = true }
+
 [templates.celestia-json]
 input_path = "~/.config/celestia/templates/colors.json"
 output_path = "~/.local/state/celestia/colors.json"
+
+[templates.kitty]
+input_path = "~/.config/celestia/templates/kitty.conf"
+output_path = "~/.local/state/celestia/kitty.conf"
+post_hook = "[ -n \"$CELESTIA_NO_RELOAD\" ] || pkill -USR1 -x kitty || true"
+
+[templates.tmux]
+input_path = "~/.config/celestia/templates/tmux.conf"
+output_path = "~/.local/state/celestia/tmux.conf"
+post_hook = "[ -n \"$CELESTIA_NO_RELOAD\" ] || tmux source-file ~/.local/state/celestia/tmux.conf 2>/dev/null || true"
