@@ -235,7 +235,7 @@ final class LauncherController: NSObject, NSTextFieldDelegate, NSWindowDelegate 
 
     private func scanWallpapersIfNeeded() {
         guard !wallpapersScanned else { return }
-        wallpapers = scanWallpapers(in: ShellPaths.wallpapers)
+        wallpapers = scanWallpapers(in: ShellPaths.wallpaperFolders)
         wallpapersScanned = true
     }
 

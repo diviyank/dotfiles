@@ -11,6 +11,27 @@ public func scanWallpapers(in dir: URL) -> [URL] {
         .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
 }
 
+public func scanWallpapers(in dirs: [URL]) -> [URL] {
+    var seen = Set<String>()
+    let unique = dirs.flatMap { scanWallpapers(in: $0) }.filter { seen.insert($0.resolvingSymlinksInPath().path).inserted }
+    return unique.sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
+}
+
+private func subdirectories(of dir: URL) -> [URL] {
+    let entries = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.isDirectoryKey])) ?? []
+    return entries
+        .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }
+        .sorted { $0.lastPathComponent < $1.lastPathComponent }
+}
+
+public func appleWallpaperFolders(desktopPictures: URL, assets: URL) -> [URL] {
+    let packages = subdirectories(of: desktopPictures.appendingPathComponent(".wallpapers", isDirectory: true))
+    let downloads = subdirectories(of: assets)
+        .filter { $0.pathExtension == "asset" }
+        .map { $0.appendingPathComponent("AssetData", isDirectory: true) }
+    return [desktopPictures] + packages + downloads
+}
+
 public func rankWallpapers(_ query: String, _ files: [URL]) -> [URL] {
     if query.isEmpty { return files }
     let scored = files.enumerated().compactMap { index, url in

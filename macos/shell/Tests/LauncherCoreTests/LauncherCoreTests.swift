@@ -97,6 +97,27 @@ final class LauncherCoreTests {
         #expect(scanWallpapers(in: tmp.appendingPathComponent("nope")) == [])
     }
 
+    @Test func scanWallpapersMergesFoldersAndDropsLinkedDuplicates() throws {
+        try mkdir("mine")
+        try mkdir("system")
+        for f in ["system/Sonoma.heic", "system/Big Sur.madesktop", "mine/lake.jpg"] { try touch(f) }
+        try FileManager.default.createSymbolicLink(
+            at: tmp.appendingPathComponent("mine/Sonoma.heic"), withDestinationURL: tmp.appendingPathComponent("system/Sonoma.heic")
+        )
+        let found = scanWallpapers(in: [tmp.appendingPathComponent("mine"), tmp.appendingPathComponent("system"), tmp.appendingPathComponent("nope")])
+        #expect(found.map(\.lastPathComponent) == ["lake.jpg", "Sonoma.heic"])
+    }
+
+    @Test func appleWallpaperFoldersIncludeDownloadedAssets() throws {
+        try mkdir("pictures/.wallpapers/Sonoma Horizon")
+        try mkdir("assets/abc.asset/AssetData")
+        try touch("assets/catalog.xml")
+        let folders = appleWallpaperFolders(desktopPictures: tmp.appendingPathComponent("pictures"), assets: tmp.appendingPathComponent("assets"))
+        let expected = ["/pictures", "/pictures/.wallpapers/Sonoma Horizon", "/assets/abc.asset/AssetData"]
+        #expect(folders.count == expected.count)
+        #expect(zip(folders, expected).allSatisfy { $0.path.hasSuffix($1) })
+    }
+
     @Test func ranksWallpapers() {
         let files = ["lake.jpg", "forest.png", "Mountain.jpg"].map { URL(fileURLWithPath: "/w/\($0)") }
         #expect(rankWallpapers("", files) == files)

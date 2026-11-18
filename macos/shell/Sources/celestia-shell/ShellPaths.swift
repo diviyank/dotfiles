@@ -1,4 +1,5 @@
 import Foundation
+import LauncherCore
 
 enum ShellPaths {
     static let home = FileManager.default.homeDirectoryForCurrentUser
@@ -13,6 +14,12 @@ enum ShellPaths {
     static let wallpaperSource = home.appendingPathComponent(".local/state/celestia/source.jpg")
     static let currentWallpaper = home.appendingPathComponent(".local/state/celestia/wallpaper")
     static let wallpapers = home.appendingPathComponent("Pictures/Wallpapers", isDirectory: true)
+    static var wallpaperFolders: [URL] {
+        [wallpapers] + appleWallpaperFolders(
+            desktopPictures: URL(fileURLWithPath: "/System/Library/Desktop Pictures", isDirectory: true),
+            assets: URL(fileURLWithPath: "/System/Library/AssetsV2/com_apple_MobileAsset_DesktopPicture", isDirectory: true)
+        )
+    }
     static let thumbnails = home.appendingPathComponent(".cache/celestia/thumbs", isDirectory: true)
     static let wallpaperScript = home.appendingPathComponent(".local/bin/celestia-wallpaper")
     static let matugen = [home.appendingPathComponent(".cargo/bin/matugen").path, "/opt/homebrew/bin/matugen"]

@@ -14,7 +14,7 @@ brew install --cask font-google-sans-flex font-rubik font-material-symbols font-
 stow .
 mkdir -p ~/.local/bin ~/.local/state ~/.cache
 stow --no-folding -t ~ macos
-mkdir -p ~/Pictures/Wallpapers   # copy the 24 wallpapers here
+mkdir -p ~/Pictures/Wallpapers   # your own wallpapers; Apple stills already on disk are listed too
 ```
 
 System Settings:
@@ -117,6 +117,7 @@ Launcher
 - [ ] Esc and focus loss close it
 - [ ] Return on an app ends with that app focused; Utilities apps are found
 - [ ] `>wallpaper` shows thumbnails and applies the chosen one
+- [ ] `>wallpaper` lists Apple stills downloaded in System Settings (Wallpaper), not the undownloaded ones
 - [x] `>` lists the actions; `>calc 2^10/3` shows 341.333333333 and Return copies it
 - [x] `>scheme` and `>wallpaper` recolour the bar and launcher while moving; Esc reverts
 - [ ] `>variant` previews and applies; `>light` then `>dark` switch modes; `>scheme` presets survive a wallpaper change
