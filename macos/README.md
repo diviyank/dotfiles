@@ -67,7 +67,7 @@ Frame and bar
 - [x] Battery shows a bolt whenever plugged in (charging or full); its popout says charging, plugged in or remaining time
 - [x] Empty spaces are hidden in the bar
 - [x] Notch island (built-in screen only): time left of the notch, date (or "Meeting in N min") right, level meter while Spotify plays
-- [x] New notifications grow the island sideways for 5 s (sender left, message right); the island shrinks back and never blocks clicks when idle
+- [x] New notifications grow the island sideways for 5 s (time stays left; icon, sender and message grow out to the right); the island shrinks back and never blocks clicks when idle
 - [ ] Clicking an island toast opens the Discord message / brings the app forward; a new Spotify track shows for 4 s
 - [ ] Hovering the top centre still opens the dashboard over the island (the visible one always shows)
 - [ ] Scrolling on volume changes it; clicking mutes

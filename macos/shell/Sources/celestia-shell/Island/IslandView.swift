@@ -13,13 +13,15 @@ struct IslandView: View {
         spotify = island.spotify
     }
 
-    private var wing: CGFloat { island.expanded ? IslandMetrics.toastWing : IslandMetrics.wing }
 
     var body: some View {
         HStack(spacing: 0) {
-            side(alignment: .trailing) { leading }
+            clock.frame(width: IslandMetrics.wing)
             Color.clear.frame(width: island.notch.width)
-            side(alignment: .leading) { trailing }
+            trailing
+                .padding(.horizontal, Theme.Island.padding)
+                .frame(width: island.expanded ? IslandMetrics.toastWing : IslandMetrics.wing, alignment: island.expanded ? .leading : .center)
+                .clipped()
         }
         .frame(height: island.notch.height)
         .background(UnevenRoundedRectangle(
@@ -30,45 +32,28 @@ struct IslandView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func side(alignment: Alignment, @ViewBuilder _ content: () -> some View) -> some View {
-        content()
-            .padding(.horizontal, Theme.Island.padding)
-            .frame(width: wing, alignment: island.expanded ? alignment : .center)
-            .clipped()
-    }
-
-    @ViewBuilder
-    private var leading: some View {
-        switch island.expanded ? island.shown : nil {
-        case .notice(let notice)?:
-            HStack(spacing: Theme.Spacing.small) {
-                Image(nsImage: Self.icon(notice.app)).resizable().frame(width: Theme.Island.iconSize, height: Theme.Island.iconSize)
-                line(notice.title, role: "on_surface", weight: .medium)
-                if let detail = notice.detail { line(detail, role: "primary", size: Theme.Island.smallSize) }
-            }
-            .transition(.opacity)
-        case .nowPlaying(let track)?:
-            HStack(spacing: Theme.Spacing.small) {
-                artwork(for: track)
-                line(track.title, role: "on_surface", weight: .medium)
-            }
-            .transition(.opacity)
-        case nil:
-            Text(Self.time(island.now))
-                .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Island.timeSize, weight: .medium)))
-                .foregroundStyle(model.color("on_surface"))
-                .monospacedDigit()
-                .transition(.opacity)
-        }
+    private var clock: some View {
+        Text(Self.time(island.now))
+            .font(Font(Theme.font(Theme.Family.numbers, size: Theme.Island.timeSize, weight: .medium)))
+            .foregroundStyle(model.color("on_surface"))
+            .monospacedDigit()
     }
 
     @ViewBuilder
     private var trailing: some View {
         switch island.expanded ? island.shown : nil {
         case .notice(let notice)?:
-            line(notice.body, role: "on_surface_variant").transition(.opacity)
+            HStack(spacing: Theme.Spacing.small) {
+                Image(nsImage: Self.icon(notice.app)).resizable().frame(width: Theme.Island.iconSize, height: Theme.Island.iconSize)
+                line(notice.title, role: "on_surface", weight: .medium).fixedSize()
+                if let detail = notice.detail { line(detail, role: "primary", size: Theme.Island.smallSize).fixedSize() }
+                line(notice.body, role: "on_surface_variant")
+            }
+            .transition(.opacity)
         case .nowPlaying(let track)?:
             HStack(spacing: Theme.Spacing.small) {
+                artwork(for: track)
+                line(track.title, role: "on_surface", weight: .medium)
                 line(track.artist, role: "on_surface_variant")
                 LevelMeter(color: model.color("primary"))
             }

@@ -21,16 +21,15 @@ private let notch = CGRect(x: 2671, y: 1039, width: 209, height: 38)
     #expect(islandIdleFrame(notch: notch, screen: narrow).maxX <= narrow.maxX)
 }
 
-@Test func toastGrowsSidewaysAlongTheBand() {
+@Test func toastGrowsToTheRightOnly() {
+    let idle = islandIdleFrame(notch: notch, screen: screen)
     let frame = islandToastFrame(notch: notch, screen: screen)
+    #expect(frame.minX == idle.minX)
+    #expect(frame.maxX == notch.maxX + IslandMetrics.toastWing)
     #expect(frame.minY == notch.minY)
     #expect(frame.height == notch.height)
-    #expect(frame.width == notch.width + 2 * IslandMetrics.toastWing)
-    #expect(frame.midX == notch.midX)
-    #expect(frame.width > islandIdleFrame(notch: notch, screen: screen).width)
-    let narrow = CGRect(x: 2600, y: -35, width: 300, height: 1112)
-    let clamped = islandToastFrame(notch: notch, screen: narrow)
-    #expect(clamped.minX >= narrow.minX && clamped.maxX <= narrow.maxX)
+    let narrow = CGRect(x: 2500, y: -35, width: 600, height: 1112)
+    #expect(islandToastFrame(notch: notch, screen: narrow).maxX <= narrow.maxX)
 }
 
 @Test func meetingTextCountsDown() {
