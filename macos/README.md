@@ -63,6 +63,7 @@ Frame and bar
 - [x] Volume icon follows the volume keys; Mail/Discord badges show within 30 s
 - [x] Mail badge caps at 99+ on one line; hovering it lists the newest unread mails, clicking one opens it in Mail
 - [ ] Hovering the Discord badge lists unread Discord notifications (sender, channel, message); clicking one opens that message; read messages drop off
+- [x] Battery shows a bolt whenever plugged in (charging or full); its popout says charging, plugged in or remaining time
 - [x] Empty spaces are hidden in the bar (the visible one always shows)
 - [ ] Scrolling on volume changes it; clicking mutes
 - [ ] Battery follows plugging and unplugging the charger

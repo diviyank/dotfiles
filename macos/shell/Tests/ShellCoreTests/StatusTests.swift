@@ -4,10 +4,25 @@ import Testing
 @testable import ShellCore
 
 @Test func batteryGlyphs() {
-    #expect(batteryGlyph(percent: 100, charging: false) == Glyph.batteryFull)
-    #expect(batteryGlyph(percent: 100, charging: true) == Glyph.batteryChargingFull)
-    #expect(batteryGlyph(percent: 50, charging: false) == Glyph.batteryBars[3])
-    #expect(batteryGlyph(percent: 5, charging: false) == Glyph.batteryBars[0])
+    #expect(batteryGlyph(percent: 100, pluggedIn: false) == Glyph.batteryFull)
+    #expect(batteryGlyph(percent: 50, pluggedIn: false) == Glyph.batteryBars[3])
+    #expect(batteryGlyph(percent: 5, pluggedIn: false) == Glyph.batteryBars[0])
+}
+
+@Test func pluggedInBatteryShowsTheBoltAtEveryLevel() {
+    #expect(batteryGlyph(percent: 100, pluggedIn: true) == Glyph.batteryChargingFull)
+    #expect(batteryGlyph(percent: 95, pluggedIn: true) == Glyph.batteryCharging[5])
+    #expect(batteryGlyph(percent: 80, pluggedIn: true) == Glyph.batteryCharging[4])
+    #expect(batteryGlyph(percent: 50, pluggedIn: true) == Glyph.batteryCharging[2])
+    #expect(batteryGlyph(percent: 3, pluggedIn: true) == Glyph.batteryCharging[0])
+}
+
+@Test func batteryStateDescribesThePowerSource() {
+    #expect(batteryState(charging: true, pluggedIn: true, minutesRemaining: 75) == "Charging, full in 1:15")
+    #expect(batteryState(charging: true, pluggedIn: true, minutesRemaining: nil) == "Charging")
+    #expect(batteryState(charging: false, pluggedIn: true, minutesRemaining: nil) == "Plugged in, not charging")
+    #expect(batteryState(charging: false, pluggedIn: false, minutesRemaining: 90) == "1:30 remaining")
+    #expect(batteryState(charging: false, pluggedIn: false, minutesRemaining: nil) == "On battery")
 }
 
 @Test func volumeGlyphs() {

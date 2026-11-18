@@ -8,6 +8,7 @@ final class BatterySensor: ObservableObject {
     @Published private(set) var present = false
     @Published private(set) var percent = 0
     @Published private(set) var charging = false
+    @Published private(set) var pluggedIn = false
     @Published private(set) var minutesRemaining: Int?
 
     private init() {
@@ -37,6 +38,7 @@ final class BatterySensor: ObservableObject {
         let maximum = max(battery[kIOPSMaxCapacityKey] as? Int ?? 100, 1)
         percent = current * 100 / maximum
         charging = battery[kIOPSIsChargingKey] as? Bool ?? false
+        pluggedIn = battery[kIOPSPowerSourceStateKey] as? String == kIOPSACPowerValue
         let minutes = battery[charging ? kIOPSTimeToFullChargeKey : kIOPSTimeToEmptyKey] as? Int ?? -1
         minutesRemaining = minutes > 0 ? minutes : nil
     }

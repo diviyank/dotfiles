@@ -8,6 +8,7 @@ public enum Glyph {
     public static let logo = g(0xEB4C)
     public static let batteryFull = g(0xE1A4)
     public static let batteryChargingFull = g(0xE1A3)
+    public static let batteryCharging = [0xF0A2, 0xF0A3, 0xF0A4, 0xF0A5, 0xF0A6, 0xF0A7].map(g)
     public static let batteryBars = [0xEBDC, 0xEBD9, 0xEBE0, 0xEBDD, 0xEBE2, 0xEBD4, 0xEBD2].map(g)
     public static let volumeUp = g(0xE050)
     public static let volumeDown = g(0xE04D)
@@ -54,7 +55,10 @@ public enum Glyph {
         ("spa", logo), ("battery_full", batteryFull), ("battery_charging_full", batteryChargingFull),
         ("battery_0_bar", batteryBars[0]), ("battery_1_bar", batteryBars[1]), ("battery_2_bar", batteryBars[2]),
         ("battery_3_bar", batteryBars[3]), ("battery_4_bar", batteryBars[4]), ("battery_5_bar", batteryBars[5]),
-        ("battery_6_bar", batteryBars[6]), ("volume_up", volumeUp), ("volume_down", volumeDown),
+        ("battery_6_bar", batteryBars[6]),
+        ("battery_charging_20", batteryCharging[0]), ("battery_charging_30", batteryCharging[1]),
+        ("battery_charging_50", batteryCharging[2]), ("battery_charging_60", batteryCharging[3]),
+        ("battery_charging_80", batteryCharging[4]), ("battery_charging_90", batteryCharging[5]), ("volume_up", volumeUp), ("volume_down", volumeDown),
         ("volume_mute", volumeMute), ("volume_off", volumeOff), ("wifi", wifi), ("wifi_off", wifiOff),
         ("network_wifi_1_bar", wifi1Bar), ("network_wifi_2_bar", wifi2Bar), ("network_wifi_3_bar", wifi3Bar),
         ("mail", mail), ("forum", forum), ("power_settings_new", power), ("lock", lock),
@@ -69,9 +73,23 @@ public enum Glyph {
     ]
 }
 
-public func batteryGlyph(percent: Int, charging: Bool) -> String {
-    if percent >= 100 { return charging ? Glyph.batteryChargingFull : Glyph.batteryFull }
-    return Glyph.batteryBars[max(0, min(6, percent * 7 / 100))]
+private let chargingThresholds = [0, 30, 50, 60, 80, 90]
+
+public func batteryGlyph(percent: Int, pluggedIn: Bool) -> String {
+    if percent >= 100 { return pluggedIn ? Glyph.batteryChargingFull : Glyph.batteryFull }
+    guard pluggedIn else { return Glyph.batteryBars[max(0, min(6, percent * 7 / 100))] }
+    return Glyph.batteryCharging[chargingThresholds.lastIndex { percent >= $0 } ?? 0]
+}
+
+public func batteryState(charging: Bool, pluggedIn: Bool, minutesRemaining: Int?) -> String {
+    let remaining = minutesRemaining.map { String(format: "%d:%02d", $0 / 60, $0 % 60) }
+    switch (charging, pluggedIn, remaining) {
+    case (true, _, let time?): return "Charging, full in \(time)"
+    case (true, _, nil): return "Charging"
+    case (false, true, _): return "Plugged in, not charging"
+    case (false, false, let time?): return "\(time) remaining"
+    case (false, false, nil): return "On battery"
+    }
 }
 
 public func volumeGlyph(percent: Int, muted: Bool) -> String {

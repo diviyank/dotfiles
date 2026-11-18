@@ -31,7 +31,7 @@ struct StatusView: View {
             icon(wifiGlyph(rssi: wifi.rssi))
                 .popout(.wifi, popouts)
             if battery.present {
-                icon(batteryGlyph(percent: battery.percent, charging: battery.charging))
+                icon(batteryGlyph(percent: battery.percent, pluggedIn: battery.pluggedIn))
                     .popout(.battery, popouts)
             }
         }
