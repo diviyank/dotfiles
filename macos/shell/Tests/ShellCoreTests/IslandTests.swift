@@ -119,3 +119,13 @@ private func notificationData(_ request: [String: Any]) throws -> Data {
     #expect(!shouldAnnounce(previous: track("a", playing: true), current: track("a", playing: false)))
     #expect(!shouldAnnounce(previous: track("a", playing: true), current: nil))
 }
+
+@Test func queueKeepsOnlyNewestNotices() {
+    func notice(_ id: Int64) -> IslandNotice { IslandNotice(id: id, app: "a", title: "t", detail: nil, body: "b", link: nil) }
+    var queue = IslandQueue()
+    for id: Int64 in 1...5 { queue.push(.notice(notice(id))) }
+    #expect(queue.pop() == .notice(notice(3)))
+    #expect(queue.pop() == .notice(notice(4)))
+    #expect(queue.pop() == .notice(notice(5)))
+    #expect(queue.pop() == nil)
+}

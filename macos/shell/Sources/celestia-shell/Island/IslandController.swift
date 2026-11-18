@@ -62,7 +62,13 @@ final class IslandController: ObservableObject {
     func setVisible(_ visible: Bool) {
         guard visible != isVisible else { return }
         isVisible = visible
-        if visible { panel.orderFrontRegardless() } else { panel.orderOut(nil) }
+        if visible {
+            panel.orderFrontRegardless()
+            pump()
+        } else {
+            queue = IslandQueue()
+            panel.orderOut(nil)
+        }
     }
 
     func close() {
@@ -101,6 +107,7 @@ final class IslandController: ObservableObject {
     }
 
     private func push(_ event: IslandEvent) {
+        guard isVisible else { return }
         queue.push(event)
         pump()
     }

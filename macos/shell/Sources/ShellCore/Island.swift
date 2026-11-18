@@ -122,6 +122,7 @@ public enum IslandEvent: Equatable, Sendable {
 
 public struct IslandQueue: Sendable {
     private var events: [IslandEvent] = []
+    private static let noticeLimit = 3
 
     public init() {}
 
@@ -130,6 +131,10 @@ public struct IslandQueue: Sendable {
     public mutating func push(_ event: IslandEvent) {
         if event.isNowPlaying { events.removeAll(where: \.isNowPlaying) }
         events.append(event)
+        while events.count(where: { !$0.isNowPlaying }) > Self.noticeLimit,
+              let oldest = events.firstIndex(where: { !$0.isNowPlaying }) {
+            events.remove(at: oldest)
+        }
     }
 
     public mutating func pop() -> IslandEvent? {

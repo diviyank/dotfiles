@@ -29,7 +29,7 @@ struct IslandView: View {
         ).fill(.black))
         .contentShape(Rectangle())
         .onTapGesture { if let event = island.shown { island.activate(event) } }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var clock: some View {
