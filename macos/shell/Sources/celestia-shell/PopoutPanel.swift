@@ -16,6 +16,7 @@ final class PopoutPanel: ObservableObject {
     private var overItem = false
     private var overPopout = false
     private var pendingClose: DispatchWorkItem?
+    private var pendingOrderOut: DispatchWorkItem?
     private var isClosed = false
 
     static let fillet: CGFloat = Theme.Bar.innerRadius
@@ -64,6 +65,8 @@ final class PopoutPanel: ObservableObject {
             }
             panel.orderFrontRegardless()
         }
+        pendingOrderOut?.cancel()
+        panel.ignoresMouseEvents = false
         withAnimation(Motion.enter) {
             self.top = top
             self.height = height
@@ -73,8 +76,10 @@ final class PopoutPanel: ObservableObject {
     }
 
     func hide() {
+        panel.ignoresMouseEvents = true
         withAnimation(Motion.exit) { revealed = false }
-        pendingClose = schedule(after: Motion.exitDuration) { [weak self] in
+        pendingOrderOut?.cancel()
+        pendingOrderOut = schedule(after: Motion.exitDuration) { [weak self] in
             guard let self, !self.revealed else { return }
             self.panel.orderOut(nil)
             self.kind = nil
@@ -84,6 +89,7 @@ final class PopoutPanel: ObservableObject {
     func close() {
         isClosed = true
         pendingClose?.cancel()
+        pendingOrderOut?.cancel()
         panel.contentView = nil
         panel.close()
     }
