@@ -47,6 +47,7 @@ final class ShellController: NSObject {
             .store(in: &subscriptions)
         model.refresh()
         mediaKeys.start()
+        DiscordSensor.shared.refresh()
     }
 
     @objc private func refresh() {

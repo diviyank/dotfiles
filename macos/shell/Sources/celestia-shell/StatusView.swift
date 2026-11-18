@@ -20,6 +20,7 @@ struct StatusView: View {
             }
             if let count = badges.discord {
                 badged(Glyph.forum, count: count) { focus("six") }
+                    .popout(.discord, popouts)
             }
             icon(volumeGlyph(percent: volume.percent, muted: volume.muted), role: "primary")
                 .overlay(ScrollCatcher(

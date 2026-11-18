@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-enum PopoutKind { case window, volume, wifi, battery, power, mail }
+enum PopoutKind { case window, volume, wifi, battery, power, mail, discord }
 
 @MainActor
 final class PopoutPanel: ObservableObject {
@@ -154,6 +154,7 @@ struct PopoutContent: View {
             case .battery: BatteryPopout(model: model)
             case .power: PowerPopout(model: model, popouts: popouts)
             case .mail: MailPopout(model: model, popouts: popouts)
+            case .discord: DiscordPopout(model: model, popouts: popouts)
             }
         }
         .padding(Theme.Spacing.large)

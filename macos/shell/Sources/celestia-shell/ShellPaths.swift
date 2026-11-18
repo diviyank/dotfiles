@@ -7,6 +7,8 @@ enum ShellPaths {
     static let settings = home.appendingPathComponent(".config/celestia/shell.json")
     static let applyYabai = home.appendingPathComponent(".config/wm/apply-yabai.sh")
     static let yabai = "/opt/homebrew/bin/yabai"
+    static let notifications = home.appendingPathComponent("Library/Group Containers/group.com.apple.usernoted/db2/db")
+    static let notificationsWAL = home.appendingPathComponent("Library/Group Containers/group.com.apple.usernoted/db2/db-wal")
     static let scheme = home.appendingPathComponent(".local/state/celestia/scheme.json")
     static let wallpaperSource = home.appendingPathComponent(".local/state/celestia/source.jpg")
     static let currentWallpaper = home.appendingPathComponent(".local/state/celestia/wallpaper")
