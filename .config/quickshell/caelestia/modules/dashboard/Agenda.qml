@@ -12,6 +12,9 @@ Item {
 
     readonly property int todayLimit: 4
     readonly property int tomorrowLimit: 3
+    readonly property int dayLimit: 5
+
+    property var selectedDay: null
 
     readonly property bool configured: AgendaEvents.configured
     readonly property var events: AgendaEvents.events
@@ -22,6 +25,7 @@ Item {
 
     readonly property var todayEvents: eventsBetween(todayStart, tomorrowStart).filter(event => event.end > Time.date)
     readonly property var tomorrowEvents: eventsBetween(tomorrowStart, tomorrowEnd)
+    readonly property var selectedDayEvents: selectedDay ? eventsBetween(selectedDay, new Date(selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate() + 1)) : []
 
     function eventsBetween(start: date, end: date): var {
         return events.filter(event => event.start < end && event.end > start).sort((a, b) => a.allDay !== b.allDay ? (a.allDay ? -1 : 1) : a.start - b.start);
@@ -42,12 +46,21 @@ Item {
         spacing: Tokens.spacing.small
 
         Section {
+            visible: !!root.selectedDay
+            title: root.selectedDay ? Qt.formatDate(root.selectedDay, "ddd d MMM") : ""
+            events: root.selectedDayEvents
+            limit: root.dayLimit
+        }
+
+        Section {
+            visible: !root.selectedDay
             title: qsTr("Today")
             events: root.todayEvents
             limit: root.todayLimit
         }
 
         Section {
+            visible: !root.selectedDay
             title: qsTr("Tomorrow")
             events: root.tomorrowEvents
             limit: root.tomorrowLimit

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Print today's and tomorrow's events from private ICS feeds as JSON for the dashboard agenda.
+"""Print the events from last month to three months ahead from private ICS feeds as JSON for the dashboard agenda.
 
 Feeds are read from ~/.local/share/caelestia/agenda-calendars, kept out of git: either a file with one ICS URL
 per line, or a directory of .ics files.
@@ -83,8 +83,9 @@ def feed_events(url: str, window_start: datetime, window_end: datetime) -> list[
 
 
 def main() -> None:
-    window_start = datetime.combine(date.today(), time()).astimezone()
-    window_end = window_start + timedelta(days=2)
+    first_of_month = date.today().replace(day=1)
+    window_start = datetime.combine((first_of_month - timedelta(days=1)).replace(day=1), time()).astimezone()
+    window_end = datetime.combine(date(first_of_month.year + (first_of_month.month + 2) // 12, (first_of_month.month + 2) % 12 + 1, 1), time()).astimezone()
     try:
         events = [event for url in feed_urls() for event in feed_events(url, window_start, window_end)]
     except Exception as error:

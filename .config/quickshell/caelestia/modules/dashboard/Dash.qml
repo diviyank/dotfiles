@@ -95,6 +95,8 @@ GridLayout {
 
         Agenda {
             id: agenda
+
+            selectedDay: calendar.selectedDay
         }
     }
 
