@@ -2,10 +2,10 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Io
 import Caelestia.Config
 import qs.components
 import qs.services
+import qs.modules.dashboard.services
 
 Item {
     id: root
@@ -13,8 +13,8 @@ Item {
     readonly property int todayLimit: 4
     readonly property int tomorrowLimit: 3
 
-    property bool configured: true
-    property var events: []
+    readonly property bool configured: AgendaEvents.configured
+    readonly property var events: AgendaEvents.events
 
     readonly property date todayStart: new Date(Time.date.getFullYear(), Time.date.getMonth(), Time.date.getDate())
     readonly property date tomorrowStart: new Date(todayStart.getFullYear(), todayStart.getMonth(), todayStart.getDate() + 1)
@@ -35,29 +35,6 @@ Item {
 
     anchors.fill: parent
     implicitWidth: 260
-
-    Process {
-        id: fetcher
-
-        command: ["/usr/bin/python3", Qt.resolvedUrl("agenda.py").toString().replace("file://", "")]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim())
-                    return;
-                const result = JSON.parse(text);
-                root.configured = result.configured;
-                root.events = result.events;
-            }
-        }
-    }
-
-    Timer {
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        interval: 5 * 60 * 1000
-        onTriggered: fetcher.running = true
-    }
 
     ColumnLayout {
         anchors.fill: parent
